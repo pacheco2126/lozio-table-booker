@@ -5,22 +5,22 @@ import location2 from "@/assets/location-2.jpg";
 
 const locations = [
   {
-    id: "centro",
-    name: "Lo Zio Centro",
-    address: "Calle Mayor 12, Madrid",
+    id: "tarragona",
+    name: "Lo Zio Tarragona",
+    address: "Carrer Reding 32, Tarragona",
     phone: "+34 912 345 678",
-    hours: "Lun–Dom: 12:00–23:30",
+    hours: "Mar–Dom: 19:00–23:30",
     image: location1,
-    alt: "Interior acogedor del restaurante Lo Zio Centro con paredes de ladrillo",
+    alt: "Interior acogedor del restaurante Lo Zio Tarragona",
   },
   {
-    id: "terraza",
-    name: "Lo Zio Terraza",
-    address: "Paseo de la Castellana 45, Madrid",
+    id: "arrabassada",
+    name: "Lo Zio Arrabassada",
+    address: "Carrer Joan Fuster 28, Tarragona",
     phone: "+34 912 876 543",
-    hours: "Lun–Dom: 12:00–00:00",
+    hours: "Mié–Mar: 10:00–23:30",
     image: location2,
-    alt: "Terraza al aire libre del restaurante Lo Zio con luces cálidas",
+    alt: "Terraza del restaurante Lo Zio Arrabassada",
   },
 ];
 
