@@ -36,9 +36,28 @@ const ReservationSection = () => {
     notes: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const loc = locations.find((l) => l.id === selectedLocation);
+    
+    const { error } = await supabase.from("reservations").insert({
+      location: selectedLocation,
+      guest_name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      reservation_date: formData.date,
+      reservation_time: formData.time,
+      guests: formData.guests,
+      notes: formData.notes || null,
+      user_id: (await supabase.auth.getUser()).data.user?.id || null,
+    });
+
+    if (error) {
+      toast.error("Error al crear la reserva. Inténtalo de nuevo.");
+      console.error(error);
+      return;
+    }
+
     toast.success(`¡Reserva solicitada en ${loc?.name}!`, {
       description: `${formData.date} a las ${formData.time} para ${formData.guests} personas. Te confirmaremos por email.`,
     });
