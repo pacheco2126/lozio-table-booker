@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -16,18 +18,24 @@ const Navbar = () => {
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
-        <a href="#" className="font-display text-2xl font-bold text-primary-foreground">
+        <a href="/" className="font-display text-2xl font-bold text-primary-foreground">
           Lo Zio
         </a>
-        <div className="flex items-center gap-8">
-          <a href="#reservar" className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors">
+        <div className="flex items-center gap-6">
+          <a href="/#reservar" className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors">
             Locales
           </a>
           <a
-            href="#reservar"
+            href="/#reservar"
             className="bg-primary text-primary-foreground px-6 py-2 rounded-sm font-body font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
           >
             Reservar
+          </a>
+          <a
+            href={user ? "/perfil" : "/auth"}
+            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
+          >
+            {user ? "Mi Perfil" : "Iniciar Sesión"}
           </a>
         </div>
       </div>
