@@ -10,19 +10,19 @@ const Footer = () => {
             </p>
           </div>
           <div>
-            <h4 className="font-display text-lg font-bold text-background mb-4">Lo Zio Centro</h4>
+            <h4 className="font-display text-lg font-bold text-background mb-4">Lo Zio Tarragona</h4>
             <p className="text-background/60 font-body text-sm leading-relaxed">
-              Calle Mayor 12, Madrid<br />
+              Carrer Reding 32, Tarragona<br />
               +34 912 345 678<br />
-              Lun–Dom: 12:00–23:30
+              Mar–Dom: 19:00–23:30
             </p>
           </div>
           <div>
-            <h4 className="font-display text-lg font-bold text-background mb-4">Lo Zio Terraza</h4>
+            <h4 className="font-display text-lg font-bold text-background mb-4">Lo Zio Arrabassada</h4>
             <p className="text-background/60 font-body text-sm leading-relaxed">
-              Paseo de la Castellana 45, Madrid<br />
+              Carrer Joan Fuster 28, Tarragona<br />
               +34 912 876 543<br />
-              Lun–Dom: 12:00–00:00
+              Mié–Mar: 10:00–23:30
             </p>
           </div>
         </div>
