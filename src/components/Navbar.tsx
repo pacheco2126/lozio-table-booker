@@ -22,6 +22,9 @@ const Navbar = () => {
           Lo Zio
         </a>
         <div className="flex items-center gap-6">
+          <a href="/#menu" className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors">
+            Menú
+          </a>
           <a href="/#reservar" className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors">
             Locales
           </a>
