@@ -14,6 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
+      order_items: {
+        Row: {
+          id: string
+          item_description: string | null
+          item_name: string
+          order_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          id?: string
+          item_description?: string | null
+          item_name: string
+          order_id: string
+          quantity?: number
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          id?: string
+          item_description?: string | null
+          item_name?: string
+          order_id?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          delivery_address: string | null
+          delivery_city: string | null
+          delivery_postal_code: string | null
+          guest_email: string
+          guest_name: string
+          guest_phone: string
+          id: string
+          notes: string | null
+          order_type: string
+          payment_method: string
+          payment_status: string
+          status: string
+          stripe_session_id: string | null
+          total_amount: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_city?: string | null
+          delivery_postal_code?: string | null
+          guest_email: string
+          guest_name: string
+          guest_phone: string
+          id?: string
+          notes?: string | null
+          order_type?: string
+          payment_method?: string
+          payment_status?: string
+          status?: string
+          stripe_session_id?: string | null
+          total_amount?: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_city?: string | null
+          delivery_postal_code?: string | null
+          guest_email?: string
+          guest_name?: string
+          guest_phone?: string
+          id?: string
+          notes?: string | null
+          order_type?: string
+          payment_method?: string
+          payment_status?: string
+          status?: string
+          stripe_session_id?: string | null
+          total_amount?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
