@@ -1,3 +1,5 @@
+import { ExternalLink } from "lucide-react";
+
 const MenuSection = () => {
   return (
     <section id="menu" className="py-24 px-4 bg-muted">
@@ -14,15 +16,16 @@ const MenuSection = () => {
           </p>
         </div>
 
-        <div className="rounded-lg overflow-hidden border border-border shadow-lg bg-card">
-          <iframe
-            src="https://pizzeria-lozio.my.canva.site/p"
-            title="Menú digital Lo Zio"
-            className="w-full border-0"
-            style={{ height: "80vh", minHeight: "600px" }}
-            loading="lazy"
-            allowFullScreen
-          />
+        <div className="flex justify-center">
+          <a
+            href="https://pizzeria-lozio.my.canva.site/p"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-3 bg-primary text-primary-foreground px-10 py-5 rounded-lg font-display text-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          >
+            Ver nuestra carta completa
+            <ExternalLink className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+          </a>
         </div>
       </div>
     </section>
