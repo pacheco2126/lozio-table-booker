@@ -178,14 +178,18 @@ const ReservationSection = () => {
               </div>
               <div>
                 <label className="block font-body text-sm font-bold text-foreground mb-1.5">Hora *</label>
-                <input
-                  type="time"
+                <select
                   name="time"
                   required
                   value={formData.time}
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+                >
+                  <option value="">Selecciona hora</option>
+                  {["19:00","19:30","20:00","20:30","21:00","21:30","22:00","22:30","23:00","23:30"].map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block font-body text-sm font-bold text-foreground mb-1.5">Personas *</label>
