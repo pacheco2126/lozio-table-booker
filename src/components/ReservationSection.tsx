@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { getUnavailableSlots, tablesNeeded, TABLES_PER_LOCATION, TABLE_CAPACITY } from "@/lib/availability";
 import location1 from "@/assets/location-1.jpg";
 import location2 from "@/assets/location-2.jpg";
 
@@ -56,9 +57,37 @@ const ReservationSection = () => {
   const [step, setStep] = useState<"select" | "details">("select");
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   const dateOptions = useMemo(() => getNext7Days(), []);
   const loc = locations.find((l) => l.id === selectedLocation)!;
+  const guestsNum = parseInt(guests) || 2;
+  const maxGuests = TABLES_PER_LOCATION * TABLE_CAPACITY;
+
+  // Fetch existing reservations and compute unavailable slots
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      setLoadingSlots(true);
+      const { data, error } = await supabase
+        .from("reservations")
+        .select("reservation_time, guests")
+        .eq("location", selectedLocation)
+        .eq("reservation_date", date)
+        .in("status", ["pending", "confirmed"]);
+
+      if (error) {
+        console.error("Error fetching availability:", error);
+        setUnavailableSlots(new Set());
+      } else {
+        const unavailable = getUnavailableSlots(data || [], loc.timeSlots, guestsNum);
+        setUnavailableSlots(unavailable);
+      }
+      setLoadingSlots(false);
+    };
+
+    fetchAvailability();
+  }, [selectedLocation, date, guests, loc.timeSlots, guestsNum]);
 
   const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
@@ -201,22 +230,37 @@ const ReservationSection = () => {
 
               {/* Time slots grid */}
               <div className="py-6">
-                <p className="font-body text-sm text-muted-foreground mb-4">Selecciona una hora disponible</p>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                  {loc.timeSlots.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => handleTimeSelect(slot)}
-                      className={`py-3 px-2 rounded-lg font-body text-sm font-medium transition-all duration-200 ${
-                        slot === previewTime
-                          ? "bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
-                          : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary"
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between mb-4">
+                  <p className="font-body text-sm text-muted-foreground">Selecciona una hora disponible</p>
+                  {loadingSlots && <span className="font-body text-xs text-muted-foreground animate-pulse">Comprobando disponibilidad...</span>}
                 </div>
+                {tablesNeeded(guestsNum) > TABLES_PER_LOCATION ? (
+                  <p className="font-body text-sm text-destructive text-center py-4">
+                    Lo sentimos, no podemos acomodar grupos de más de {maxGuests} personas.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                    {loc.timeSlots.map((slot) => {
+                      const isUnavailable = unavailableSlots.has(slot);
+                      return (
+                        <button
+                          key={slot}
+                          onClick={() => handleTimeSelect(slot)}
+                          disabled={isUnavailable}
+                          className={`py-3 px-2 rounded-lg font-body text-sm font-medium transition-all duration-200 ${
+                            isUnavailable
+                              ? "bg-muted/50 text-muted-foreground/40 cursor-not-allowed line-through"
+                              : slot === previewTime
+                              ? "bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
+                              : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary"
+                          }`}
+                        >
+                          {slot}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           ) : (
