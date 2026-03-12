@@ -57,9 +57,37 @@ const ReservationSection = () => {
   const [step, setStep] = useState<"select" | "details">("select");
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   const dateOptions = useMemo(() => getNext7Days(), []);
   const loc = locations.find((l) => l.id === selectedLocation)!;
+  const guestsNum = parseInt(guests) || 2;
+  const maxGuests = TABLES_PER_LOCATION * TABLE_CAPACITY;
+
+  // Fetch existing reservations and compute unavailable slots
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      setLoadingSlots(true);
+      const { data, error } = await supabase
+        .from("reservations")
+        .select("reservation_time, guests")
+        .eq("location", selectedLocation)
+        .eq("reservation_date", date)
+        .in("status", ["pending", "confirmed"]);
+
+      if (error) {
+        console.error("Error fetching availability:", error);
+        setUnavailableSlots(new Set());
+      } else {
+        const unavailable = getUnavailableSlots(data || [], loc.timeSlots, guestsNum);
+        setUnavailableSlots(unavailable);
+      }
+      setLoadingSlots(false);
+    };
+
+    fetchAvailability();
+  }, [selectedLocation, date, guests, loc.timeSlots, guestsNum]);
 
   const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
