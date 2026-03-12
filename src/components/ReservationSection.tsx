@@ -230,22 +230,37 @@ const ReservationSection = () => {
 
               {/* Time slots grid */}
               <div className="py-6">
-                <p className="font-body text-sm text-muted-foreground mb-4">Selecciona una hora disponible</p>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                  {loc.timeSlots.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => handleTimeSelect(slot)}
-                      className={`py-3 px-2 rounded-lg font-body text-sm font-medium transition-all duration-200 ${
-                        slot === previewTime
-                          ? "bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
-                          : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary"
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between mb-4">
+                  <p className="font-body text-sm text-muted-foreground">Selecciona una hora disponible</p>
+                  {loadingSlots && <span className="font-body text-xs text-muted-foreground animate-pulse">Comprobando disponibilidad...</span>}
                 </div>
+                {tablesNeeded(guestsNum) > TABLES_PER_LOCATION ? (
+                  <p className="font-body text-sm text-destructive text-center py-4">
+                    Lo sentimos, no podemos acomodar grupos de más de {maxGuests} personas.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                    {loc.timeSlots.map((slot) => {
+                      const isUnavailable = unavailableSlots.has(slot);
+                      return (
+                        <button
+                          key={slot}
+                          onClick={() => handleTimeSelect(slot)}
+                          disabled={isUnavailable}
+                          className={`py-3 px-2 rounded-lg font-body text-sm font-medium transition-all duration-200 ${
+                            isUnavailable
+                              ? "bg-muted/50 text-muted-foreground/40 cursor-not-allowed line-through"
+                              : slot === previewTime
+                              ? "bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
+                              : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary"
+                          }`}
+                        >
+                          {slot}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           ) : (
