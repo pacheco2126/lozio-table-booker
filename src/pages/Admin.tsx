@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
+import AdminManualReservation from "@/components/AdminManualReservation";
 
 interface Reservation {
   id: string;
