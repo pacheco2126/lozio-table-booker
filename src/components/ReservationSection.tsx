@@ -65,7 +65,7 @@ function getNext7Days(): { label: string; value: string }[] {
 const ReservationSection = () => {
   const [selectedLocation, setSelectedLocation] = useState(locations[0].id);
   const [guests, setGuests] = useState("2");
-  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState<Date>(new Date());
   
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "details">("select");
