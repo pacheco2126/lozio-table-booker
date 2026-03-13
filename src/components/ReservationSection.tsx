@@ -142,7 +142,7 @@ const ReservationSection = () => {
     }
 
     toast.success(`¡Reserva confirmada en ${loc.name}!`, {
-      description: `${date} a las ${selectedTime} para ${guests} personas.`,
+      description: `${format(date, "PPP", { locale: es })} a las ${selectedTime} para ${guests} personas.`,
     });
     setFormData({ name: "", email: "", phone: "", notes: "" });
     setSelectedTime(null);
