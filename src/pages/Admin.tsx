@@ -128,13 +128,16 @@ const Admin = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="pt-28 pb-16 px-4 max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-            Panel de Administración
-          </h1>
-          <p className="text-muted-foreground font-body mt-2">
-            Gestiona las reservas de tus restaurantes
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+              Panel de Administración
+            </h1>
+            <p className="text-muted-foreground font-body mt-2">
+              Gestiona las reservas de tus restaurantes
+            </p>
+          </div>
+          <AdminManualReservation onCreated={fetchReservations} />
         </div>
 
         {/* Stats */}
