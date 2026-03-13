@@ -305,7 +305,7 @@ const ReservationSection = () => {
                 <div className="font-body text-sm text-foreground">
                   <span className="font-bold">{selectedTime}</span>
                   <span className="text-muted-foreground mx-1.5">·</span>
-                  <span>{dateOptions.find((d) => d.value === date)?.label}</span>
+                  <span>{format(date, "EEE d MMM", { locale: es })}</span>
                   <span className="text-muted-foreground mx-1.5">·</span>
                   <span>{guests} {parseInt(guests) === 1 ? "persona" : "personas"}</span>
                 </div>
