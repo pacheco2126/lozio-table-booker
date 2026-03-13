@@ -242,7 +242,7 @@ const ReservationSection = () => {
               {/* Turns grid */}
               <div className="py-6">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="font-body text-sm text-muted-foreground">Selecciona un turno</p>
+                  <p className="font-body text-sm text-muted-foreground">Selecciona una hora</p>
                   {loadingSlots && <span className="font-body text-xs text-muted-foreground animate-pulse">Comprobando disponibilidad...</span>}
                 </div>
                 {tablesNeeded(guestsNum) > TABLES_PER_LOCATION ? (
