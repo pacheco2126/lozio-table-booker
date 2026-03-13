@@ -13,10 +13,8 @@ import { cn } from "@/lib/utils";
 import location1 from "@/assets/location-1.jpg";
 import location2 from "@/assets/location-2.jpg";
 
-const turns = [
-  { label: "Turno 1", time: "19:00", range: "19:00 – 20:30" },
-  { label: "Turno 2", time: "20:00", range: "20:00 – 22:00" },
-  { label: "Turno 3", time: "22:00", range: "22:00 – 23:30" },
+const timeSlots = [
+  "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00",
 ];
 
 const locations = [
