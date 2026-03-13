@@ -192,8 +192,8 @@ const ReservationSection = () => {
 
           {step === "select" ? (
             <div className="px-6 pb-8">
-              {/* Party / Date / Time selectors row */}
-              <div className="grid grid-cols-3 gap-3 py-6">
+              {/* Party / Date selectors row */}
+              <div className="grid grid-cols-2 gap-3 py-6">
                 <div>
                   <label className="block font-body text-xs text-muted-foreground mb-1.5">Personas</label>
                   <select
@@ -219,27 +219,23 @@ const ReservationSection = () => {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block font-body text-xs text-muted-foreground mb-1.5">Hora</label>
-                  <select
-                    value={previewTime}
-                    onChange={(e) => setPreviewTime(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    {loc.timeSlots.map((t) => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </select>
-                </div>
               </div>
+
+              {/* Warning banner */}
+              <Alert className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/30 mb-4">
+                <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+                <AlertDescription className="text-yellow-800 dark:text-yellow-200 font-body text-sm">
+                  Dispones de <strong>1 hora y media</strong> para disfrutar de tu comida.
+                </AlertDescription>
+              </Alert>
 
               {/* Divider */}
               <div className="border-t border-border my-2" />
 
-              {/* Time slots grid */}
+              {/* Turns grid */}
               <div className="py-6">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="font-body text-sm text-muted-foreground">Selecciona una hora disponible</p>
+                  <p className="font-body text-sm text-muted-foreground">Selecciona un turno</p>
                   {loadingSlots && <span className="font-body text-xs text-muted-foreground animate-pulse">Comprobando disponibilidad...</span>}
                 </div>
                 {tablesNeeded(guestsNum) > TABLES_PER_LOCATION ? (
@@ -247,23 +243,22 @@ const ReservationSection = () => {
                     Lo sentimos, no podemos acomodar grupos de más de {maxGuests} personas.
                   </p>
                 ) : (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                    {loc.timeSlots.map((slot) => {
-                      const isUnavailable = unavailableSlots.has(slot);
+                  <div className="grid grid-cols-1 gap-3">
+                    {turns.map((turn) => {
+                      const isUnavailable = unavailableSlots.has(turn.time);
                       return (
                         <button
-                          key={slot}
-                          onClick={() => handleTimeSelect(slot)}
+                          key={turn.time}
+                          onClick={() => handleTimeSelect(turn.time)}
                           disabled={isUnavailable}
-                          className={`py-3 px-2 rounded-lg font-body text-sm font-medium transition-all duration-200 ${
+                          className={`py-4 px-4 rounded-lg font-body text-sm font-medium transition-all duration-200 flex items-center justify-between ${
                             isUnavailable
                               ? "bg-muted/50 text-muted-foreground/40 cursor-not-allowed line-through"
-                              : slot === previewTime
-                              ? "bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
-                              : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary"
+                              : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:ring-2 hover:ring-primary/30"
                           }`}
                         >
-                          {slot}
+                          <span className="font-bold">{turn.label}</span>
+                          <span className="text-muted-foreground">{turn.range}</span>
                         </button>
                       );
                     })}
