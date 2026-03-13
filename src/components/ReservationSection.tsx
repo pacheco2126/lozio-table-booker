@@ -36,7 +36,7 @@ const locations = [
     hours: "Mié–Mar: 10:00–23:30",
     image: location2,
     alt: "Terraza del restaurante Lo Zio Arrabassada",
-    timeSlots: turns.map(t => t.time),
+    timeSlots,
   },
 ];
 
