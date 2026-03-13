@@ -1,7 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
+import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getUnavailableSlots, tablesNeeded, TABLES_PER_LOCATION, TABLE_CAPACITY } from "@/lib/availability";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import location1 from "@/assets/location-1.jpg";
 import location2 from "@/assets/location-2.jpg";
 
