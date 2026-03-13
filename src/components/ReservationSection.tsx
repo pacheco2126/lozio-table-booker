@@ -26,7 +26,7 @@ const locations = [
     hours: "Mar–Dom: 19:00–23:30",
     image: location1,
     alt: "Interior acogedor del restaurante Lo Zio Tarragona",
-    timeSlots: turns.map(t => t.time),
+    timeSlots,
   },
   {
     id: "arrabassada",
