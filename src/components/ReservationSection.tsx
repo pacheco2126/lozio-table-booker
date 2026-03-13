@@ -1,9 +1,15 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { toast } from "sonner";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getUnavailableSlots, tablesNeeded, TABLES_PER_LOCATION, TABLE_CAPACITY } from "@/lib/availability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import location1 from "@/assets/location-1.jpg";
 import location2 from "@/assets/location-2.jpg";
 
@@ -38,28 +44,10 @@ const locations = [
 
 const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-function getNext7Days(): { label: string; value: string }[] {
-  const days: { label: string; value: string }[] = [];
-  const today = new Date();
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    const value = d.toISOString().split("T")[0];
-    const label =
-      i === 0
-        ? "Hoy"
-        : i === 1
-        ? "Mañana"
-        : d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
-    days.push({ label, value });
-  }
-  return days;
-}
-
 const ReservationSection = () => {
   const [selectedLocation, setSelectedLocation] = useState(locations[0].id);
   const [guests, setGuests] = useState("2");
-  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState<Date>(new Date());
   
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "details">("select");
@@ -68,7 +56,6 @@ const ReservationSection = () => {
   const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  const dateOptions = useMemo(() => getNext7Days(), []);
   const loc = locations.find((l) => l.id === selectedLocation)!;
   const guestsNum = parseInt(guests) || 2;
   const maxGuests = TABLES_PER_LOCATION * TABLE_CAPACITY;
@@ -81,7 +68,7 @@ const ReservationSection = () => {
         .from("reservations")
         .select("reservation_time, guests")
         .eq("location", selectedLocation)
-        .eq("reservation_date", date)
+        .eq("reservation_date", format(date, "yyyy-MM-dd"))
         .in("status", ["pending", "confirmed"]);
 
       if (error) {
@@ -120,7 +107,7 @@ const ReservationSection = () => {
       guest_name: formData.name,
       email: formData.email,
       phone: formData.phone,
-      reservation_date: date,
+      reservation_date: format(date, "yyyy-MM-dd"),
       reservation_time: selectedTime,
       guests,
       notes: formData.notes || null,
@@ -136,7 +123,7 @@ const ReservationSection = () => {
     }
 
     toast.success(`¡Reserva confirmada en ${loc.name}!`, {
-      description: `${date} a las ${selectedTime} para ${guests} personas.`,
+      description: `${format(date, "PPP", { locale: es })} a las ${selectedTime} para ${guests} personas.`,
     });
     setFormData({ name: "", email: "", phone: "", notes: "" });
     setSelectedTime(null);
@@ -209,15 +196,37 @@ const ReservationSection = () => {
                 </div>
                 <div>
                   <label className="block font-body text-xs text-muted-foreground mb-1.5">Fecha</label>
-                  <select
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    {dateOptions.map((d) => (
-                      <option key={d.value} value={d.value}>{d.label}</option>
-                    ))}
-                  </select>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal font-body text-sm",
+                          !date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {format(date, "EEE d MMM", { locale: es })}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(d) => d && setDate(d)}
+                        disabled={(d) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          const maxDate = new Date(today);
+                          maxDate.setDate(today.getDate() + 30);
+                          return d < today || d > maxDate;
+                        }}
+                        locale={es}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
 
@@ -277,7 +286,7 @@ const ReservationSection = () => {
                 <div className="font-body text-sm text-foreground">
                   <span className="font-bold">{selectedTime}</span>
                   <span className="text-muted-foreground mx-1.5">·</span>
-                  <span>{dateOptions.find((d) => d.value === date)?.label}</span>
+                  <span>{format(date, "EEE d MMM", { locale: es })}</span>
                   <span className="text-muted-foreground mx-1.5">·</span>
                   <span>{guests} {parseInt(guests) === 1 ? "persona" : "personas"}</span>
                 </div>
