@@ -13,10 +13,8 @@ import { cn } from "@/lib/utils";
 import location1 from "@/assets/location-1.jpg";
 import location2 from "@/assets/location-2.jpg";
 
-const turns = [
-  { label: "Turno 1", time: "19:00", range: "19:00 – 20:30" },
-  { label: "Turno 2", time: "20:00", range: "20:00 – 22:00" },
-  { label: "Turno 3", time: "22:00", range: "22:00 – 23:30" },
+const timeSlots = [
+  "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00",
 ];
 
 const locations = [
@@ -28,7 +26,7 @@ const locations = [
     hours: "Mar–Dom: 19:00–23:30",
     image: location1,
     alt: "Interior acogedor del restaurante Lo Zio Tarragona",
-    timeSlots: turns.map(t => t.time),
+    timeSlots,
   },
   {
     id: "arrabassada",
@@ -38,7 +36,7 @@ const locations = [
     hours: "Mié–Mar: 10:00–23:30",
     image: location2,
     alt: "Terraza del restaurante Lo Zio Arrabassada",
-    timeSlots: turns.map(t => t.time),
+    timeSlots,
   },
 ];
 
@@ -244,7 +242,7 @@ const ReservationSection = () => {
               {/* Turns grid */}
               <div className="py-6">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="font-body text-sm text-muted-foreground">Selecciona un turno</p>
+                  <p className="font-body text-sm text-muted-foreground">Selecciona una hora</p>
                   {loadingSlots && <span className="font-body text-xs text-muted-foreground animate-pulse">Comprobando disponibilidad...</span>}
                 </div>
                 {tablesNeeded(guestsNum) > TABLES_PER_LOCATION ? (
@@ -252,22 +250,21 @@ const ReservationSection = () => {
                     Lo sentimos, no podemos acomodar grupos de más de {maxGuests} personas.
                   </p>
                 ) : (
-                  <div className="grid grid-cols-1 gap-3">
-                    {turns.map((turn) => {
-                      const isUnavailable = unavailableSlots.has(turn.time);
+                  <div className="grid grid-cols-3 gap-2">
+                    {timeSlots.map((slot) => {
+                      const isUnavailable = unavailableSlots.has(slot);
                       return (
                         <button
-                          key={turn.time}
-                          onClick={() => handleTimeSelect(turn.time)}
+                          key={slot}
+                          onClick={() => handleTimeSelect(slot)}
                           disabled={isUnavailable}
-                          className={`py-4 px-4 rounded-lg font-body text-sm font-medium transition-all duration-200 flex items-center justify-between ${
+                          className={`py-3 px-3 rounded-lg font-body text-sm font-medium transition-all duration-200 ${
                             isUnavailable
                               ? "bg-muted/50 text-muted-foreground/40 cursor-not-allowed line-through"
                               : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:ring-2 hover:ring-primary/30"
                           }`}
                         >
-                          <span className="font-bold">{turn.label}</span>
-                          <span className="text-muted-foreground">{turn.range}</span>
+                          {slot}
                         </button>
                       );
                     })}
