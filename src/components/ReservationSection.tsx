@@ -87,7 +87,7 @@ const ReservationSection = () => {
         .from("reservations")
         .select("reservation_time, guests")
         .eq("location", selectedLocation)
-        .eq("reservation_date", date)
+        .eq("reservation_date", format(date, "yyyy-MM-dd"))
         .in("status", ["pending", "confirmed"]);
 
       if (error) {
