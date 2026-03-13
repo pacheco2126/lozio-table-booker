@@ -250,22 +250,21 @@ const ReservationSection = () => {
                     Lo sentimos, no podemos acomodar grupos de más de {maxGuests} personas.
                   </p>
                 ) : (
-                  <div className="grid grid-cols-1 gap-3">
-                    {turns.map((turn) => {
-                      const isUnavailable = unavailableSlots.has(turn.time);
+                  <div className="grid grid-cols-3 gap-2">
+                    {timeSlots.map((slot) => {
+                      const isUnavailable = unavailableSlots.has(slot);
                       return (
                         <button
-                          key={turn.time}
-                          onClick={() => handleTimeSelect(turn.time)}
+                          key={slot}
+                          onClick={() => handleTimeSelect(slot)}
                           disabled={isUnavailable}
-                          className={`py-4 px-4 rounded-lg font-body text-sm font-medium transition-all duration-200 flex items-center justify-between ${
+                          className={`py-3 px-3 rounded-lg font-body text-sm font-medium transition-all duration-200 ${
                             isUnavailable
                               ? "bg-muted/50 text-muted-foreground/40 cursor-not-allowed line-through"
                               : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:ring-2 hover:ring-primary/30"
                           }`}
                         >
-                          <span className="font-bold">{turn.label}</span>
-                          <span className="text-muted-foreground">{turn.range}</span>
+                          {slot}
                         </button>
                       );
                     })}
