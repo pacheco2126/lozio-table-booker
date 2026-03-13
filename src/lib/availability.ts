@@ -3,12 +3,10 @@ export const TABLES_PER_LOCATION = 15;
 export const TABLE_CAPACITY = 4;
 
 /**
- * Estimated duration in minutes based on party size.
- * Base: 45 min for 2 people, +10 min per additional 2 people.
+ * Fixed duration: 90 minutes (1h 30min) for all reservations.
  */
-export function estimatedDuration(guests: number): number {
-  if (guests <= 2) return 45;
-  return 45 + Math.ceil((guests - 2) / 2) * 10;
+export function estimatedDuration(_guests: number): number {
+  return 90;
 }
 
 /**
