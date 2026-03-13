@@ -60,7 +60,7 @@ const ReservationSection = () => {
   const [selectedLocation, setSelectedLocation] = useState(locations[0].id);
   const [guests, setGuests] = useState("2");
   const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
-  const [previewTime, setPreviewTime] = useState("19:00");
+  
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "details">("select");
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", notes: "" });
