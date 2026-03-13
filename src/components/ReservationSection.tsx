@@ -56,7 +56,6 @@ const ReservationSection = () => {
   const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  const dateOptions = useMemo(() => getNext7Days(), []);
   const loc = locations.find((l) => l.id === selectedLocation)!;
   const guestsNum = parseInt(guests) || 2;
   const maxGuests = TABLES_PER_LOCATION * TABLE_CAPACITY;
