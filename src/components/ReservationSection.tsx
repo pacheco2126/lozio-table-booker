@@ -126,7 +126,7 @@ const ReservationSection = () => {
       guest_name: formData.name,
       email: formData.email,
       phone: formData.phone,
-      reservation_date: date,
+      reservation_date: format(date, "yyyy-MM-dd"),
       reservation_time: selectedTime,
       guests,
       notes: formData.notes || null,
