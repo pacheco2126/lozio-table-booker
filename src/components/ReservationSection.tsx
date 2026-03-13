@@ -44,24 +44,6 @@ const locations = [
 
 const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-function getNext7Days(): { label: string; value: string }[] {
-  const days: { label: string; value: string }[] = [];
-  const today = new Date();
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    const value = d.toISOString().split("T")[0];
-    const label =
-      i === 0
-        ? "Hoy"
-        : i === 1
-        ? "Mañana"
-        : d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
-    days.push({ label, value });
-  }
-  return days;
-}
-
 const ReservationSection = () => {
   const [selectedLocation, setSelectedLocation] = useState(locations[0].id);
   const [guests, setGuests] = useState("2");
