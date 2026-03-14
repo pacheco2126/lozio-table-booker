@@ -84,6 +84,23 @@ const Admin = () => {
     setLoading(false);
   };
 
+  const confirmReservation = async (id: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("confirm-reservation", {
+        body: { reservation_id: id },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success("Reserva confirmada - WhatsApp enviado al cliente");
+      fetchReservations();
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Error al confirmar la reserva");
+    }
+  };
+
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase
       .from("reservations")
@@ -219,7 +236,7 @@ const Admin = () => {
                         <div className="flex gap-1">
                           {r.status !== "confirmed" && (
                             <button
-                              onClick={() => updateStatus(r.id, "confirmed")}
+                              onClick={() => confirmReservation(r.id)}
                               className="px-2 py-1 text-xs font-body font-bold bg-secondary/20 text-secondary rounded-sm hover:bg-secondary/30 transition-colors"
                             >
                               Confirmar
