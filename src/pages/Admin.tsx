@@ -84,6 +84,23 @@ const Admin = () => {
     setLoading(false);
   };
 
+  const confirmReservation = async (id: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("confirm-reservation", {
+        body: { reservation_id: id },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success("Reserva confirmada - WhatsApp enviado al cliente");
+      fetchReservations();
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Error al confirmar la reserva");
+    }
+  };
+
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase
       .from("reservations")
