@@ -236,7 +236,7 @@ const Admin = () => {
                         <div className="flex gap-1">
                           {r.status !== "confirmed" && (
                             <button
-                              onClick={() => updateStatus(r.id, "confirmed")}
+                              onClick={() => confirmReservation(r.id)}
                               className="px-2 py-1 text-xs font-body font-bold bg-secondary/20 text-secondary rounded-sm hover:bg-secondary/30 transition-colors"
                             >
                               Confirmar
