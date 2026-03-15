@@ -158,6 +158,7 @@ export type Database = {
           reservation_date: string
           reservation_time: string
           status: string
+          table_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -172,6 +173,7 @@ export type Database = {
           reservation_date: string
           reservation_time: string
           status?: string
+          table_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -186,7 +188,52 @@ export type Database = {
           reservation_date?: string
           reservation_time?: string
           status?: string
+          table_id?: string | null
           user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tables: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: string
+          is_active: boolean
+          location: string
+          name: string
+          position_x: number
+          position_y: number
+          shape: string
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location?: string
+          name: string
+          position_x?: number
+          position_y?: number
+          shape?: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location?: string
+          name?: string
+          position_x?: number
+          position_y?: number
+          shape?: string
         }
         Relationships: []
       }
