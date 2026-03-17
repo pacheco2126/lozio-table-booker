@@ -491,6 +491,38 @@ const FloorPlan = () => {
                   <span>{tableReservation.notes}</span>
                 </div>
               )}
+              {/* Guest profile info */}
+              {guestProfile && (
+                <div className="space-y-2">
+                  {guestProfile.allergies && guestProfile.allergies.length > 0 && (
+                    <div className="bg-destructive/10 border border-destructive/30 rounded-md p-2.5">
+                      <p className="text-[10px] font-bold text-destructive font-body flex items-center gap-1 mb-1">
+                        <AlertTriangle className="h-3 w-3" /> ALERGIAS
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {guestProfile.allergies.map((a, i) => (
+                          <span key={i} className="px-1.5 py-0.5 bg-destructive/20 text-destructive rounded-sm text-[10px] font-body font-bold">{a}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {guestProfile.food_preferences && (
+                    <div className="flex items-start gap-1.5 text-xs font-body text-muted-foreground">
+                      <Heart className="h-3 w-3 mt-0.5 shrink-0 text-primary" />
+                      <span>{guestProfile.food_preferences}</span>
+                    </div>
+                  )}
+                  {guestProfile.internal_notes && (
+                    <div className="flex items-start gap-1.5 text-xs font-body text-accent-foreground bg-accent/10 p-2 rounded-md">
+                      <MessageSquare className="h-3 w-3 mt-0.5 shrink-0" />
+                      <span>{guestProfile.internal_notes}</span>
+                    </div>
+                  )}
+                  {guestProfile.visit_count ? (
+                    <p className="text-[10px] font-body text-muted-foreground">{guestProfile.visit_count} visitas anteriores</p>
+                  ) : null}
+                </div>
+              )}
               <div className="flex items-center gap-2 text-xs font-body">
                 <span className={cn(
                   "px-2 py-1 rounded-sm font-bold",
