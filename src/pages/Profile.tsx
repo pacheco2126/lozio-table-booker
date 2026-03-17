@@ -60,7 +60,16 @@ const Profile = () => {
 
     const { error } = await supabase
       .from('profiles')
-      .update(profile)
+      .update({
+        full_name: profile.full_name,
+        phone: profile.phone,
+        address: profile.address,
+        city: profile.city,
+        postal_code: profile.postal_code,
+        allergies: profile.allergies,
+        food_preferences: profile.food_preferences,
+        favorite_table_area: profile.favorite_table_area,
+      })
       .eq('user_id', user!.id);
 
     if (error) {
