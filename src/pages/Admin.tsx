@@ -158,6 +158,7 @@ const Admin = () => {
           <TabsList className="font-body">
             <TabsTrigger value="reservations" className="font-bold">Reservas</TabsTrigger>
             <TabsTrigger value="floorplan" className="font-bold">Plano del salón</TabsTrigger>
+            <TabsTrigger value="customers" className="font-bold">Clientes</TabsTrigger>
           </TabsList>
 
           <TabsContent value="reservations" className="space-y-6">
