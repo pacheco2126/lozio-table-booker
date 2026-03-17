@@ -255,6 +255,10 @@ const Admin = () => {
           <TabsContent value="floorplan">
             <FloorPlan />
           </TabsContent>
+
+          <TabsContent value="customers">
+            <AdminCustomers />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
