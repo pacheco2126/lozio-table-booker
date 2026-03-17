@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
 import FloorPlan from "@/components/FloorPlan";
+import AdminCustomers from "@/components/AdminCustomers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Reservation {
