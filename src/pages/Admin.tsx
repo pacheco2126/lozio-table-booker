@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
 import FloorPlan from "@/components/FloorPlan";
+import AdminCustomers from "@/components/AdminCustomers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Reservation {
@@ -157,6 +158,7 @@ const Admin = () => {
           <TabsList className="font-body">
             <TabsTrigger value="reservations" className="font-bold">Reservas</TabsTrigger>
             <TabsTrigger value="floorplan" className="font-bold">Plano del salón</TabsTrigger>
+            <TabsTrigger value="customers" className="font-bold">Clientes</TabsTrigger>
           </TabsList>
 
           <TabsContent value="reservations" className="space-y-6">
@@ -252,6 +254,10 @@ const Admin = () => {
 
           <TabsContent value="floorplan">
             <FloorPlan />
+          </TabsContent>
+
+          <TabsContent value="customers">
+            <AdminCustomers />
           </TabsContent>
         </Tabs>
       </div>

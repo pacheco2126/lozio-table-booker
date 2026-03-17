@@ -15,7 +15,11 @@ const Profile = () => {
     address: '',
     city: '',
     postal_code: '',
+    allergies: [] as string[],
+    food_preferences: '',
+    favorite_table_area: '',
   });
+  const [newAllergy, setNewAllergy] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -32,7 +36,7 @@ const Profile = () => {
   const fetchProfile = async () => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('full_name, phone, address, city, postal_code')
+      .select('full_name, phone, address, city, postal_code, allergies, food_preferences, favorite_table_area')
       .eq('user_id', user!.id)
       .single();
 
@@ -43,6 +47,9 @@ const Profile = () => {
         address: data.address || '',
         city: data.city || '',
         postal_code: data.postal_code || '',
+        allergies: (data.allergies as string[]) || [],
+        food_preferences: data.food_preferences || '',
+        favorite_table_area: data.favorite_table_area || '',
       });
     }
   };
@@ -53,7 +60,16 @@ const Profile = () => {
 
     const { error } = await supabase
       .from('profiles')
-      .update(profile)
+      .update({
+        full_name: profile.full_name,
+        phone: profile.phone,
+        address: profile.address,
+        city: profile.city,
+        postal_code: profile.postal_code,
+        allergies: profile.allergies,
+        food_preferences: profile.food_preferences,
+        favorite_table_area: profile.favorite_table_area,
+      })
       .eq('user_id', user!.id);
 
     if (error) {
@@ -158,6 +174,71 @@ const Profile = () => {
                   />
                 </div>
               </div>
+
+              {/* Allergies */}
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">Alergias</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {profile.allergies.map((a, i) => (
+                    <span key={i} className="flex items-center gap-1 px-2 py-1 bg-destructive/10 text-destructive text-xs font-body font-bold rounded-sm">
+                      {a}
+                      <button type="button" onClick={() => setProfile(prev => ({ ...prev, allergies: prev.allergies.filter((_, idx) => idx !== i) }))}
+                        className="hover:text-destructive/70">×</button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newAllergy}
+                    onChange={(e) => setNewAllergy(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (newAllergy.trim()) {
+                          setProfile(prev => ({ ...prev, allergies: [...prev.allergies, newAllergy.trim()] }));
+                          setNewAllergy('');
+                        }
+                      }
+                    }}
+                    className="flex-1 px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Ej: Gluten, Lactosa... (Enter para añadir)"
+                  />
+                  <button type="button" onClick={() => {
+                    if (newAllergy.trim()) {
+                      setProfile(prev => ({ ...prev, allergies: [...prev.allergies, newAllergy.trim()] }));
+                      setNewAllergy('');
+                    }
+                  }} className="px-4 py-3 rounded-sm bg-primary text-primary-foreground font-body font-bold text-sm">+</button>
+                </div>
+              </div>
+
+              {/* Food preferences */}
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">Preferencias alimentarias</label>
+                <textarea
+                  name="food_preferences"
+                  value={profile.food_preferences}
+                  onChange={(e) => setProfile(prev => ({ ...prev, food_preferences: e.target.value }))}
+                  rows={2}
+                  className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  placeholder="Vegetariano, sin picante, cocina italiana..."
+                />
+              </div>
+
+              {/* Favorite table area */}
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">Zona preferida del restaurante</label>
+                <input
+                  type="text"
+                  name="favorite_table_area"
+                  value={profile.favorite_table_area}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Terraza, ventana, interior..."
+                />
+              </div>
+
               <button
                 type="submit"
                 disabled={loading}

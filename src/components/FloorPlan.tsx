@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { format, addMinutes, parse } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon, ChevronLeft, ChevronRight, X, Phone, Users, Clock, MessageSquare } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, X, Phone, Users, Clock, MessageSquare, AlertTriangle, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,15 @@ interface Reservation {
   notes: string | null;
   status: string;
   location: string;
+  user_id: string | null;
+}
+
+interface GuestProfile {
+  allergies: string[] | null;
+  food_preferences: string | null;
+  favorite_table_area: string | null;
+  internal_notes: string | null;
+  visit_count: number | null;
 }
 
 const timeSlots = [
@@ -53,6 +62,7 @@ const FloorPlan = () => {
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [tableReservation, setTableReservation] = useState<Reservation | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [guestProfile, setGuestProfile] = useState<GuestProfile | null>(null);
   const [showNewReservation, setShowNewReservation] = useState(false);
   const [draggingTable, setDraggingTable] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -146,14 +156,24 @@ const FloorPlan = () => {
     upcoming: "bg-accent",
   };
 
-  const handleTableClick = (table: Table) => {
+  const handleTableClick = async (table: Table) => {
     const status = getTableStatus(table);
     setSelectedTable(table);
 
     if (status === "occupied" || status === "upcoming") {
       const res = getReservationForTable(table);
       setTableReservation(res);
+      setGuestProfile(null);
       setShowDetails(true);
+      // Fetch guest profile if reservation has user_id
+      if (res?.user_id) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("allergies, food_preferences, favorite_table_area, internal_notes, visit_count")
+          .eq("user_id", res.user_id)
+          .maybeSingle();
+        if (data) setGuestProfile(data as GuestProfile);
+      }
     } else {
       setNewResForm({ guest_name: "", email: "", phone: "", guests: String(table.capacity), notes: "" });
       setShowNewReservation(true);
@@ -469,6 +489,38 @@ const FloorPlan = () => {
                 <div className="flex items-start gap-2 text-sm font-body text-muted-foreground bg-muted/50 p-3 rounded-md">
                   <MessageSquare className="h-4 w-4 mt-0.5 shrink-0" />
                   <span>{tableReservation.notes}</span>
+                </div>
+              )}
+              {/* Guest profile info */}
+              {guestProfile && (
+                <div className="space-y-2">
+                  {guestProfile.allergies && guestProfile.allergies.length > 0 && (
+                    <div className="bg-destructive/10 border border-destructive/30 rounded-md p-2.5">
+                      <p className="text-[10px] font-bold text-destructive font-body flex items-center gap-1 mb-1">
+                        <AlertTriangle className="h-3 w-3" /> ALERGIAS
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {guestProfile.allergies.map((a, i) => (
+                          <span key={i} className="px-1.5 py-0.5 bg-destructive/20 text-destructive rounded-sm text-[10px] font-body font-bold">{a}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {guestProfile.food_preferences && (
+                    <div className="flex items-start gap-1.5 text-xs font-body text-muted-foreground">
+                      <Heart className="h-3 w-3 mt-0.5 shrink-0 text-primary" />
+                      <span>{guestProfile.food_preferences}</span>
+                    </div>
+                  )}
+                  {guestProfile.internal_notes && (
+                    <div className="flex items-start gap-1.5 text-xs font-body text-accent-foreground bg-accent/10 p-2 rounded-md">
+                      <MessageSquare className="h-3 w-3 mt-0.5 shrink-0" />
+                      <span>{guestProfile.internal_notes}</span>
+                    </div>
+                  )}
+                  {guestProfile.visit_count ? (
+                    <p className="text-[10px] font-body text-muted-foreground">{guestProfile.visit_count} visitas anteriores</p>
+                  ) : null}
                 </div>
               )}
               <div className="flex items-center gap-2 text-xs font-body">
