@@ -15,7 +15,11 @@ const Profile = () => {
     address: '',
     city: '',
     postal_code: '',
+    allergies: [] as string[],
+    food_preferences: '',
+    favorite_table_area: '',
   });
+  const [newAllergy, setNewAllergy] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) {
