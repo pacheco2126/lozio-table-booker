@@ -61,6 +61,7 @@ const FloorPlan = () => {
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [tableReservation, setTableReservation] = useState<Reservation | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [guestProfile, setGuestProfile] = useState<GuestProfile | null>(null);
   const [showNewReservation, setShowNewReservation] = useState(false);
   const [draggingTable, setDraggingTable] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
