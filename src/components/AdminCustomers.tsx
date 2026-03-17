@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { getAllergenById } from "@/lib/allergens";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Search, User, Phone, MapPin, AlertTriangle, MessageSquare, CalendarDays, X } from "lucide-react";
