@@ -35,6 +35,14 @@ interface Reservation {
   location: string;
 }
 
+interface GuestProfile {
+  allergies: string[] | null;
+  food_preferences: string | null;
+  favorite_table_area: string | null;
+  internal_notes: string | null;
+  visit_count: number | null;
+}
+
 const timeSlots = [
   "19:00","19:30","20:00","20:30","21:00","21:30","22:00","22:30","23:00",
 ];
