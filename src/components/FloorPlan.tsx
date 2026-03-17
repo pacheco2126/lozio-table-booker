@@ -33,6 +33,7 @@ interface Reservation {
   notes: string | null;
   status: string;
   location: string;
+  user_id: string | null;
 }
 
 interface GuestProfile {
