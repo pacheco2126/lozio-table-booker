@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { getAllergenById } from "@/lib/allergens";
 import { format, addMinutes, parse } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon, ChevronLeft, ChevronRight, X, Phone, Users, Clock, MessageSquare, AlertTriangle, Heart } from "lucide-react";
