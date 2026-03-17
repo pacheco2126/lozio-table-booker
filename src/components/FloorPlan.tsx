@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { format, addMinutes, parse } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon, ChevronLeft, ChevronRight, X, Phone, Users, Clock, MessageSquare } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, X, Phone, Users, Clock, MessageSquare, AlertTriangle, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
