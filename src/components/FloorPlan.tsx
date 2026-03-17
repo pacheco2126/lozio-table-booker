@@ -155,14 +155,24 @@ const FloorPlan = () => {
     upcoming: "bg-accent",
   };
 
-  const handleTableClick = (table: Table) => {
+  const handleTableClick = async (table: Table) => {
     const status = getTableStatus(table);
     setSelectedTable(table);
 
     if (status === "occupied" || status === "upcoming") {
       const res = getReservationForTable(table);
       setTableReservation(res);
+      setGuestProfile(null);
       setShowDetails(true);
+      // Fetch guest profile if reservation has user_id
+      if (res?.user_id) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("allergies, food_preferences, favorite_table_area, internal_notes, visit_count")
+          .eq("user_id", res.user_id)
+          .maybeSingle();
+        if (data) setGuestProfile(data as GuestProfile);
+      }
     } else {
       setNewResForm({ guest_name: "", email: "", phone: "", guests: String(table.capacity), notes: "" });
       setShowNewReservation(true);
