@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
+import { EU_ALLERGENS } from '@/lib/allergens';
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -19,7 +20,6 @@ const Profile = () => {
     food_preferences: '',
     favorite_table_area: '',
   });
-  const [newAllergy, setNewAllergy] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) {
