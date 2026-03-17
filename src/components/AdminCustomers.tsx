@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { getAllergenById } from "@/lib/allergens";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Search, User, Phone, MapPin, AlertTriangle, MessageSquare, CalendarDays, X } from "lucide-react";
@@ -186,9 +187,14 @@ const AdminCustomers = () => {
                     <AlertTriangle className="h-3.5 w-3.5" /> ALERGIAS
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {selectedProfile.allergies.map((a, i) => (
-                      <span key={i} className="px-2 py-0.5 bg-destructive/20 text-destructive rounded-sm text-xs font-body font-bold">{a}</span>
-                    ))}
+                    {selectedProfile.allergies.map((a, i) => {
+                      const allergen = getAllergenById(a);
+                      return (
+                        <span key={i} className="px-2 py-0.5 bg-destructive/20 text-destructive rounded-sm text-xs font-body font-bold">
+                          {allergen ? `${allergen.emoji} ${allergen.name}` : a}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
               )}

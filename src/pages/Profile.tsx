@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
+import { EU_ALLERGENS } from '@/lib/allergens';
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -19,7 +20,6 @@ const Profile = () => {
     food_preferences: '',
     favorite_table_area: '',
   });
-  const [newAllergy, setNewAllergy] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -175,41 +175,35 @@ const Profile = () => {
                 </div>
               </div>
 
-              {/* Allergies */}
+              {/* Allergies - EU 14 Allergen Selector */}
               <div>
-                <label className="block font-body text-sm font-bold text-foreground mb-1.5">Alergias</label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {profile.allergies.map((a, i) => (
-                    <span key={i} className="flex items-center gap-1 px-2 py-1 bg-destructive/10 text-destructive text-xs font-body font-bold rounded-sm">
-                      {a}
-                      <button type="button" onClick={() => setProfile(prev => ({ ...prev, allergies: prev.allergies.filter((_, idx) => idx !== i) }))}
-                        className="hover:text-destructive/70">×</button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newAllergy}
-                    onChange={(e) => setNewAllergy(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        if (newAllergy.trim()) {
-                          setProfile(prev => ({ ...prev, allergies: [...prev.allergies, newAllergy.trim()] }));
-                          setNewAllergy('');
-                        }
-                      }
-                    }}
-                    className="flex-1 px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="Ej: Gluten, Lactosa... (Enter para añadir)"
-                  />
-                  <button type="button" onClick={() => {
-                    if (newAllergy.trim()) {
-                      setProfile(prev => ({ ...prev, allergies: [...prev.allergies, newAllergy.trim()] }));
-                      setNewAllergy('');
-                    }
-                  }} className="px-4 py-3 rounded-sm bg-primary text-primary-foreground font-body font-bold text-sm">+</button>
+                <label className="block font-body text-sm font-bold text-foreground mb-2">Alergias (alérgenos UE)</label>
+                <div className="flex flex-wrap gap-2">
+                  {EU_ALLERGENS.map((allergen) => {
+                    const isSelected = profile.allergies.includes(allergen.id);
+                    return (
+                      <button
+                        key={allergen.id}
+                        type="button"
+                        onClick={() => {
+                          setProfile(prev => ({
+                            ...prev,
+                            allergies: isSelected
+                              ? prev.allergies.filter(a => a !== allergen.id)
+                              : [...prev.allergies, allergen.id],
+                          }));
+                        }}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-md border text-sm font-body font-bold transition-all ${
+                          isSelected
+                            ? 'bg-destructive/15 border-destructive text-destructive ring-1 ring-destructive/30'
+                            : 'bg-card border-border text-muted-foreground hover:border-foreground/30'
+                        }`}
+                      >
+                        <span className="text-base">{allergen.emoji}</span>
+                        <span>{allergen.name}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

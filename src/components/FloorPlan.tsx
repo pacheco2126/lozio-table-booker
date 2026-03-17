@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { getAllergenById } from "@/lib/allergens";
 import { format, addMinutes, parse } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon, ChevronLeft, ChevronRight, X, Phone, Users, Clock, MessageSquare, AlertTriangle, Heart } from "lucide-react";
@@ -500,9 +501,14 @@ const FloorPlan = () => {
                         <AlertTriangle className="h-3 w-3" /> ALERGIAS
                       </p>
                       <div className="flex flex-wrap gap-1">
-                        {guestProfile.allergies.map((a, i) => (
-                          <span key={i} className="px-1.5 py-0.5 bg-destructive/20 text-destructive rounded-sm text-[10px] font-body font-bold">{a}</span>
-                        ))}
+                        {guestProfile.allergies.map((a, i) => {
+                          const allergen = getAllergenById(a);
+                          return (
+                            <span key={i} className="px-1.5 py-0.5 bg-destructive/20 text-destructive rounded-sm text-[10px] font-body font-bold">
+                              {allergen ? `${allergen.emoji} ${allergen.name}` : a}
+                            </span>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
