@@ -36,7 +36,7 @@ const Profile = () => {
   const fetchProfile = async () => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('full_name, phone, address, city, postal_code')
+      .select('full_name, phone, address, city, postal_code, allergies, food_preferences, favorite_table_area')
       .eq('user_id', user!.id)
       .single();
 
@@ -47,6 +47,9 @@ const Profile = () => {
         address: data.address || '',
         city: data.city || '',
         postal_code: data.postal_code || '',
+        allergies: (data.allergies as string[]) || [],
+        food_preferences: data.food_preferences || '',
+        favorite_table_area: data.favorite_table_area || '',
       });
     }
   };
