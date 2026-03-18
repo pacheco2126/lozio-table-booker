@@ -1,5 +1,6 @@
 import { UtensilsCrossed, Wine, CakeSlice, Plus, ShoppingCart, Filter } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
@@ -122,6 +123,7 @@ const MenuItem = ({ item, onAdd, hidden }: { item: MenuItemData; onAdd: () => vo
 
 const MenuSection = () => {
   const { addItem } = useCart();
+  const { t } = useTranslation();
   const [excludedAllergens, setExcludedAllergens] = useState<string[]>([]);
 
   const toggleExclude = (id: string) => {
@@ -144,7 +146,7 @@ const MenuSection = () => {
       description: item.desc,
       price: item.priceNum,
     });
-    toast.success(`${item.name} añadido al pedido`);
+    toast.success(t("menu.addedToOrder", { name: item.name }));
   };
 
   return (
@@ -154,17 +156,17 @@ const MenuSection = () => {
           {/* Header */}
           <div className="text-center mb-16">
             <p className="text-menu-teal font-body uppercase tracking-[0.25em] text-sm mb-3">
-              Nuestra Carta
+              {t("menu.header")}
             </p>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-2">
-              Pizzeria de Lo Zio
+              {t("menu.title")}
             </h2>
             <p className="font-display text-lg tracking-[0.3em] uppercase text-muted-foreground mb-6">
-              Tarragona
+              {t("menu.location")}
             </p>
             <div className="inline-flex items-center gap-2 bg-menu-teal/10 text-menu-teal px-4 py-2 rounded-full text-sm font-body">
               <ShoppingCart className="w-4 h-4" />
-              Toca cualquier plato para añadirlo a tu pedido
+              {t("menu.cartHint")}
             </div>
           </div>
 
@@ -172,8 +174,8 @@ const MenuSection = () => {
           <div className="mb-12 p-4 rounded-lg border border-border bg-card">
             <div className="flex items-center gap-2 mb-3">
               <Filter className="w-4 h-4 text-menu-teal" />
-              <span className="font-display font-bold text-sm text-foreground">Filtrar por alérgenos</span>
-              <span className="text-xs text-muted-foreground">(ocultar platos que contengan)</span>
+              <span className="font-display font-bold text-sm text-foreground">{t("menu.filterTitle")}</span>
+              <span className="text-xs text-muted-foreground">{t("menu.filterHint")}</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {EU_ALLERGENS.map((a) => {
@@ -189,7 +191,7 @@ const MenuSection = () => {
                     }`}
                   >
                     <span>{a.emoji}</span>
-                    <span>{a.name}</span>
+                    <span>{t(`allergens.${a.id}`)}</span>
                   </button>
                 );
               })}
@@ -199,7 +201,7 @@ const MenuSection = () => {
                 onClick={() => setExcludedAllergens([])}
                 className="mt-3 text-xs text-menu-teal hover:underline"
               >
-                Limpiar filtros
+                {t("menu.clearFilters")}
               </button>
             )}
           </div>
@@ -208,7 +210,7 @@ const MenuSection = () => {
           <div className="mb-16">
             <div className="flex items-center gap-3 mb-8">
               <UtensilsCrossed className="w-6 h-6 text-menu-teal" />
-              <h3 className="font-display text-3xl font-bold text-menu-teal">Pizzas</h3>
+              <h3 className="font-display text-3xl font-bold text-menu-teal">{t("menu.pizzas")}</h3>
             </div>
             <div className="grid md:grid-cols-2 gap-x-12 gap-y-0">
               <div>
@@ -228,7 +230,7 @@ const MenuSection = () => {
           <div className="mb-16">
             <div className="flex items-center gap-3 mb-6">
               <Plus className="w-6 h-6 text-menu-teal" />
-              <h3 className="font-display text-2xl font-bold text-menu-teal">Extras</h3>
+              <h3 className="font-display text-2xl font-bold text-menu-teal">{t("menu.extras")}</h3>
             </div>
             <div className="max-w-sm">
               {extras.map((item) => (
@@ -242,7 +244,7 @@ const MenuSection = () => {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <Wine className="w-6 h-6 text-menu-teal" />
-                <h3 className="font-display text-2xl font-bold text-menu-teal">Bebidas</h3>
+                <h3 className="font-display text-2xl font-bold text-menu-teal">{t("menu.drinks")}</h3>
               </div>
               {bebidas.map((item) => (
                 <MenuItem key={item.name} item={item} onAdd={() => handleAdd(item)} hidden={isHidden(item)} />
@@ -251,7 +253,7 @@ const MenuSection = () => {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <CakeSlice className="w-6 h-6 text-menu-teal" />
-                <h3 className="font-display text-2xl font-bold text-menu-teal">Postre</h3>
+                <h3 className="font-display text-2xl font-bold text-menu-teal">{t("menu.dessert")}</h3>
               </div>
               {postres.map((item) => (
                 <MenuItem key={item.name} item={item} onAdd={() => handleAdd(item)} hidden={isHidden(item)} />

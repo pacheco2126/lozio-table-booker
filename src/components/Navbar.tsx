@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import logoZio from "@/assets/logozio.png";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -24,23 +27,24 @@ const Navbar = () => {
         </a>
         <div className="flex items-center gap-6">
           <a href="/#menu" className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors">
-            Menú
+            {t("nav.menu")}
           </a>
           <a href="/#reservar" className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors">
-            Locales
+            {t("nav.locations")}
           </a>
           <a
             href="/#reservar"
             className="bg-primary text-primary-foreground px-6 py-2 rounded-sm font-body font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
           >
-            Reservar
+            {t("nav.reserve")}
           </a>
           <a
             href={user ? "/perfil" : "/auth"}
             className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
           >
-            {user ? "Mi Perfil" : "Iniciar Sesión"}
+            {user ? t("nav.profile") : t("nav.login")}
           </a>
+          <LanguageSwitcher />
         </div>
       </div>
     </nav>
