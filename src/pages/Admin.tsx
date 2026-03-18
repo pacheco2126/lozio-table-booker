@@ -147,50 +147,95 @@ const Admin = () => {
                 <p className="text-muted-foreground font-body text-lg">{t("admin.noReservations")}</p>
               </div>
             ) : (
-              <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border">
-                      {headers.map((h) => (
-                        <th key={h} className="px-4 py-3 text-left font-body font-bold text-foreground uppercase tracking-wider text-xs">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map((r) => {
-                      const st = statusLabels[r.status] || statusLabels.pending;
-                      return (
-                        <tr key={r.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                          <td className="px-4 py-3 font-body text-foreground whitespace-nowrap">{r.reservation_date}</td>
-                          <td className="px-4 py-3 font-body text-foreground whitespace-nowrap">{r.reservation_time}</td>
-                          <td className="px-4 py-3 font-body text-foreground whitespace-nowrap">{locationNames[r.location] || r.location}</td>
-                          <td className="px-4 py-3 font-body text-foreground font-bold">{r.guest_name}</td>
-                          <td className="px-4 py-3 font-body text-muted-foreground"><div>{r.email}</div><div>{r.phone}</div></td>
-                          <td className="px-4 py-3 font-body text-foreground text-center">{r.guests}</td>
-                          <td className="px-4 py-3 font-body text-muted-foreground max-w-[200px] truncate">{r.notes || "—"}</td>
-                          <td className="px-4 py-3"><span className={`px-2 py-1 rounded-sm text-xs font-bold font-body ${st.className}`}>{st.label}</span></td>
-                          <td className="px-4 py-3">
-                            <div className="flex gap-1">
-                              {r.status !== "confirmed" && (
-                                <button onClick={() => confirmReservation(r.id)}
-                                  className="px-2 py-1 text-xs font-body font-bold bg-secondary/20 text-secondary rounded-sm hover:bg-secondary/30 transition-colors">
-                                  {t("admin.confirm")}
-                                </button>
-                              )}
-                              {r.status !== "cancelled" && (
-                                <button onClick={() => updateStatus(r.id, "cancelled")}
-                                  className="px-2 py-1 text-xs font-body font-bold bg-destructive/20 text-destructive rounded-sm hover:bg-destructive/30 transition-colors">
-                                  {t("admin.cancel")}
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                {/* Desktop table */}
+                <div className="hidden md:block bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        {headers.map((h) => (
+                          <th key={h} className="px-4 py-3 text-left font-body font-bold text-foreground uppercase tracking-wider text-xs">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filtered.map((r) => {
+                        const st = statusLabels[r.status] || statusLabels.pending;
+                        return (
+                          <tr key={r.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                            <td className="px-4 py-3 font-body text-foreground whitespace-nowrap">{r.reservation_date}</td>
+                            <td className="px-4 py-3 font-body text-foreground whitespace-nowrap">{r.reservation_time}</td>
+                            <td className="px-4 py-3 font-body text-foreground whitespace-nowrap">{locationNames[r.location] || r.location}</td>
+                            <td className="px-4 py-3 font-body text-foreground font-bold">{r.guest_name}</td>
+                            <td className="px-4 py-3 font-body text-muted-foreground"><div>{r.email}</div><div>{r.phone}</div></td>
+                            <td className="px-4 py-3 font-body text-foreground text-center">{r.guests}</td>
+                            <td className="px-4 py-3 font-body text-muted-foreground max-w-[200px] truncate">{r.notes || "—"}</td>
+                            <td className="px-4 py-3"><span className={`px-2 py-1 rounded-sm text-xs font-bold font-body ${st.className}`}>{st.label}</span></td>
+                            <td className="px-4 py-3">
+                              <div className="flex gap-1">
+                                {r.status !== "confirmed" && (
+                                  <button onClick={() => confirmReservation(r.id)}
+                                    className="px-2 py-1 text-xs font-body font-bold bg-secondary/20 text-secondary rounded-sm hover:bg-secondary/30 transition-colors">
+                                    {t("admin.confirm")}
+                                  </button>
+                                )}
+                                {r.status !== "cancelled" && (
+                                  <button onClick={() => updateStatus(r.id, "cancelled")}
+                                    className="px-2 py-1 text-xs font-body font-bold bg-destructive/20 text-destructive rounded-sm hover:bg-destructive/30 transition-colors">
+                                    {t("admin.cancel")}
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile cards */}
+                <div className="md:hidden space-y-3">
+                  {filtered.map((r) => {
+                    const st = statusLabels[r.status] || statusLabels.pending;
+                    return (
+                      <div key={r.id} className="bg-card rounded-lg border border-border p-4 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="font-body font-bold text-foreground">{r.guest_name}</p>
+                            <p className="text-xs text-muted-foreground font-body">{locationNames[r.location] || r.location}</p>
+                          </div>
+                          <span className={`px-2 py-1 rounded-sm text-xs font-bold font-body ${st.className}`}>{st.label}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm font-body text-foreground">
+                          <span>{r.reservation_date}</span>
+                          <span className="font-bold">{r.reservation_time}</span>
+                          <span>{r.guests} 👤</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground font-body">
+                          <p>{r.email}</p>
+                          <p>{r.phone}</p>
+                        </div>
+                        {r.notes && <p className="text-xs text-muted-foreground font-body italic">{r.notes}</p>}
+                        <div className="flex gap-2 pt-1">
+                          {r.status !== "confirmed" && (
+                            <button onClick={() => confirmReservation(r.id)}
+                              className="flex-1 px-3 py-2.5 min-h-[44px] text-sm font-body font-bold bg-secondary/20 text-secondary rounded-md hover:bg-secondary/30 transition-colors">
+                              {t("admin.confirm")}
+                            </button>
+                          )}
+                          {r.status !== "cancelled" && (
+                            <button onClick={() => updateStatus(r.id, "cancelled")}
+                              className="flex-1 px-3 py-2.5 min-h-[44px] text-sm font-body font-bold bg-destructive/20 text-destructive rounded-md hover:bg-destructive/30 transition-colors">
+                              {t("admin.cancel")}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </TabsContent>
 

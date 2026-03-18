@@ -177,14 +177,14 @@ const MenuSection = () => {
               <span className="font-display font-bold text-sm text-foreground">{t("menu.filterTitle")}</span>
               <span className="text-xs text-muted-foreground">{t("menu.filterHint")}</span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 md:gap-2">
               {EU_ALLERGENS.map((a) => {
                 const active = excludedAllergens.includes(a.id);
                 return (
                   <button
                     key={a.id}
                     onClick={() => toggleExclude(a.id)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                    className={`inline-flex items-center gap-1 md:gap-1.5 px-2.5 md:px-3 py-2 md:py-1.5 rounded-full text-xs font-medium border transition-colors min-h-[36px] md:min-h-0 ${
                       active
                         ? "bg-destructive/15 border-destructive text-destructive"
                         : "bg-muted border-border text-muted-foreground hover:border-menu-teal/40"

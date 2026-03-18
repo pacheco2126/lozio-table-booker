@@ -271,7 +271,7 @@ const ReservationSection = () => {
               </div>
 
               <button type="submit" disabled={submitting}
-                className="w-full mt-6 bg-primary text-primary-foreground py-4 rounded-lg font-body font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50">
+                className="w-full mt-6 bg-primary text-primary-foreground py-4 min-h-[48px] rounded-lg font-body font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50">
                 {submitting ? t("reservation.submitting") : t("reservation.submit")}
               </button>
             </form>

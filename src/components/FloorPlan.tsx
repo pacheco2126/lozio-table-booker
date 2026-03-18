@@ -261,6 +261,7 @@ const FloorPlan = () => {
           ));
         })}
       </div>
+      </div>
 
       {/* Reservation Details Dialog */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>

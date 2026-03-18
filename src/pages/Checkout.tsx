@@ -186,7 +186,7 @@ const Checkout = () => {
                 <Textarea value={form.notes} onChange={(e) => updateField("notes", e.target.value)} placeholder={t("checkout.notesPlaceholder")} maxLength={500} rows={3} />
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display text-lg py-7">
+              <Button type="submit" disabled={loading} className="w-full bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display text-lg py-7 min-h-[56px]">
                 {loading ? t("checkout.processing") : `${t("checkout.confirmOrder")} · ${totalPrice.toFixed(2)} €`}
               </Button>
             </form>
