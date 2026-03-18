@@ -110,14 +110,14 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
-      <div className="pt-28 pb-24 px-4">
+      <div className="pt-24 md:pt-28 pb-24 px-3 md:px-4">
         <div className="max-w-5xl mx-auto">
           <Button variant="ghost" onClick={() => navigate("/#menu")} className="mb-6 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4 mr-2" /> {t("checkout.backToMenu")}
           </Button>
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8">{t("checkout.title")}</h1>
+          <h1 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-8">{t("checkout.title")}</h1>
 
           <div className="grid lg:grid-cols-5 gap-8">
             <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-8">
