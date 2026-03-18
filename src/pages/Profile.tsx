@@ -58,13 +58,13 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
-      <div className="pt-32 pb-16 px-4">
+      <div className="pt-24 md:pt-32 pb-16 px-3 md:px-4">
         <div className="max-w-xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="font-display text-3xl font-bold text-foreground">{t('profile.title')}</h1>
+              <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">{t('profile.title')}</h1>
               <p className="text-muted-foreground font-body text-sm mt-1">{user?.email}</p>
             </div>
             <button onClick={handleSignOut} className="text-destructive font-body text-sm font-bold hover:underline">{t('profile.signOut')}</button>
