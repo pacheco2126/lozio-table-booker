@@ -250,16 +250,16 @@ const ReservationSection = () => {
                   <input type="text" name="name" required value={formData.name} onChange={handleChange}
                     className="w-full px-4 py-3 rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder={t("reservation.name")} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.email")} *</label>
                     <input type="email" name="email" required value={formData.email} onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="tu@email.com" />
+                      className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="tu@email.com" />
                   </div>
                   <div>
                     <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.phone")} *</label>
                     <input type="tel" name="phone" required value={formData.phone} onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="+34 600 000 000" />
+                      className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="+34 600 000 000" />
                   </div>
                 </div>
                 <div>
