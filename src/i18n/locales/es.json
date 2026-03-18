@@ -288,5 +288,9 @@
     "sesamo": "Sésamo",
     "altramuces": "Altramuces",
     "sulfitos": "Sulfitos"
+  },
+  "pwa": {
+    "installBanner": "Instala nuestra app para una mejor experiencia",
+    "install": "Instalar"
   }
 }

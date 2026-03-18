@@ -231,16 +231,22 @@ const FloorPlan = () => {
           const status = getTableStatus(table);
           const isRound = table.shape === "round";
           const size = table.capacity <= 2 ? "7%" : "9%";
-          return (
-            <div key={table.id}
-              className={cn("absolute flex flex-col items-center justify-center border-2 cursor-pointer transition-colors shadow-sm", isRound ? "rounded-full" : "rounded-md", statusColors[status], draggingTable === table.id && "ring-2 ring-primary shadow-lg z-20")}
-              style={{ left: `${table.position_x}%`, top: `${table.position_y}%`, width: size, height: size }}
-              onClick={() => !draggingTable && handleTableClick(table)}
-              onMouseDown={(e) => handleMouseDown(e, table)}>
-              <div className={cn("absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border border-card", statusDot[status])} />
-              <span className="text-[10px] font-body font-bold text-foreground leading-none">{table.name.replace("Mesa ", "M").replace("Barra ", "B")}</span>
-              <span className="text-[8px] font-body text-muted-foreground leading-none mt-0.5">{table.capacity}p</span>
-            </div>
+            return (
+              <div key={table.id}
+                className={cn("absolute flex flex-col items-center justify-center border-2 cursor-pointer transition-colors shadow-sm", isRound ? "rounded-full" : "rounded-md", statusColors[status], draggingTable === table.id && "ring-2 ring-primary shadow-lg z-20")}
+                style={{ left: `${table.position_x}%`, top: `${table.position_y}%`, width: size, height: size }}
+                onClick={() => !draggingTable && handleTableClick(table)}
+                onMouseDown={(e) => handleMouseDown(e, table)}
+                onTouchStart={() => {
+                  const timer = setTimeout(() => handleTableClick(table), 500);
+                  (table as any)._longPressTimer = timer;
+                }}
+                onTouchEnd={() => clearTimeout((table as any)._longPressTimer)}
+                onTouchMove={() => clearTimeout((table as any)._longPressTimer)}>
+                <div className={cn("absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border border-card", statusDot[status])} />
+                <span className="text-[10px] font-body font-bold text-foreground leading-none">{table.name.replace("Mesa ", "M").replace("Barra ", "B")}</span>
+                <span className="text-[8px] font-body text-muted-foreground leading-none mt-0.5">{table.capacity}p</span>
+              </div>
           );
         })}
 
