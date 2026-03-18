@@ -1,6 +1,9 @@
+import { useTranslation } from "react-i18next";
 import heroPizza from "@/assets/hero-pizza.jpg";
 
 const HeroSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
       <img
@@ -12,20 +15,20 @@ const HeroSection = () => {
       <div className="hero-overlay absolute inset-0" />
       <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
         <p className="text-primary-foreground/80 font-body text-lg tracking-[0.3em] uppercase mb-4 animate-fade-in-up">
-          Auténtica pizza italiana
+          {t("hero.subtitle")}
         </p>
         <h1 className="font-display text-6xl md:text-8xl font-bold text-primary-foreground mb-6 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-          Lo Zio
+          {t("hero.title")}
         </h1>
         <p className="text-primary-foreground/90 font-body text-xl md:text-2xl font-light mb-10 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
-          Tradición familiar desde el corazón de Italia
+          {t("hero.description")}
         </p>
         <a
           href="#reservar"
           className="inline-block bg-primary text-primary-foreground px-10 py-4 rounded-sm font-body font-bold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity animate-fade-in-up"
           style={{ animationDelay: "0.6s" }}
         >
-          Reservar Mesa
+          {t("hero.cta")}
         </a>
       </div>
     </section>
