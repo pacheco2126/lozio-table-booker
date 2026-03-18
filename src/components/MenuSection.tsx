@@ -151,7 +151,7 @@ const MenuSection = () => {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <section id="menu" className="py-24 px-4 bg-muted">
+      <section id="menu" className="py-16 md:py-24 px-4 bg-muted pb-24 md:pb-24">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
