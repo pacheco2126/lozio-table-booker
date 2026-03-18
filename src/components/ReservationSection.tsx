@@ -220,7 +220,7 @@ const ReservationSection = () => {
                       const isUnavailable = unavailableSlots.has(slot);
                       return (
                         <button key={slot} onClick={() => handleTimeSelect(slot)} disabled={isUnavailable}
-                          className={`py-3 px-3 rounded-lg font-body text-sm font-medium transition-all duration-200 ${
+                          className={`py-3.5 px-3 rounded-lg font-body text-sm font-medium transition-all duration-200 min-h-[44px] ${
                             isUnavailable ? "bg-muted/50 text-muted-foreground/40 cursor-not-allowed line-through" : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:ring-2 hover:ring-primary/30"
                           }`}>{slot}</button>
                       );
