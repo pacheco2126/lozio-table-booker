@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 const timeSlots = ["19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00"];
 const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const dateFnsLocales: Record<string, Locale> = { es, en: enUS, ca };
+const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 
 interface Props { onCreated: () => void; }
 

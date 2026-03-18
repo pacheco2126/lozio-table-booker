@@ -20,7 +20,7 @@ const timeSlots = ["19:00","19:30","20:00","20:30","21:00","21:30","22:00","22:3
 const FLOOR_W = 800;
 const FLOOR_H = 600;
 const RESERVATION_DURATION = 90;
-const dateFnsLocales: Record<string, Locale> = { es, en: enUS, ca };
+const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 
 const FloorPlan = () => {
   const { t, i18n } = useTranslation();

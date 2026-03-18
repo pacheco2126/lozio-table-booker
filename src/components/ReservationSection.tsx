@@ -20,7 +20,7 @@ const timeSlots = [
 
 const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-const dateFnsLocales: Record<string, Locale> = { es, en: enUS, ca };
+const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 
 const ReservationSection = () => {
   const { t, i18n } = useTranslation();
