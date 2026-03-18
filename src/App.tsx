@@ -27,6 +27,7 @@ const App = () => (
           <BrowserRouter>
             <CartDrawer />
             <CartFloatingButton />
+            <MobileBottomNav />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
