@@ -137,7 +137,7 @@ const ReservationSection = () => {
   };
 
   return (
-    <section id="reservar" className="py-24 px-4 bg-background">
+    <section id="reservar" className="py-16 md:py-24 px-4 bg-background pb-24 md:pb-24">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-primary font-body uppercase tracking-[0.25em] text-sm mb-3">{t("reservation.sectionTitle")}</p>
