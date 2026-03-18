@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import logoZio from "@/assets/logozio.png";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
