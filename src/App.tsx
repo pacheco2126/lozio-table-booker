@@ -26,6 +26,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <InstallBanner />
             <CartDrawer />
             <CartFloatingButton />
             <MobileBottomNav />
