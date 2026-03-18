@@ -201,7 +201,8 @@ const FloorPlan = () => {
         </div>
       </div>
 
-      <div ref={floorRef} className="relative bg-card border border-border rounded-lg overflow-hidden select-none" style={{ aspectRatio: `${FLOOR_W}/${FLOOR_H}` }}>
+      <div className="overflow-auto touch-pan-x touch-pan-y">
+      <div ref={floorRef} className="relative bg-card border border-border rounded-lg overflow-hidden select-none min-w-[600px]" style={{ aspectRatio: `${FLOOR_W}/${FLOOR_H}` }}>
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)", backgroundSize: "5% 5%" }} />
         <div className="absolute inset-1 border-2 border-border rounded-md pointer-events-none" />
 
