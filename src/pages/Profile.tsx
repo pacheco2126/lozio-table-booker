@@ -90,17 +90,17 @@ const Profile = () => {
                   className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder={t('profile.addressPlaceholder')} />
               </div>
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t('profile.city')}</label>
                   <input type="text" name="city" value={profile.city} onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-3 min-h-[44px] rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder={t('profile.cityPlaceholder')} />
                 </div>
                 <div>
                   <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t('profile.postalCode')}</label>
                   <input type="text" name="postal_code" value={profile.postal_code} onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-3 min-h-[44px] rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder={t('profile.postalCodePlaceholder')} />
                 </div>
               </div>
