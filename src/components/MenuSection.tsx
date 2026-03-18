@@ -100,7 +100,7 @@ const AllergenBadges = ({ allergens }: { allergens?: string[] }) => {
 const MenuItem = ({ item, onAdd, hidden }: { item: MenuItemData; onAdd: () => void; hidden?: boolean }) => {
   if (hidden) return null;
   return (
-    <div className="group flex justify-between items-start gap-3 py-2.5 border-b border-menu-teal/15 last:border-0 hover:bg-menu-teal/5 px-2 -mx-2 rounded transition-colors">
+    <div className="group flex justify-between items-start gap-3 py-3 border-b border-menu-teal/15 last:border-0 hover:bg-menu-teal/5 px-2 -mx-2 rounded transition-colors">
       <div className="flex-1 min-w-0">
         <span className="font-display font-bold text-menu-teal text-sm tracking-wide">{item.name}</span>
         {item.desc && <p className="text-muted-foreground text-xs mt-0.5 leading-relaxed">{item.desc}</p>}
@@ -111,10 +111,10 @@ const MenuItem = ({ item, onAdd, hidden }: { item: MenuItemData; onAdd: () => vo
         <Button
           variant="outline"
           size="icon"
-          className="h-7 w-7 border-menu-teal/30 text-menu-teal hover:bg-menu-teal hover:text-menu-teal-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+          className="h-9 w-9 md:h-7 md:w-7 border-menu-teal/30 text-menu-teal hover:bg-menu-teal hover:text-menu-teal-foreground md:opacity-0 md:group-hover:opacity-100 transition-opacity"
           onClick={onAdd}
         >
-          <Plus className="w-3.5 h-3.5" />
+          <Plus className="w-4 h-4 md:w-3.5 md:h-3.5" />
         </Button>
       </div>
     </div>
