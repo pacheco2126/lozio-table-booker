@@ -25,7 +25,7 @@ const Navbar = () => {
         <a href="/" className="flex items-center">
           <img src={logoZio} alt="Lo Zio" className="h-10 w-auto brightness-0 invert" />
         </a>
-        <div className="flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-6">
           <a href="/#menu" className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors">
             {t("nav.menu")}
           </a>
@@ -44,6 +44,9 @@ const Navbar = () => {
           >
             {user ? t("nav.profile") : t("nav.login")}
           </a>
+          <LanguageSwitcher />
+        </div>
+        <div className="md:hidden">
           <LanguageSwitcher />
         </div>
       </div>

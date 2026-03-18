@@ -58,13 +58,13 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
-      <div className="pt-32 pb-16 px-4">
+      <div className="pt-24 md:pt-32 pb-16 px-3 md:px-4">
         <div className="max-w-xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="font-display text-3xl font-bold text-foreground">{t('profile.title')}</h1>
+              <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">{t('profile.title')}</h1>
               <p className="text-muted-foreground font-body text-sm mt-1">{user?.email}</p>
             </div>
             <button onClick={handleSignOut} className="text-destructive font-body text-sm font-bold hover:underline">{t('profile.signOut')}</button>
@@ -90,17 +90,17 @@ const Profile = () => {
                   className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder={t('profile.addressPlaceholder')} />
               </div>
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t('profile.city')}</label>
                   <input type="text" name="city" value={profile.city} onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-3 min-h-[44px] rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder={t('profile.cityPlaceholder')} />
                 </div>
                 <div>
                   <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t('profile.postalCode')}</label>
                   <input type="text" name="postal_code" value={profile.postal_code} onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-3 min-h-[44px] rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder={t('profile.postalCodePlaceholder')} />
                 </div>
               </div>
@@ -140,7 +140,7 @@ const Profile = () => {
               </div>
 
               <button type="submit" disabled={loading}
-                className="w-full bg-primary text-primary-foreground py-3 rounded-sm font-body font-bold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
+                className="w-full bg-primary text-primary-foreground py-3 min-h-[48px] rounded-sm font-body font-bold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
                 {loading ? t('profile.saving') : t('profile.save')}
               </button>
             </form>

@@ -137,7 +137,7 @@ const ReservationSection = () => {
   };
 
   return (
-    <section id="reservar" className="py-24 px-4 bg-background">
+    <section id="reservar" className="py-16 md:py-24 px-4 bg-background pb-24 md:pb-24">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-primary font-body uppercase tracking-[0.25em] text-sm mb-3">{t("reservation.sectionTitle")}</p>
@@ -220,7 +220,7 @@ const ReservationSection = () => {
                       const isUnavailable = unavailableSlots.has(slot);
                       return (
                         <button key={slot} onClick={() => handleTimeSelect(slot)} disabled={isUnavailable}
-                          className={`py-3 px-3 rounded-lg font-body text-sm font-medium transition-all duration-200 ${
+                          className={`py-3.5 px-3 rounded-lg font-body text-sm font-medium transition-all duration-200 min-h-[44px] ${
                             isUnavailable ? "bg-muted/50 text-muted-foreground/40 cursor-not-allowed line-through" : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:ring-2 hover:ring-primary/30"
                           }`}>{slot}</button>
                       );
@@ -250,16 +250,16 @@ const ReservationSection = () => {
                   <input type="text" name="name" required value={formData.name} onChange={handleChange}
                     className="w-full px-4 py-3 rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder={t("reservation.name")} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.email")} *</label>
                     <input type="email" name="email" required value={formData.email} onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="tu@email.com" />
+                      className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="tu@email.com" />
                   </div>
                   <div>
                     <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.phone")} *</label>
                     <input type="tel" name="phone" required value={formData.phone} onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="+34 600 000 000" />
+                      className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="+34 600 000 000" />
                   </div>
                 </div>
                 <div>
@@ -271,7 +271,7 @@ const ReservationSection = () => {
               </div>
 
               <button type="submit" disabled={submitting}
-                className="w-full mt-6 bg-primary text-primary-foreground py-4 rounded-lg font-body font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50">
+                className="w-full mt-6 bg-primary text-primary-foreground py-4 min-h-[48px] rounded-lg font-body font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50">
                 {submitting ? t("reservation.submitting") : t("reservation.submit")}
               </button>
             </form>
