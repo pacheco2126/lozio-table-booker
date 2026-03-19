@@ -1,6 +1,7 @@
 import { UtensilsCrossed, Plus, ShoppingCart } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import pizzaPlaceholder from "@/assets/pizza-placeholder.png";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -78,11 +79,8 @@ const AllergenBadges = ({ allergens }: { allergens?: string[] }) => {
 const MenuItem = ({ item, onAdd }: { item: MenuItemData; onAdd: () => void }) => {
   return (
     <div className="group flex items-center gap-3 py-3 border-b border-menu-teal/15 last:border-0 hover:bg-menu-teal/5 px-2 -mx-2 rounded transition-colors">
-      {/* Placeholder image */}
-      <div className="w-14 h-14 md:w-12 md:h-12 rounded-lg bg-menu-teal/10 shrink-0 overflow-hidden">
-        <div className="w-full h-full flex items-center justify-center text-menu-teal/40">
-          <UtensilsCrossed className="w-6 h-6" />
-        </div>
+      <div className="w-14 h-14 md:w-12 md:h-12 rounded-lg shrink-0 overflow-hidden">
+        <img src={pizzaPlaceholder} alt={item.name} className="w-full h-full object-cover" />
       </div>
       <div className="flex-1 min-w-0">
         <span className="font-display font-bold text-menu-teal text-sm tracking-wide">{item.name}</span>
