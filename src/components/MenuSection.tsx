@@ -1,6 +1,7 @@
 import { UtensilsCrossed, Plus, ShoppingCart } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import pizzaPlaceholder from "@/assets/pizza-placeholder.png";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
