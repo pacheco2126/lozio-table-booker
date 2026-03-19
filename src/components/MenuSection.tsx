@@ -79,7 +79,7 @@ const AllergenBadges = ({ allergens }: { allergens?: string[] }) => {
 const MenuItem = ({ item, onAdd }: { item: MenuItemData; onAdd: () => void }) => {
   return (
     <div className="group flex items-center gap-3 py-3 border-b border-menu-teal/15 last:border-0 hover:bg-menu-teal/5 px-2 -mx-2 rounded transition-colors">
-      <div className="w-14 h-14 md:w-12 md:h-12 rounded-lg shrink-0 overflow-hidden">
+      <div className="w-14 h-14 md:w-20 md:h-20 rounded-lg shrink-0 overflow-hidden">
         <img src={pizzaPlaceholder} alt={item.name} className="w-full h-full object-cover" />
       </div>
       <div className="flex-1 min-w-0">
