@@ -104,7 +104,11 @@
     "title": "Your Order",
     "empty": "Your cart is empty",
     "total": "Total",
-    "checkout": "Place Order"
+    "checkout": "Place Order",
+    "addMore": "Add something else?",
+    "extras": "Extras",
+    "drinks": "Drinks",
+    "desserts": "Desserts"
   },
   "checkout": {
     "emptyTitle": "Your cart is empty",
