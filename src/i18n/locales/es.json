@@ -104,7 +104,11 @@
     "title": "Tu Pedido",
     "empty": "Tu carrito está vacío",
     "total": "Total",
-    "checkout": "Realizar Pedido"
+    "checkout": "Realizar Pedido",
+    "addMore": "¿Añadir algo más?",
+    "extras": "Extras",
+    "drinks": "Bebidas",
+    "desserts": "Postres"
   },
   "checkout": {
     "emptyTitle": "Tu carrito está vacío",

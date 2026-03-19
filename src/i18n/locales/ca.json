@@ -104,7 +104,11 @@
     "title": "La Teva Comanda",
     "empty": "El teu carret està buit",
     "total": "Total",
-    "checkout": "Fer Comanda"
+    "checkout": "Fer Comanda",
+    "addMore": "Afegir alguna cosa més?",
+    "extras": "Extres",
+    "drinks": "Begudes",
+    "desserts": "Postres"
   },
   "checkout": {
     "emptyTitle": "El teu carret està buit",
