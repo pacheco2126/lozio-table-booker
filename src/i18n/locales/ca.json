@@ -10,7 +10,6 @@
   "hero": {
     "subtitle": "Autèntica pizza italiana",
     "title": "Lo Zio",
-    "description": "Family tradition from the heart of Italy",
     "cta": "Reservar Taula"
   },
   "menu": {
@@ -25,9 +24,7 @@
     "extras": "Extres",
     "drinks": "Begudes",
     "dessert": "Postres",
-    "addedToOrder": "{{name}} afegit a la comanda",
-    "addExtras": "Afegir extres?",
-    "addToCart": "Afegir a la comanda"
+    "addedToOrder": "{{name}} afegit a la comanda"
   },
   "reservation": {
     "sectionTitle": "Els nostres locals",
@@ -104,11 +101,7 @@
     "title": "La Teva Comanda",
     "empty": "El teu carret està buit",
     "total": "Total",
-    "checkout": "Fer Comanda",
-    "addMore": "Afegir alguna cosa més?",
-    "extras": "Extres",
-    "drinks": "Begudes",
-    "desserts": "Postres"
+    "checkout": "Fer Comanda"
   },
   "checkout": {
     "emptyTitle": "El teu carret està buit",

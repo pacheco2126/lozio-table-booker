@@ -10,7 +10,6 @@
   "hero": {
     "subtitle": "Authentic Italian pizza",
     "title": "Lo Zio",
-    "description": "Family tradition from the heart of Italy",
     "cta": "Reserve a Table"
   },
   "menu": {
@@ -25,9 +24,7 @@
     "extras": "Extras",
     "drinks": "Drinks",
     "dessert": "Dessert",
-    "addedToOrder": "{{name}} added to order",
-    "addExtras": "Add extras?",
-    "addToCart": "Add to order"
+    "addedToOrder": "{{name}} added to order"
   },
   "reservation": {
     "sectionTitle": "Our locations",
@@ -104,11 +101,7 @@
     "title": "Your Order",
     "empty": "Your cart is empty",
     "total": "Total",
-    "checkout": "Place Order",
-    "addMore": "Add something else?",
-    "extras": "Extras",
-    "drinks": "Drinks",
-    "desserts": "Desserts"
+    "checkout": "Place Order"
   },
   "checkout": {
     "emptyTitle": "Your cart is empty",
