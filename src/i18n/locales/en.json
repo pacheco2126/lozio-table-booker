@@ -25,7 +25,9 @@
     "extras": "Extras",
     "drinks": "Drinks",
     "dessert": "Dessert",
-    "addedToOrder": "{{name}} added to order"
+    "addedToOrder": "{{name}} added to order",
+    "addExtras": "Add extras?",
+    "addToCart": "Add to order"
   },
   "reservation": {
     "sectionTitle": "Our locations",

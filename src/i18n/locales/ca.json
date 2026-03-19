@@ -25,7 +25,9 @@
     "extras": "Extres",
     "drinks": "Begudes",
     "dessert": "Postres",
-    "addedToOrder": "{{name}} afegit a la comanda"
+    "addedToOrder": "{{name}} afegit a la comanda",
+    "addExtras": "Afegir extres?",
+    "addToCart": "Afegir a la comanda"
   },
   "reservation": {
     "sectionTitle": "Els nostres locals",

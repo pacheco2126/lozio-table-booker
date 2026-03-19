@@ -36,7 +36,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
       return [...prev, { ...item, quantity: 1 }];
     });
-    setIsOpen(true);
+    // Don't auto-open cart drawer, floating button is enough
   }, []);
 
   const removeItem = useCallback((id: string) => {
