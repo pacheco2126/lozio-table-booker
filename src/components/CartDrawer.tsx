@@ -1,18 +1,100 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, Wine, CakeSlice, ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+interface UpsellItem {
+  id: string;
+  name: string;
+  price: number;
+  priceLabel: string;
+}
+
+const drinkOptions: UpsellItem[] = [
+  { id: "cerveza", name: "Cerveza", price: 3, priceLabel: "3,00 €" },
+  { id: "refresco", name: "Refresco", price: 2.5, priceLabel: "2,50 €" },
+  { id: "vino-botella", name: "Botella de vino", price: 20, priceLabel: "20,00 €" },
+  { id: "agua", name: "Agua", price: 2.5, priceLabel: "2,50 €" },
+];
+
+const extraOptions: UpsellItem[] = [
+  { id: "extra-verdura", name: "Extra: Verdura", price: 2, priceLabel: "+2,00 €" },
+  { id: "extra-embutido-queso", name: "Extra: Embutido / Queso", price: 3, priceLabel: "+3,00 €" },
+  { id: "extra-mozzarella-bufala", name: "Extra: Mozzarella búfala", price: 5, priceLabel: "+5,00 €" },
+];
+
+const dessertOptions: UpsellItem[] = [
+  { id: "tiramisu", name: "Tiramisú", price: 6, priceLabel: "6,00 €" },
+];
+
+const UpsellSection = ({
+  icon,
+  title,
+  items,
+  onAdd,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  items: UpsellItem[];
+  onAdd: (item: UpsellItem) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="border border-border rounded-lg overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-3 py-2.5 bg-muted/50 hover:bg-muted transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          {icon}
+          <span className="font-display font-bold text-xs text-foreground">{title}</span>
+        </div>
+        {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+      </button>
+      {open && (
+        <div className="px-3 py-2 space-y-1 animate-fade-in">
+          {items.map((item) => (
+            <div key={item.id} className="flex items-center justify-between py-1.5">
+              <span className="text-xs text-foreground">{item.name}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">{item.priceLabel}</span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-6 w-6 border-menu-teal/30 text-menu-teal hover:bg-menu-teal hover:text-menu-teal-foreground"
+                  onClick={() => onAdd(item)}
+                >
+                  <Plus className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CartDrawer = () => {
-  const { items, isOpen, setIsOpen, updateQuantity, removeItem, totalPrice, totalItems } = useCart();
+  const { items, isOpen, setIsOpen, updateQuantity, removeItem, totalPrice, totalItems, addItem } = useCart();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   const handleCheckout = () => {
     setIsOpen(false);
     navigate("/pedido");
+  };
+
+  const handleAddUpsell = (item: UpsellItem) => {
+    addItem({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+    });
   };
 
   return (
@@ -52,6 +134,29 @@ const CartDrawer = () => {
                 </div>
               </div>
             ))}
+
+            {/* Upsell sections */}
+            <div className="space-y-2 pt-2">
+              <p className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">{t("cart.addMore")}</p>
+              <UpsellSection
+                icon={<Plus className="w-4 h-4 text-menu-teal" />}
+                title={t("cart.extras")}
+                items={extraOptions}
+                onAdd={handleAddUpsell}
+              />
+              <UpsellSection
+                icon={<Wine className="w-4 h-4 text-menu-teal" />}
+                title={t("cart.drinks")}
+                items={drinkOptions}
+                onAdd={handleAddUpsell}
+              />
+              <UpsellSection
+                icon={<CakeSlice className="w-4 h-4 text-menu-teal" />}
+                title={t("cart.desserts")}
+                items={dessertOptions}
+                onAdd={handleAddUpsell}
+              />
+            </div>
           </div>
         )}
 
