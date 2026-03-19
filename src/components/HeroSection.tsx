@@ -20,8 +20,11 @@ const HeroSection = () => {
         <h1 className="font-display text-4xl sm:text-6xl md:text-8xl font-bold text-primary-foreground mb-6 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
           {t("hero.title")}
         </h1>
-        <p className="text-primary-foreground/90 font-body text-xl md:text-2xl font-light mb-10 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
+        <p className="text-primary-foreground/90 font-body text-xl md:text-2xl font-light mb-4 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
           {t("hero.description")}
+        </p>
+        <p className="text-primary-foreground/70 font-body text-base md:text-lg italic mb-10 animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
+          "La vita è un brivido che vola via... è tutto un equilibrio sopra la follia..."
         </p>
         <a
           href="#reservar"
