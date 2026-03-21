@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Menu, X } from "lucide-react";
 import logoZio from "@/assets/logozio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -9,6 +10,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -40,6 +42,14 @@ const Navbar = () => {
           >
             {t("nav.reserve")}
           </a>
+          {isAdmin && (
+            <a
+              href="/admin"
+              className="bg-accent text-accent-foreground px-4 py-2 rounded-sm font-body font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity flex items-center gap-1.5"
+            >
+              <span>Admin</span>
+            </a>
+          )}
           <a
             href={user ? "/perfil" : "/auth"}
             className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
@@ -48,7 +58,6 @@ const Navbar = () => {
           </a>
           <LanguageSwitcher />
         </div>
-        {/* Mobile: language switcher + landscape hamburger */}
         <div className="md:hidden flex items-center gap-2">
           <LanguageSwitcher />
           <button
@@ -60,12 +69,14 @@ const Navbar = () => {
           </button>
         </div>
       </div>
-      {/* Landscape dropdown menu */}
       {menuOpen && (
         <div className="landscape-dropdown md:hidden bg-foreground/95 backdrop-blur-sm border-t border-border px-4 py-3 flex flex-wrap gap-4">
           <a href="/#menu" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{t("nav.menu")}</a>
           <a href="/#reservar" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{t("nav.reserve")}</a>
           <a href="/pedido" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{t("nav.order")}</a>
+          {isAdmin && (
+            <a href="/admin" onClick={() => setMenuOpen(false)} className="text-accent font-body text-sm uppercase tracking-widest font-bold">Admin</a>
+          )}
           <a href={user ? "/perfil" : "/auth"} onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{user ? t("nav.profile") : t("nav.login")}</a>
         </div>
       )}

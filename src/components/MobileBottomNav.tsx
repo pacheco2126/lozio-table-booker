@@ -1,20 +1,21 @@
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { UtensilsCrossed, CalendarDays, ShoppingCart, User } from "lucide-react";
+import { UtensilsCrossed, CalendarDays, ShoppingCart, User, Settings } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const MobileBottomNav = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { totalItems, setIsOpen } = useCart();
-
-  const isHome = location.pathname === "/";
+  const { isAdmin } = useIsAdmin();
 
   const tabs = [
     { label: t("nav.menu"), icon: UtensilsCrossed, href: "/#menu" },
     { label: t("nav.reserve"), icon: CalendarDays, href: "/#reservar" },
     { label: t("nav.order"), icon: ShoppingCart, href: null, badge: totalItems, action: () => setIsOpen(true) },
     { label: t("nav.profile"), icon: User, href: "/perfil" },
+    ...(isAdmin ? [{ label: "Admin", icon: Settings, href: "/admin" }] : []),
   ];
 
   return (
@@ -24,7 +25,7 @@ const MobileBottomNav = () => {
           const Icon = tab.icon;
           const isActive =
             (tab.href === "/perfil" && location.pathname === "/perfil") ||
-            (tab.href === "/pedido" && location.pathname === "/pedido");
+            (tab.href === "/admin" && location.pathname === "/admin");
 
           const content = (
             <>
@@ -42,7 +43,7 @@ const MobileBottomNav = () => {
             </>
           );
 
-          const className = `relative flex flex-col items-center justify-center gap-0.5 py-2.5 px-3 min-h-[56px] flex-1 transition-colors ${
+          const className = `relative flex flex-col items-center justify-center gap-0.5 py-2.5 px-2 min-h-[56px] flex-1 transition-colors ${
             isActive
               ? "text-primary"
               : "text-muted-foreground hover:text-foreground"
@@ -63,7 +64,6 @@ const MobileBottomNav = () => {
           );
         })}
       </div>
-      {/* Safe area spacing for notched phones */}
       <div className="h-[env(safe-area-inset-bottom)]" />
     </nav>
   );
