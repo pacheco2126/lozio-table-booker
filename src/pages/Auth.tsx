@@ -46,7 +46,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 landscape-compact">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <a href="/" className="font-display text-3xl font-bold text-primary">Lo Zio</a>
