@@ -40,12 +40,13 @@ const Admin = () => {
   };
 
   useEffect(() => { if (!authLoading && !user) navigate("/auth"); }, [user, authLoading, navigate]);
-  useEffect(() => { if (user) checkAdmin(); }, [user]);
-
-  const checkAdmin = async () => {
-    const { data } = await supabase.from("user_roles").select("role").eq("user_id", user!.id).eq("role", "admin").maybeSingle();
-    if (data) { setIsAdmin(true); fetchReservations(); } else { setIsAdmin(false); setLoading(false); }
-  };
+  useEffect(() => {
+    if (!adminLoading && isAdmin) {
+      fetchReservations();
+    } else if (!adminLoading) {
+      setLoading(false);
+    }
+  }, [isAdmin, adminLoading]);
 
   const fetchReservations = async () => {
     const { data, error } = await supabase.from("reservations").select("*").order("reservation_date", { ascending: true }).order("reservation_time", { ascending: true });
