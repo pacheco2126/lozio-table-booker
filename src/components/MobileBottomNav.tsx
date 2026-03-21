@@ -6,36 +6,28 @@ import { useCart } from "@/contexts/CartContext";
 const MobileBottomNav = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { totalItems } = useCart();
+  const { totalItems, setIsOpen } = useCart();
 
   const isHome = location.pathname === "/";
 
   const tabs = [
     { label: t("nav.menu"), icon: UtensilsCrossed, href: "/#menu" },
     { label: t("nav.reserve"), icon: CalendarDays, href: "/#reservar" },
-    { label: t("nav.order"), icon: ShoppingCart, href: "/pedido", badge: totalItems },
+    { label: t("nav.order"), icon: ShoppingCart, href: null, badge: totalItems, action: () => setIsOpen(true) },
     { label: t("nav.profile"), icon: User, href: "/perfil" },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-t border-border md:hidden landscape-hide-bottom-nav">
       <div className="flex items-stretch justify-around">
-        {tabs.map((tab) => {
+        {tabs.map((tab, idx) => {
           const Icon = tab.icon;
           const isActive =
             (tab.href === "/perfil" && location.pathname === "/perfil") ||
             (tab.href === "/pedido" && location.pathname === "/pedido");
 
-          return (
-            <a
-              key={tab.href}
-              href={tab.href}
-              className={`relative flex flex-col items-center justify-center gap-0.5 py-2.5 px-3 min-h-[56px] flex-1 transition-colors ${
-                isActive
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
+          const content = (
+            <>
               <div className="relative">
                 <Icon className="w-5 h-5" />
                 {tab.badge ? (
@@ -47,6 +39,26 @@ const MobileBottomNav = () => {
               <span className="text-[10px] font-body font-medium leading-tight">
                 {tab.label}
               </span>
+            </>
+          );
+
+          const className = `relative flex flex-col items-center justify-center gap-0.5 py-2.5 px-3 min-h-[56px] flex-1 transition-colors ${
+            isActive
+              ? "text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`;
+
+          if (tab.action) {
+            return (
+              <button key={idx} onClick={tab.action} className={className}>
+                {content}
+              </button>
+            );
+          }
+
+          return (
+            <a key={tab.href} href={tab.href!} className={className}>
+              {content}
             </a>
           );
         })}
