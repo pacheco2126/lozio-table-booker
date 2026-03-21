@@ -244,7 +244,7 @@ const ReservationSection = () => {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 landscape-form-grid">
                 <div>
                   <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.name")} *</label>
                   <input type="text" name="name" required value={formData.name} onChange={handleChange}

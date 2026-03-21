@@ -18,7 +18,7 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-t border-border md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-t border-border md:hidden landscape-hide-bottom-nav">
       <div className="flex items-stretch justify-around">
         {tabs.map((tab) => {
           const Icon = tab.icon;
