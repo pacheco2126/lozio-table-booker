@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
 import FloorPlan from "@/components/FloorPlan";
 import AdminCustomers from "@/components/AdminCustomers";
+import AdminReports from "@/components/AdminReports";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Reservation {
