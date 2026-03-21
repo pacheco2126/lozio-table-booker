@@ -25,6 +25,7 @@ const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 const ReservationSection = () => {
   const { t, i18n } = useTranslation();
   const dfLocale = dateFnsLocales[i18n.language] || es;
+  const [highlight, setHighlight] = useState(false);
 
   const locations = [
     {
@@ -149,7 +150,15 @@ const ReservationSection = () => {
           {locations.map((l) => (
             <button
               key={l.id}
-              onClick={() => { setSelectedLocation(l.id); setSelectedTime(null); setStep("select"); }}
+              onClick={() => {
+                setSelectedLocation(l.id); setSelectedTime(null); setStep("select");
+                setTimeout(() => {
+                  const el = document.getElementById('reservation-form');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  setHighlight(true);
+                  setTimeout(() => setHighlight(false), 1500);
+                }, 100);
+              }}
               className={`group relative overflow-hidden rounded-lg transition-all duration-300 ${
                 selectedLocation === l.id ? "ring-4 ring-primary shadow-xl scale-[1.02]" : "ring-1 ring-border hover:ring-primary/50"
               }`}
@@ -165,7 +174,7 @@ const ReservationSection = () => {
           ))}
         </div>
 
-        <div className="max-w-xl mx-auto bg-card rounded-xl shadow-lg border border-border overflow-hidden">
+        <div id="reservation-form" className={`max-w-xl mx-auto bg-card rounded-xl shadow-lg border overflow-hidden scroll-mt-20 transition-all duration-700 ${highlight ? 'border-primary ring-2 ring-primary/40 shadow-primary/20 shadow-xl' : 'border-border'}`} style={{ scrollMarginBottom: '64px' }}>
           <div className="text-center pt-8 pb-2 px-6">
             <h3 className="font-display text-2xl font-bold text-foreground">{loc.name}</h3>
             <p className="text-muted-foreground font-body text-sm mt-1">{t("reservation.pizzeria")}</p>
