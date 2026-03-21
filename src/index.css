@@ -110,6 +110,14 @@
 }
 
 @media (orientation: landscape) and (max-height: 430px) and (max-width: 932px) {
+  /* Show hamburger and dropdown in landscape */
+  .landscape-hamburger {
+    display: block !important;
+  }
+  .landscape-dropdown {
+    display: flex !important;
+  }
+
   /* Reduce vertical spacing globally */
   .landscape-compact section {
     padding-top: 1.5rem !important;
