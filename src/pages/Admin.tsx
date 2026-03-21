@@ -244,6 +244,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="floorplan"><FloorPlan /></TabsContent>
+          <TabsContent value="reports"><AdminReports /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
         </Tabs>
       </div>
