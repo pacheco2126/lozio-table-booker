@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
 import FloorPlan from "@/components/FloorPlan";
 import AdminCustomers from "@/components/AdminCustomers";
+import AdminReports from "@/components/AdminReports";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Reservation {
@@ -23,11 +25,11 @@ const locationNames: Record<string, string> = {
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [filterLocation, setFilterLocation] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
 
@@ -38,12 +40,13 @@ const Admin = () => {
   };
 
   useEffect(() => { if (!authLoading && !user) navigate("/auth"); }, [user, authLoading, navigate]);
-  useEffect(() => { if (user) checkAdmin(); }, [user]);
-
-  const checkAdmin = async () => {
-    const { data } = await supabase.from("user_roles").select("role").eq("user_id", user!.id).eq("role", "admin").maybeSingle();
-    if (data) { setIsAdmin(true); fetchReservations(); } else { setIsAdmin(false); setLoading(false); }
-  };
+  useEffect(() => {
+    if (!adminLoading && isAdmin) {
+      fetchReservations();
+    } else if (!adminLoading) {
+      setLoading(false);
+    }
+  }, [isAdmin, adminLoading]);
 
   const fetchReservations = async () => {
     const { data, error } = await supabase.from("reservations").select("*").order("reservation_date", { ascending: true }).order("reservation_time", { ascending: true });
@@ -66,7 +69,7 @@ const Admin = () => {
     if (error) { toast.error(t("admin.statusError")); } else { toast.success(t("admin.statusUpdated")); fetchReservations(); }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || adminLoading || loading) {
     return (<div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground font-body">{t("profile.loadingText")}</p></div>);
   }
 
@@ -108,6 +111,7 @@ const Admin = () => {
           <TabsList className="font-body">
             <TabsTrigger value="reservations" className="font-bold">{t("admin.reservations")}</TabsTrigger>
             <TabsTrigger value="floorplan" className="font-bold">{t("admin.floorPlan")}</TabsTrigger>
+            <TabsTrigger value="reports" className="font-bold">{t("admin.reports.title")}</TabsTrigger>
             <TabsTrigger value="customers" className="font-bold">{t("admin.customers")}</TabsTrigger>
           </TabsList>
 
@@ -240,6 +244,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="floorplan"><FloorPlan /></TabsContent>
+          <TabsContent value="reports"><AdminReports /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
         </Tabs>
       </div>

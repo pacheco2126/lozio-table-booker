@@ -207,6 +207,24 @@
       "notes": "Notas",
       "status": "Estado",
       "actions": "Acciones"
+    },
+    "reports": {
+      "title": "Reportes",
+      "today": "Hoy",
+      "thisWeek": "Esta semana",
+      "thisMonth": "Este mes",
+      "total": "Total",
+      "byLocation": "Por local",
+      "byStatus": "Por estado",
+      "popularTimes": "Horarios más populares",
+      "reservations": "reservas",
+      "last30Days": "Reservas últimos 30 días"
+    },
+    "fab": {
+      "newReservation": "Nueva reserva",
+      "todayReservations": "Reservas de hoy",
+      "floorPlan": "Plano del salón",
+      "reports": "Reportes"
     }
   },
   "customers": {
