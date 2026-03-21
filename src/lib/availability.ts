@@ -1,6 +1,6 @@
-// Table configuration per location
-export const TABLES_PER_LOCATION = 15;
-export const TABLE_CAPACITY = 4;
+// Online reservation tables: Mesa 1-8, capacity 1-6 each
+export const ONLINE_TABLES = 8;
+export const MAX_ONLINE_GUESTS = 6;
 
 /**
  * Fixed duration: 90 minutes (1h 30min) for all reservations.
@@ -9,21 +9,20 @@ export function estimatedDuration(_guests: number): number {
   return 90;
 }
 
-/**
- * Number of tables required for a party size (each table seats 4).
- */
+// Keep legacy exports for backward compat
+export const TABLES_PER_LOCATION = 15;
+export const TABLE_CAPACITY = 6;
+
 export function tablesNeeded(guests: number): number {
-  return Math.ceil(guests / TABLE_CAPACITY);
+  return 1; // Now 1 table per reservation since each fits up to 6
 }
 
 interface Reservation {
-  reservation_time: string; // "HH:MM"
-  guests: string;           // stored as text
+  reservation_time: string;
+  guests: string;
+  table_id?: string | null;
 }
 
-/**
- * Convert "HH:MM" to minutes since midnight.
- */
 function timeToMinutes(time: string): number {
   const [h, m] = time.split(":").map(Number);
   return h * 60 + m;
@@ -31,9 +30,7 @@ function timeToMinutes(time: string): number {
 
 /**
  * Given existing reservations for a location+date, compute which time slots
- * are unavailable because all 15 tables would be occupied.
- *
- * Returns a Set of time slot strings (e.g. "20:00") that are fully booked.
+ * are unavailable because all 8 online tables would be occupied.
  */
 export function getUnavailableSlots(
   existingReservations: Reservation[],
@@ -41,7 +38,6 @@ export function getUnavailableSlots(
   requestedGuests: number
 ): Set<string> {
   const unavailable = new Set<string>();
-  const neededTables = tablesNeeded(requestedGuests);
   const requestedDuration = estimatedDuration(requestedGuests);
 
   for (const slot of timeSlots) {
@@ -52,19 +48,17 @@ export function getUnavailableSlots(
     let tablesInUse = 0;
 
     for (const res of existingReservations) {
-      const resGuests = parseInt(res.guests) || 2;
       const resStart = timeToMinutes(res.reservation_time);
-      const resEnd = resStart + estimatedDuration(resGuests);
-      const resTables = tablesNeeded(resGuests);
+      const resEnd = resStart + 90;
 
-      // Check overlap: two intervals [a,b) and [c,d) overlap if a < d && c < b
+      // Check overlap
       if (slotStart < resEnd && resStart < slotEnd) {
-        tablesInUse += resTables;
+        tablesInUse += 1;
       }
     }
 
-    // Not enough tables left for this party
-    if (tablesInUse + neededTables > TABLES_PER_LOCATION) {
+    // All 8 online tables occupied
+    if (tablesInUse >= ONLINE_TABLES) {
       unavailable.add(slot);
     }
   }
