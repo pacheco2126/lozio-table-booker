@@ -207,6 +207,24 @@
       "notes": "Notes",
       "status": "Estat",
       "actions": "Accions"
+    },
+    "reports": {
+      "title": "Informes",
+      "today": "Avui",
+      "thisWeek": "Aquesta setmana",
+      "thisMonth": "Aquest mes",
+      "total": "Total",
+      "byLocation": "Per local",
+      "byStatus": "Per estat",
+      "popularTimes": "Horaris més populars",
+      "reservations": "reserves",
+      "last30Days": "Reserves últims 30 dies"
+    },
+    "fab": {
+      "newReservation": "Nova reserva",
+      "todayReservations": "Reserves d'avui",
+      "floorPlan": "Plànol del saló",
+      "reports": "Informes"
     }
   },
   "customers": {
