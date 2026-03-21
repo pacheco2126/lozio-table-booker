@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
+import { Menu, X } from "lucide-react";
 import logoZio from "@/assets/logozio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
   const { t } = useTranslation();
 
@@ -46,10 +48,27 @@ const Navbar = () => {
           </a>
           <LanguageSwitcher />
         </div>
-        <div className="md:hidden">
+        {/* Mobile: language switcher + landscape hamburger */}
+        <div className="md:hidden flex items-center gap-2">
           <LanguageSwitcher />
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="landscape-hamburger text-primary-foreground p-1"
+            aria-label="Menu"
+          >
+            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
+      {/* Landscape dropdown menu */}
+      {menuOpen && (
+        <div className="landscape-dropdown md:hidden bg-foreground/95 backdrop-blur-sm border-t border-border px-4 py-3 flex flex-wrap gap-4">
+          <a href="/#menu" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{t("nav.menu")}</a>
+          <a href="/#reservar" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{t("nav.reserve")}</a>
+          <a href="/pedido" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{t("nav.order")}</a>
+          <a href={user ? "/perfil" : "/auth"} onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{user ? t("nav.profile") : t("nav.login")}</a>
+        </div>
+      )}
     </nav>
   );
 };
