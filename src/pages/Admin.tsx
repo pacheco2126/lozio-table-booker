@@ -111,6 +111,7 @@ const Admin = () => {
           <TabsList className="font-body">
             <TabsTrigger value="reservations" className="font-bold">{t("admin.reservations")}</TabsTrigger>
             <TabsTrigger value="floorplan" className="font-bold">{t("admin.floorPlan")}</TabsTrigger>
+            <TabsTrigger value="reports" className="font-bold">{t("admin.reports.title")}</TabsTrigger>
             <TabsTrigger value="customers" className="font-bold">{t("admin.customers")}</TabsTrigger>
           </TabsList>
 
