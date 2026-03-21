@@ -101,7 +101,14 @@
   }
 }
 
-/* Mobile landscape orientation utilities */
+/* Hamburger hidden by default on mobile portrait, shown in landscape */
+.landscape-hamburger {
+  display: none;
+}
+.landscape-dropdown {
+  display: none;
+}
+
 @media (orientation: landscape) and (max-height: 430px) and (max-width: 932px) {
   /* Reduce vertical spacing globally */
   .landscape-compact section {
