@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
-import { AlertTriangle, CalendarIcon } from "lucide-react";
+import { AlertTriangle, CalendarIcon, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getUnavailableSlots, tablesNeeded, TABLES_PER_LOCATION, TABLE_CAPACITY } from "@/lib/availability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -11,8 +11,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import location1 from "@/assets/location-1.jpg";
 import location2 from "@/assets/location-2.jpg";
+
+const COMING_SOON_LOCATIONS = ["tarragona"];
 
 const timeSlots = [
   "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00",
@@ -26,6 +29,7 @@ const ReservationSection = () => {
   const { t, i18n } = useTranslation();
   const dfLocale = dateFnsLocales[i18n.language] || es;
   const [highlight, setHighlight] = useState(false);
+  const { isAdmin } = useIsAdmin();
 
   const locations = [
     {
@@ -50,7 +54,11 @@ const ReservationSection = () => {
     },
   ];
 
-  const [selectedLocation, setSelectedLocation] = useState(locations[0].id);
+  const defaultLocation = COMING_SOON_LOCATIONS.includes(locations[0].id) && !isAdmin
+    ? locations[1]?.id || locations[0].id
+    : locations[0].id;
+
+  const [selectedLocation, setSelectedLocation] = useState(defaultLocation);
   const [guests, setGuests] = useState("2");
   const [date, setDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -147,33 +155,63 @@ const ReservationSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-12">
-          {locations.map((l) => (
-            <button
-              key={l.id}
-              onClick={() => {
-                setSelectedLocation(l.id); setSelectedTime(null); setStep("select");
-                setTimeout(() => {
-                  const el = document.getElementById('reservation-form');
-                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  setHighlight(true);
-                  setTimeout(() => setHighlight(false), 1500);
-                }, 100);
-              }}
-              className={`group relative overflow-hidden rounded-lg transition-all duration-300 ${
-                selectedLocation === l.id ? "ring-4 ring-primary shadow-xl scale-[1.02]" : "ring-1 ring-border hover:ring-primary/50"
-              }`}
-            >
-              <img src={l.image} alt={l.alt} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
-              <div className="hero-overlay absolute inset-0" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-left">
-                <h3 className="font-display text-2xl font-bold text-primary-foreground mb-1">{l.name}</h3>
-                <p className="text-primary-foreground/80 font-body text-sm">{l.address}</p>
-                <p className="text-primary-foreground/70 font-body text-sm">{l.hours}</p>
-              </div>
-            </button>
-          ))}
+          {locations.map((l) => {
+            const isComingSoon = COMING_SOON_LOCATIONS.includes(l.id) && !isAdmin;
+            return (
+              <button
+                key={l.id}
+                onClick={() => {
+                  if (isComingSoon) return;
+                  setSelectedLocation(l.id); setSelectedTime(null); setStep("select");
+                  setTimeout(() => {
+                    const el = document.getElementById('reservation-form');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setHighlight(true);
+                    setTimeout(() => setHighlight(false), 1500);
+                  }, 100);
+                }}
+                disabled={isComingSoon}
+                className={`group relative overflow-hidden rounded-lg transition-all duration-300 ${
+                  isComingSoon
+                    ? "opacity-80 cursor-default ring-1 ring-border"
+                    : selectedLocation === l.id ? "ring-4 ring-primary shadow-xl scale-[1.02]" : "ring-1 ring-border hover:ring-primary/50"
+                }`}
+              >
+                <img src={l.image} alt={l.alt} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                <div className="hero-overlay absolute inset-0" />
+                <div className="absolute bottom-0 left-0 right-0 p-6 text-left">
+                  <h3 className="font-display text-2xl font-bold text-primary-foreground mb-1">{l.name}</h3>
+                  <p className="text-primary-foreground/80 font-body text-sm">{l.address}</p>
+                  <p className="text-primary-foreground/70 font-body text-sm">{l.hours}</p>
+                  {isComingSoon && (
+                    <div className="mt-3 space-y-1">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-dashed border-muted-foreground/40 bg-muted/60 text-muted-foreground font-body text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+                        <Clock className="w-3.5 h-3.5" />
+                        Próximamente
+                      </span>
+                      <p className="text-primary-foreground/50 font-body text-xs italic">
+                        Las reservas online estarán disponibles muy pronto
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
 
+        {COMING_SOON_LOCATIONS.includes(selectedLocation) && !isAdmin ? (
+          <div className="max-w-xl mx-auto bg-card rounded-xl shadow-lg border border-dashed border-muted-foreground/30 overflow-hidden text-center py-16 px-6">
+            <Clock className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+            <h3 className="font-display text-2xl font-bold text-foreground mb-2">{loc.name}</h3>
+            <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-dashed border-muted-foreground/40 bg-muted text-muted-foreground font-body text-sm font-semibold uppercase tracking-wider mb-3">
+              🕐 Próximamente
+            </span>
+            <p className="text-muted-foreground font-body text-sm mt-3">
+              Las reservas online estarán disponibles muy pronto
+            </p>
+          </div>
+        ) : (
         <div id="reservation-form" className={`max-w-xl mx-auto bg-card rounded-xl shadow-lg border overflow-hidden scroll-mt-20 transition-all duration-700 ${highlight ? 'border-primary ring-2 ring-primary/40 shadow-primary/20 shadow-xl' : 'border-border'}`} style={{ scrollMarginBottom: '64px' }}>
           <div className="text-center pt-8 pb-2 px-6">
             <h3 className="font-display text-2xl font-bold text-foreground">{loc.name}</h3>
@@ -286,6 +324,7 @@ const ReservationSection = () => {
             </form>
           )}
         </div>
+        )}
       </div>
     </section>
   );
