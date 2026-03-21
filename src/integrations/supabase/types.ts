@@ -281,6 +281,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      find_available_table: {
+        Args: {
+          _date: string
+          _guests: number
+          _location: string
+          _time: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

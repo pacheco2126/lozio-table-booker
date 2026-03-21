@@ -16,11 +16,15 @@ interface Table { id: string; name: string; capacity: number; position_x: number
 interface Reservation { id: string; table_id: string | null; guest_name: string; email: string; phone: string; reservation_date: string; reservation_time: string; guests: string; notes: string | null; status: string; location: string; user_id: string | null; }
 interface GuestProfile { allergies: string[] | null; food_preferences: string | null; favorite_table_area: string | null; internal_notes: string | null; visit_count: number | null; }
 
+const ONLINE_TABLE_NAMES = ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5","Mesa 6","Mesa 7","Mesa 8"];
+
 const timeSlots = ["19:00","19:30","20:00","20:30","21:00","21:30","22:00","22:30","23:00"];
 const FLOOR_W = 800;
 const FLOOR_H = 600;
 const RESERVATION_DURATION = 90;
 const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
+
+const isOnlineTable = (table: Table) => ONLINE_TABLE_NAMES.includes(table.name);
 
 const FloorPlan = () => {
   const { t, i18n } = useTranslation();
@@ -63,7 +67,8 @@ const FloorPlan = () => {
     return () => { supabase.removeChannel(channel); };
   }, [fetchReservations, fetchTables]);
 
-  const getTableStatus = (table: Table): "available" | "occupied" | "upcoming" => {
+  const getTableStatus = (table: Table): "available" | "occupied" | "upcoming" | "manual" => {
+    if (!isOnlineTable(table)) return "manual";
     const now = parse(selectedTime, "HH:mm", new Date());
     const soon = addMinutes(now, 30);
     for (const res of reservations) {
@@ -92,8 +97,14 @@ const FloorPlan = () => {
     available: "bg-muted border-border hover:border-primary/50",
     occupied: "bg-destructive/20 border-destructive",
     upcoming: "bg-accent/30 border-accent",
+    manual: "bg-blue-500/15 border-blue-500/50 hover:border-blue-500",
   };
-  const statusDot: Record<string, string> = { available: "bg-muted-foreground/30", occupied: "bg-destructive", upcoming: "bg-accent" };
+  const statusDot: Record<string, string> = {
+    available: "bg-muted-foreground/30",
+    occupied: "bg-destructive",
+    upcoming: "bg-accent",
+    manual: "bg-blue-500",
+  };
 
   const handleTableClick = async (table: Table) => {
     const status = getTableStatus(table);
@@ -109,14 +120,6 @@ const FloorPlan = () => {
       setNewResForm({ guest_name: "", email: "", phone: "", guests: String(table.capacity), notes: "" });
       setShowNewReservation(true);
     }
-  };
-
-  const confirmReservation = async (id: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke("confirm-reservation", { body: { reservation_id: id } });
-      if (error) throw error; if (data?.error) throw new Error(data.error);
-      toast.success(t("floorPlan.confirmSuccess")); setShowDetails(false); fetchReservations();
-    } catch { toast.error(t("floorPlan.confirmError")); }
   };
 
   const cancelReservation = async (id: string) => {
@@ -194,10 +197,11 @@ const FloorPlan = () => {
           <Button variant="ghost" size="icon" disabled={timeIndex >= timeSlots.length - 1} onClick={() => setSelectedTime(timeSlots[timeIndex + 1])}><ChevronRight className="h-4 w-4" /></Button>
         </div>
 
-        <div className="flex items-center gap-4 ml-auto text-xs font-body text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-4 ml-auto text-xs font-body text-muted-foreground">
           <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-muted border border-border" /> {t("floorPlan.available")}</span>
           <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-destructive/20 border border-destructive" /> {t("floorPlan.occupied")}</span>
           <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-accent/30 border border-accent" /> {t("floorPlan.upcoming")}</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-blue-500/15 border border-blue-500/50" /> Gestión manual</span>
         </div>
       </div>
 
@@ -310,7 +314,6 @@ const FloorPlan = () => {
                 </span>
               </div>
               <div className="flex gap-2 pt-2">
-                {tableReservation.status !== "confirmed" && (<Button onClick={() => confirmReservation(tableReservation.id)} className="flex-1 font-bold" variant="default">{t("floorPlan.confirmBtn")}</Button>)}
                 <Button onClick={() => cancelReservation(tableReservation.id)} variant="destructive" className="flex-1 font-bold">{t("floorPlan.cancelReservation")}</Button>
               </div>
             </div>

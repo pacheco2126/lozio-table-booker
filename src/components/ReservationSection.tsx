@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
-import { AlertTriangle, CalendarIcon, Clock } from "lucide-react";
+import { AlertTriangle, CalendarIcon, Clock, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getUnavailableSlots, tablesNeeded, TABLES_PER_LOCATION, TABLE_CAPACITY } from "@/lib/availability";
+import { getUnavailableSlots, MAX_ONLINE_GUESTS } from "@/lib/availability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -18,10 +18,10 @@ import location2 from "@/assets/location-2.jpg";
 const COMING_SOON_LOCATIONS = ["tarragona"];
 
 const timeSlots = [
-  "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00",
+  "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00",
 ];
 
-const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const guestOptions = [1, 2, 3, 4, 5, 6];
 
 const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 
@@ -62,22 +62,22 @@ const ReservationSection = () => {
   const [guests, setGuests] = useState("2");
   const [date, setDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [step, setStep] = useState<"select" | "details">("select");
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", notes: "" });
+  const [step, setStep] = useState<"select" | "details" | "success">("select");
+  const [formData, setFormData] = useState({ name: "", phone: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
   const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [confirmationMsg, setConfirmationMsg] = useState("");
 
   const loc = locations.find((l) => l.id === selectedLocation)!;
   const guestsNum = parseInt(guests) || 2;
-  const maxGuests = TABLES_PER_LOCATION * TABLE_CAPACITY;
 
   useEffect(() => {
     const fetchAvailability = async () => {
       setLoadingSlots(true);
       const { data, error } = await supabase
         .from("reservations")
-        .select("reservation_time, guests")
+        .select("reservation_time, guests, table_id")
         .eq("location", selectedLocation)
         .eq("reservation_date", format(date, "yyyy-MM-dd"))
         .in("status", ["pending", "confirmed"]);
@@ -113,36 +113,50 @@ const ReservationSection = () => {
     e.preventDefault();
     setSubmitting(true);
 
-    const { error } = await supabase.from("reservations").insert({
-      location: selectedLocation,
-      guest_name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      reservation_date: format(date, "yyyy-MM-dd"),
-      reservation_time: selectedTime,
-      guests,
-      notes: formData.notes || null,
-      user_id: (await supabase.auth.getUser()).data.user?.id || null,
-    });
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id || null;
 
-    setSubmitting(false);
+      const { data, error } = await supabase.functions.invoke("auto-assign-reservation", {
+        body: {
+          location: selectedLocation,
+          guest_name: formData.name,
+          phone: formData.phone,
+          reservation_date: format(date, "yyyy-MM-dd"),
+          reservation_time: selectedTime,
+          guests,
+          notes: formData.notes || null,
+          user_id: userId,
+        },
+      });
 
-    if (error) {
+      if (error) throw error;
+
+      if (data?.success) {
+        const dateParts = format(date, "yyyy-MM-dd").split("-");
+        const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+        setConfirmationMsg(
+          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${selectedTime} en la ${data.table_name}.`
+        );
+        setStep("success");
+        toast.success("¡Reserva confirmada!");
+      } else if (data?.error === "no_tables") {
+        toast.error(data.message);
+      } else {
+        toast.error(data?.message || t("reservation.error"));
+      }
+    } catch (err) {
+      console.error(err);
       toast.error(t("reservation.error"));
-      console.error(error);
-      return;
     }
 
-    toast.success(t("reservation.successTitle", { name: loc.name }), {
-      description: t("reservation.successDesc", {
-        date: format(date, "PPP", { locale: dfLocale }),
-        time: selectedTime,
-        guests,
-      }),
-    });
-    setFormData({ name: "", email: "", phone: "", notes: "" });
+    setSubmitting(false);
+  };
+
+  const handleNewReservation = () => {
+    setFormData({ name: "", phone: "", notes: "" });
     setSelectedTime(null);
     setStep("select");
+    setConfirmationMsg("");
   };
 
   return (
@@ -218,7 +232,18 @@ const ReservationSection = () => {
             <p className="text-muted-foreground font-body text-sm mt-1">{t("reservation.pizzeria")}</p>
           </div>
 
-          {step === "select" ? (
+          {step === "success" ? (
+            <div className="px-6 pb-8 pt-6 text-center">
+              <CheckCircle className="w-16 h-16 text-secondary mx-auto mb-4" />
+              <p className="font-display text-xl font-bold text-foreground mb-3">{confirmationMsg}</p>
+              <p className="text-muted-foreground font-body text-sm mb-6">
+                {t("reservation.confirmationNote", "Recibirás un recordatorio por WhatsApp antes de tu reserva.")}
+              </p>
+              <Button onClick={handleNewReservation} variant="outline" className="font-body font-bold">
+                {t("reservation.newReservation", "Hacer otra reserva")}
+              </Button>
+            </div>
+          ) : step === "select" ? (
             <div className="px-6 pb-8">
               <div className="grid grid-cols-2 gap-3 py-6">
                 <div>
@@ -226,7 +251,6 @@ const ReservationSection = () => {
                   <select value={guests} onChange={(e) => setGuests(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                     {guestOptions.map((n) => (<option key={n} value={n}>{n}</option>))}
-                    <option value="10+">+10</option>
                   </select>
                 </div>
                 <div>
@@ -259,8 +283,10 @@ const ReservationSection = () => {
                   <p className="font-body text-sm text-muted-foreground">{t("reservation.selectTime")}</p>
                   {loadingSlots && <span className="font-body text-xs text-muted-foreground animate-pulse">{t("reservation.checkingAvailability")}</span>}
                 </div>
-                {tablesNeeded(guestsNum) > TABLES_PER_LOCATION ? (
-                  <p className="font-body text-sm text-destructive text-center py-4">{t("reservation.maxGuestsError", { max: maxGuests })}</p>
+                {guestsNum > MAX_ONLINE_GUESTS ? (
+                  <p className="font-body text-sm text-destructive text-center py-4">
+                    Para grupos de más de {MAX_ONLINE_GUESTS} personas, por favor llámanos directamente.
+                  </p>
                 ) : (
                   <div className="grid grid-cols-3 gap-2">
                     {timeSlots.map((slot) => {
@@ -297,17 +323,10 @@ const ReservationSection = () => {
                   <input type="text" name="name" required value={formData.name} onChange={handleChange}
                     className="w-full px-4 py-3 rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder={t("reservation.name")} />
                 </div>
-                <div className="grid grid-cols-1 gap-4">
-                  <div>
-                    <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.email")} *</label>
-                    <input type="email" name="email" required value={formData.email} onChange={handleChange}
-                      className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="tu@email.com" />
-                  </div>
-                  <div>
-                    <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.phone")} *</label>
-                    <input type="tel" name="phone" required value={formData.phone} onChange={handleChange}
-                      className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="+34 600 000 000" />
-                  </div>
+                <div>
+                  <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.phone")} *</label>
+                  <input type="tel" name="phone" required value={formData.phone} onChange={handleChange}
+                    className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="+34 600 000 000" />
                 </div>
                 <div>
                   <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.notes")}</label>
