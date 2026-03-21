@@ -29,6 +29,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <InstallBanner />
+            <UpdateBanner />
             <CartDrawer />
             <CartFloatingButton />
             <MobileBottomNav />
