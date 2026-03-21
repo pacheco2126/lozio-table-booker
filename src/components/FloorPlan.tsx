@@ -48,14 +48,14 @@ const FloorPlan = () => {
   const dateStr = format(selectedDate, "yyyy-MM-dd");
 
   const fetchTables = useCallback(async () => {
-    const { data } = await supabase.from("tables").select("*").eq("location", "tarragona").eq("is_active", true);
+    const { data } = await supabase.from("tables").select("*").eq("location", floorLocation).eq("is_active", true);
     if (data) setTables(data as Table[]);
-  }, []);
+  }, [floorLocation]);
 
   const fetchReservations = useCallback(async () => {
-    const { data } = await supabase.from("reservations").select("*").eq("reservation_date", dateStr).eq("location", "tarragona").in("status", ["pending", "confirmed"]);
+    const { data } = await supabase.from("reservations").select("*").eq("reservation_date", dateStr).eq("location", floorLocation).in("status", ["pending", "confirmed"]);
     if (data) setReservations(data as Reservation[]);
-  }, [dateStr]);
+  }, [dateStr, floorLocation]);
 
   useEffect(() => { fetchTables(); }, [fetchTables]);
   useEffect(() => { fetchReservations(); }, [fetchReservations]);
