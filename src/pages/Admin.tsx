@@ -16,6 +16,7 @@ interface Reservation {
   id: string; location: string; guest_name: string; email: string; phone: string;
   reservation_date: string; reservation_time: string; guests: string;
   notes: string | null; status: string; created_at: string; user_id: string | null;
+  table_id: string | null;
 }
 
 const locationNames: Record<string, string> = {
@@ -32,6 +33,7 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [filterLocation, setFilterLocation] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [tableNames, setTableNames] = useState<Record<string, string>>({});
 
   const statusLabels: Record<string, { label: string; className: string }> = {
     pending: { label: t("admin.statusPending"), className: "bg-accent/20 text-accent-foreground" },
@@ -43,6 +45,7 @@ const Admin = () => {
   useEffect(() => {
     if (!adminLoading && isAdmin) {
       fetchReservations();
+      fetchTableNames();
     } else if (!adminLoading) {
       setLoading(false);
     }
@@ -54,14 +57,13 @@ const Admin = () => {
     setLoading(false);
   };
 
-  const confirmReservation = async (id: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke("confirm-reservation", { body: { reservation_id: id } });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      toast.success(t("admin.confirmSuccess"));
-      fetchReservations();
-    } catch { toast.error(t("admin.confirmError")); }
+  const fetchTableNames = async () => {
+    const { data } = await supabase.from("tables").select("id, name");
+    if (data) {
+      const map: Record<string, string> = {};
+      data.forEach((t: any) => { map[t.id] = t.name; });
+      setTableNames(map);
+    }
   };
 
   const updateStatus = async (id: string, status: string) => {
@@ -91,7 +93,7 @@ const Admin = () => {
     return true;
   });
 
-  const headers = ["date","time","location","client","contact","guests","notes","status","actions"].map(
+  const headers = ["date","time","location","client","contact","guests","table","status","actions"].map(
     (h) => t(`admin.tableHeaders.${h}`)
   );
 
@@ -171,18 +173,12 @@ const Admin = () => {
                             <td className="px-4 py-3 font-body text-foreground whitespace-nowrap">{r.reservation_time}</td>
                             <td className="px-4 py-3 font-body text-foreground whitespace-nowrap">{locationNames[r.location] || r.location}</td>
                             <td className="px-4 py-3 font-body text-foreground font-bold">{r.guest_name}</td>
-                            <td className="px-4 py-3 font-body text-muted-foreground"><div>{r.email}</div><div>{r.phone}</div></td>
+                            <td className="px-4 py-3 font-body text-muted-foreground"><div>{r.phone}</div></td>
                             <td className="px-4 py-3 font-body text-foreground text-center">{r.guests}</td>
-                            <td className="px-4 py-3 font-body text-muted-foreground max-w-[200px] truncate">{r.notes || "—"}</td>
+                            <td className="px-4 py-3 font-body text-foreground whitespace-nowrap">{r.table_id ? tableNames[r.table_id] || "—" : "—"}</td>
                             <td className="px-4 py-3"><span className={`px-2 py-1 rounded-sm text-xs font-bold font-body ${st.className}`}>{st.label}</span></td>
                             <td className="px-4 py-3">
                               <div className="flex gap-1">
-                                {r.status !== "confirmed" && (
-                                  <button onClick={() => confirmReservation(r.id)}
-                                    className="px-2 py-1 text-xs font-body font-bold bg-secondary/20 text-secondary rounded-sm hover:bg-secondary/30 transition-colors">
-                                    {t("admin.confirm")}
-                                  </button>
-                                )}
                                 {r.status !== "cancelled" && (
                                   <button onClick={() => updateStatus(r.id, "cancelled")}
                                     className="px-2 py-1 text-xs font-body font-bold bg-destructive/20 text-destructive rounded-sm hover:bg-destructive/30 transition-colors">
@@ -215,19 +211,15 @@ const Admin = () => {
                           <span>{r.reservation_date}</span>
                           <span className="font-bold">{r.reservation_time}</span>
                           <span>{r.guests} 👤</span>
+                          {r.table_id && tableNames[r.table_id] && (
+                            <span className="text-muted-foreground">🪑 {tableNames[r.table_id]}</span>
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground font-body">
-                          <p>{r.email}</p>
                           <p>{r.phone}</p>
                         </div>
                         {r.notes && <p className="text-xs text-muted-foreground font-body italic">{r.notes}</p>}
                         <div className="flex gap-2 pt-1">
-                          {r.status !== "confirmed" && (
-                            <button onClick={() => confirmReservation(r.id)}
-                              className="flex-1 px-3 py-2.5 min-h-[44px] text-sm font-body font-bold bg-secondary/20 text-secondary rounded-md hover:bg-secondary/30 transition-colors">
-                              {t("admin.confirm")}
-                            </button>
-                          )}
                           {r.status !== "cancelled" && (
                             <button onClick={() => updateStatus(r.id, "cancelled")}
                               className="flex-1 px-3 py-2.5 min-h-[44px] text-sm font-body font-bold bg-destructive/20 text-destructive rounded-md hover:bg-destructive/30 transition-colors">
