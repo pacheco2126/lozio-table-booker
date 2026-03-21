@@ -41,20 +41,21 @@ const FloorPlan = () => {
   const [draggingTable, setDraggingTable] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const floorRef = useRef<HTMLDivElement>(null);
+  const [floorLocation, setFloorLocation] = useState("arrabassada");
   const [newResForm, setNewResForm] = useState({ guest_name: "", email: "", phone: "", guests: "2", notes: "" });
   const [submitting, setSubmitting] = useState(false);
 
   const dateStr = format(selectedDate, "yyyy-MM-dd");
 
   const fetchTables = useCallback(async () => {
-    const { data } = await supabase.from("tables").select("*").eq("location", "tarragona").eq("is_active", true);
+    const { data } = await supabase.from("tables").select("*").eq("location", floorLocation).eq("is_active", true);
     if (data) setTables(data as Table[]);
-  }, []);
+  }, [floorLocation]);
 
   const fetchReservations = useCallback(async () => {
-    const { data } = await supabase.from("reservations").select("*").eq("reservation_date", dateStr).eq("location", "tarragona").in("status", ["pending", "confirmed"]);
+    const { data } = await supabase.from("reservations").select("*").eq("reservation_date", dateStr).eq("location", floorLocation).in("status", ["pending", "confirmed"]);
     if (data) setReservations(data as Reservation[]);
-  }, [dateStr]);
+  }, [dateStr, floorLocation]);
 
   useEffect(() => { fetchTables(); }, [fetchTables]);
   useEffect(() => { fetchReservations(); }, [fetchReservations]);
@@ -132,7 +133,7 @@ const FloorPlan = () => {
     if (!newResForm.guest_name.trim() || !newResForm.phone.trim()) { toast.error(t("floorPlan.namePhoneRequired")); return; }
     setSubmitting(true);
     const { error } = await supabase.from("reservations").insert({
-      location: "tarragona", guest_name: newResForm.guest_name, email: newResForm.email || "manual@reserva.local",
+      location: floorLocation, guest_name: newResForm.guest_name, email: newResForm.email || "manual@reserva.local",
       phone: newResForm.phone, reservation_date: dateStr, reservation_time: selectedTime,
       guests: newResForm.guests, notes: newResForm.notes || null, status: "confirmed", user_id: null, table_id: selectedTable?.id || null,
     });
@@ -179,6 +180,11 @@ const FloorPlan = () => {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3 bg-card rounded-lg p-4 border border-border">
+        <select value={floorLocation} onChange={(e) => setFloorLocation(e.target.value)}
+          className="px-3 py-2 rounded-md bg-background border border-input font-body text-foreground text-sm font-bold">
+          <option value="arrabassada">Lo Zio Arrabassada</option>
+          <option value="tarragona">Lo Zio Tarragona</option>
+        </select>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="gap-2 font-body"><CalendarIcon className="h-4 w-4" />{format(selectedDate, "EEEE d MMMM", { locale: dfLocale })}</Button>
