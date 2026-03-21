@@ -69,7 +69,7 @@ const Admin = () => {
     if (error) { toast.error(t("admin.statusError")); } else { toast.success(t("admin.statusUpdated")); fetchReservations(); }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || adminLoading || loading) {
     return (<div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground font-body">{t("profile.loadingText")}</p></div>);
   }
 
