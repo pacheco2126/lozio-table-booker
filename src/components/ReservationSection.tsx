@@ -150,7 +150,15 @@ const ReservationSection = () => {
           {locations.map((l) => (
             <button
               key={l.id}
-              onClick={() => { setSelectedLocation(l.id); setSelectedTime(null); setStep("select"); }}
+              onClick={() => {
+                setSelectedLocation(l.id); setSelectedTime(null); setStep("select");
+                setTimeout(() => {
+                  const el = document.getElementById('reservation-form');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  setHighlight(true);
+                  setTimeout(() => setHighlight(false), 1500);
+                }, 100);
+              }}
               className={`group relative overflow-hidden rounded-lg transition-all duration-300 ${
                 selectedLocation === l.id ? "ring-4 ring-primary shadow-xl scale-[1.02]" : "ring-1 ring-border hover:ring-primary/50"
               }`}
