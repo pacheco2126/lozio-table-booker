@@ -174,7 +174,7 @@ const ReservationSection = () => {
           ))}
         </div>
 
-        <div className="max-w-xl mx-auto bg-card rounded-xl shadow-lg border border-border overflow-hidden">
+        <div id="reservation-form" className={`max-w-xl mx-auto bg-card rounded-xl shadow-lg border overflow-hidden scroll-mt-20 transition-all duration-700 ${highlight ? 'border-primary ring-2 ring-primary/40 shadow-primary/20 shadow-xl' : 'border-border'}`} style={{ scrollMarginBottom: '64px' }}>
           <div className="text-center pt-8 pb-2 px-6">
             <h3 className="font-display text-2xl font-bold text-foreground">{loc.name}</h3>
             <p className="text-muted-foreground font-body text-sm mt-1">{t("reservation.pizzeria")}</p>
