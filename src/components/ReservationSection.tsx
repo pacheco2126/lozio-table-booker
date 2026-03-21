@@ -75,18 +75,31 @@ const ReservationSection = () => {
   useEffect(() => {
     const fetchAvailability = async () => {
       setLoadingSlots(true);
-      const { data, error } = await supabase
-        .from("reservations")
-        .select("reservation_time, guests, table_id")
-        .eq("location", selectedLocation)
-        .eq("reservation_date", format(date, "yyyy-MM-dd"))
-        .in("status", ["pending", "confirmed"]);
 
-      if (error) {
-        console.error("Error fetching availability:", error);
+      const [resResult, tablesResult] = await Promise.all([
+        supabase
+          .from("reservations")
+          .select("reservation_time, guests, table_id")
+          .eq("location", selectedLocation)
+          .eq("reservation_date", format(date, "yyyy-MM-dd"))
+          .in("status", ["pending", "confirmed"]),
+        supabase
+          .from("tables")
+          .select("id, name, capacity")
+          .eq("location", selectedLocation)
+          .eq("is_active", true),
+      ]);
+
+      if (resResult.error) {
+        console.error("Error fetching availability:", resResult.error);
         setUnavailableSlots(new Set());
       } else {
-        const unavailable = getUnavailableSlots(data || [], loc.timeSlots, guestsNum);
+        const unavailable = getUnavailableSlots(
+          resResult.data || [],
+          loc.timeSlots,
+          guestsNum,
+          tablesResult.data || undefined
+        );
         setUnavailableSlots(unavailable);
       }
       setLoadingSlots(false);
