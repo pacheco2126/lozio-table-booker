@@ -5,7 +5,7 @@ const HeroSection = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden landscape-hero">
+    <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden hero-section">
       <img
         src={heroPizza}
         alt="Pizza artesanal italiana con mozzarella fresca y albahaca"
