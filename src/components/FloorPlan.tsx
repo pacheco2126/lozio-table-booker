@@ -180,6 +180,11 @@ const FloorPlan = () => {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3 bg-card rounded-lg p-4 border border-border">
+        <select value={floorLocation} onChange={(e) => setFloorLocation(e.target.value)}
+          className="px-3 py-2 rounded-md bg-background border border-input font-body text-foreground text-sm font-bold">
+          <option value="arrabassada">Lo Zio Arrabassada</option>
+          <option value="tarragona">Lo Zio Tarragona</option>
+        </select>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="gap-2 font-body"><CalendarIcon className="h-4 w-4" />{format(selectedDate, "EEEE d MMMM", { locale: dfLocale })}</Button>
