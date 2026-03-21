@@ -25,6 +25,7 @@ const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 const ReservationSection = () => {
   const { t, i18n } = useTranslation();
   const dfLocale = dateFnsLocales[i18n.language] || es;
+  const [highlight, setHighlight] = useState(false);
 
   const locations = [
     {
