@@ -11,7 +11,10 @@
     "subtitle": "Auténtica pizza italiana",
     "title": "Lo Zio",
     "description": "",
-    "cta": "Reservar Mesa"
+    "cta": "Reservar Mesa",
+    "reserveSubtitle": "Elige local, fecha y hora",
+    "orderCta": "Pedir a Domicilio",
+    "orderSubtitle": "Ver carta y hacer tu pedido"
   },
   "menu": {
     "header": "Nuestra Carta",
