@@ -41,6 +41,7 @@ const FloorPlan = () => {
   const [draggingTable, setDraggingTable] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const floorRef = useRef<HTMLDivElement>(null);
+  const [floorLocation, setFloorLocation] = useState("arrabassada");
   const [newResForm, setNewResForm] = useState({ guest_name: "", email: "", phone: "", guests: "2", notes: "" });
   const [submitting, setSubmitting] = useState(false);
 
