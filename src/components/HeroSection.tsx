@@ -5,7 +5,7 @@ const HeroSection = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden landscape-hero">
+    <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden hero-section">
       <img
         src={heroPizza}
         alt="Pizza artesanal italiana con mozzarella fresca y albahaca"
@@ -13,7 +13,7 @@ const HeroSection = () => {
         loading="eager"
       />
       <div className="hero-overlay absolute inset-0" />
-      <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
+      <div className="relative z-10 text-center px-4 max-w-3xl mx-auto hero-content">
         <p className="text-primary-foreground/80 font-body text-lg tracking-[0.3em] uppercase mb-4 animate-fade-in-up">
           {t("hero.subtitle")}
         </p>

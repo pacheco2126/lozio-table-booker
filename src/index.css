@@ -109,8 +109,19 @@
   display: none;
 }
 
+/* Mobile landscape: hero + nav compact */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .hero-section {
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+  }
+  .hero-content {
+    padding-top: 60px;
+    padding-bottom: 20px;
+  }
+}
+
 @media (orientation: landscape) and (max-height: 430px) and (max-width: 932px) {
-  /* Show hamburger and dropdown in landscape */
   .landscape-hamburger {
     display: block !important;
   }
@@ -118,38 +129,27 @@
     display: flex !important;
   }
 
-  /* Reduce vertical spacing globally */
+  /* Compact nav: 48px */
+  nav.fixed {
+    height: 48px !important;
+    min-height: 48px !important;
+  }
+  nav.fixed > div {
+    height: 100%;
+  }
+  nav.fixed img {
+    height: 1.75rem !important;
+  }
+
   .landscape-compact section {
     padding-top: 1.5rem !important;
     padding-bottom: 1.5rem !important;
   }
 
-  /* Hide bottom nav in landscape */
   .landscape-hide-bottom-nav {
     display: none !important;
   }
 
-  /* Compact hero */
-  .landscape-hero {
-    min-height: unset !important;
-    height: 30vh !important;
-    max-height: 30vh !important;
-  }
-
-  .landscape-hero h1 {
-    font-size: 1.75rem !important;
-  }
-
-  .landscape-hero p {
-    font-size: 0.85rem !important;
-    margin-bottom: 0.5rem !important;
-  }
-
-  .landscape-hero .mb-10 {
-    margin-bottom: 1rem !important;
-  }
-
-  /* 2-column form layout */
   .landscape-form-grid {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
@@ -160,13 +160,11 @@
     grid-column: 1 / -1;
   }
 
-  /* Floor plan scrollable */
   .landscape-floor-scroll {
     overflow: auto !important;
     max-height: 60vh !important;
   }
 
-  /* Reduce card/section padding */
   .landscape-compact .py-16 {
     padding-top: 1.5rem !important;
     padding-bottom: 1.5rem !important;
