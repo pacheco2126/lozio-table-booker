@@ -133,7 +133,7 @@ const FloorPlan = () => {
     if (!newResForm.guest_name.trim() || !newResForm.phone.trim()) { toast.error(t("floorPlan.namePhoneRequired")); return; }
     setSubmitting(true);
     const { error } = await supabase.from("reservations").insert({
-      location: "tarragona", guest_name: newResForm.guest_name, email: newResForm.email || "manual@reserva.local",
+      location: floorLocation, guest_name: newResForm.guest_name, email: newResForm.email || "manual@reserva.local",
       phone: newResForm.phone, reservation_date: dateStr, reservation_time: selectedTime,
       guests: newResForm.guests, notes: newResForm.notes || null, status: "confirmed", user_id: null, table_id: selectedTable?.id || null,
     });
