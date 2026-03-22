@@ -45,7 +45,7 @@ const Admin = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [tableNames, setTableNames] = useState<Record<string, string>>({});
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [showPast, setShowPast] = useState(false);
+  const [showPast, setShowPast] = useState(true);
   const [calendarOpen, setCalendarOpen] = useState(!isMobile);
 
   const statusLabels: Record<string, { label: string; className: string }> = {
