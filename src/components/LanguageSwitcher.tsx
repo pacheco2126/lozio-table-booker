@@ -4,6 +4,7 @@ const languages = [
   { code: "es", label: "ES" },
   { code: "en", label: "EN" },
   { code: "ca", label: "CA" },
+  { code: "it", label: "IT" },
 ];
 
 const LanguageSwitcher = () => {
