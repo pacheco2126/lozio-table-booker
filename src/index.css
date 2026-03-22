@@ -183,3 +183,19 @@
     padding-bottom: 0.75rem !important;
   }
 }
+
+/* Calendar reservation dot indicator */
+.reservation-dot {
+  position: relative;
+}
+.reservation-dot::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: hsl(var(--destructive));
+}
