@@ -13,14 +13,15 @@ serve(async (req) => {
   }
 
   try {
-    const { location, guest_name, phone, reservation_date, reservation_time, guests, notes, user_id } = await req.json();
+    const { location, guest_name, phone, reservation_date, reservation_time, guests, notes, user_id } =
+      await req.json();
 
     if (!location || !guest_name || !phone || !reservation_date || !reservation_time || !guests) {
       throw new Error("Missing required fields");
     }
 
     const guestsNum = parseInt(guests) || 2;
-    if (guestsNum < 1 || guestsNum > 6) {
+    if (guestsNum < 1 || guestsNum > 15) {
       throw new Error("El número de comensales debe ser entre 1 y 6 para reservas online.");
     }
 
@@ -46,18 +47,15 @@ serve(async (req) => {
         JSON.stringify({
           success: false,
           error: "no_tables",
-          message: "Lo sentimos, no hay mesas disponibles para ese horario. Por favor elige otro horario o llámanos directamente.",
+          message:
+            "Lo sentimos, no hay mesas disponibles para ese horario. Por favor elige otro horario o llámanos directamente.",
         }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
     // Get table name for the confirmation message
-    const { data: tableData } = await supabase
-      .from("tables")
-      .select("name")
-      .eq("id", tableId)
-      .single();
+    const { data: tableData } = await supabase.from("tables").select("name").eq("id", tableId).single();
 
     const tableName = tableData?.name || "asignada";
 
@@ -107,22 +105,19 @@ serve(async (req) => {
           `🪑 Mesa: ${tableName}\n` +
           `📍 Local: ${location}${notes ? `\n📝 Notas: ${notes}` : ""}`;
 
-        await fetch(
-          `https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_ID}/messages`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${WHATSAPP_TOKEN}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              messaging_product: "whatsapp",
-              to: cleanPhone,
-              type: "text",
-              text: { body: message },
-            }),
-          }
-        );
+        await fetch(`https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_ID}/messages`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            to: cleanPhone,
+            type: "text",
+            text: { body: message },
+          }),
+        });
       }
     } catch (whatsappError) {
       console.error("WhatsApp notification failed (non-blocking):", whatsappError);
@@ -135,13 +130,13 @@ serve(async (req) => {
         table_name: tableName,
         message: `¡Reserva confirmada! Te esperamos el ${reservation_date} a las ${reservation_time.substring(0, 5)} en la ${tableName}.`,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
     console.error("Error in auto-assign-reservation:", error.message);
-    return new Response(
-      JSON.stringify({ success: false, error: "server_error", message: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ success: false, error: "server_error", message: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
