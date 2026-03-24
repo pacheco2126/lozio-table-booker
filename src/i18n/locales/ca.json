@@ -83,6 +83,7 @@
     "selectTime": "Selecciona una hora",
     "checkingAvailability": "Comprovant disponibilitat...",
     "maxGuestsError": "Ho sentim, no podem acomodar grups de més de {{max}} persones.",
+    "largeGroupMessage": "Per a grups de més de {{max}} persones, si us plau truca'ns directament.",
     "durationWarning": "Disposes d'<strong>1 hora i mitja</strong> per gaudir del teu àpat.",
     "person": "persona",
     "persons": "persones",

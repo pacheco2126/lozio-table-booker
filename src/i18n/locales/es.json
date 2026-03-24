@@ -83,6 +83,7 @@
     "selectTime": "Selecciona una hora",
     "checkingAvailability": "Comprobando disponibilidad...",
     "maxGuestsError": "Lo sentimos, no podemos acomodar grupos de más de {{max}} personas.",
+    "largeGroupMessage": "Para grupos de más de {{max}} personas, por favor llámanos directamente.",
     "durationWarning": "Dispones de <strong>1 hora y media</strong> para disfrutar de tu comida.",
     "person": "persona",
     "persons": "personas",
