@@ -6,7 +6,7 @@ import { Menu, X } from "lucide-react";
 const logo_app_inicio = "/logo_app_inicio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-const Navbar = () => {
+const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
