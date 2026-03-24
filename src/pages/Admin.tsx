@@ -292,59 +292,20 @@ const Admin = () => {
                     <option value="confirmed">{t("admin.confirmed")}</option>
                     <option value="cancelled">{t("admin.cancelled")}</option>
                   </select>
-                  {selectedDate && (
+                  {format(selectedDate, "yyyy-MM-dd") !== format(new Date(), "yyyy-MM-dd") && (
                     <Button size="sm" variant="ghost" onClick={handleGoToToday} className="font-body text-xs text-primary">
-                      ✕ Quitar filtro de fecha
+                      ✕ Volver a hoy
                     </Button>
                   )}
                 </div>
 
-                {/* Today's reservations */}
-                {todayReservations.length > 0 && (
-                  <>
-                    {renderDateGroup(format(new Date(), "yyyy-MM-dd"), todayReservations, true)}
-                    {Object.keys(futureGroups).length > 0 && (
-                      <div className="border-t-2 border-primary/20 my-4" />
-                    )}
-                  </>
-                )}
-
-                {/* Future reservations grouped by date */}
-                {Object.keys(futureGroups).sort().map((dateStr) => (
-                  renderDateGroup(dateStr, futureGroups[dateStr])
-                ))}
-
-                {/* Empty state */}
-                {todayReservations.length === 0 && Object.keys(futureGroups).length === 0 && pastReservations.length === 0 && (
+                {/* Reservations for selected date */}
+                {filteredForDate.length > 0 ? (
+                  renderDateGroup(format(selectedDate, "yyyy-MM-dd"), filteredForDate, format(selectedDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd"))
+                ) : (
                   <div className="bg-card rounded-lg p-12 border border-border text-center">
                     <p className="text-muted-foreground font-body text-lg">{t("admin.noReservations")}</p>
                   </div>
-                )}
-
-                {/* Past reservations collapsible */}
-                {!selectedDate && pastReservations.length > 0 && (
-                  <Collapsible open={showPast} onOpenChange={setShowPast}>
-                    <div className="border-t border-border pt-4 mt-4">
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" className="w-full justify-between font-body text-sm text-muted-foreground">
-                          <span>Ver reservas pasadas ({pastReservations.length})</span>
-                          {showPast ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                        </Button>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="mt-3 space-y-6">
-                        {(() => {
-                          const pastGroups: Record<string, Reservation[]> = {};
-                          pastReservations.forEach((r) => {
-                            if (!pastGroups[r.reservation_date]) pastGroups[r.reservation_date] = [];
-                            pastGroups[r.reservation_date].push(r);
-                          });
-                          return Object.keys(pastGroups).sort().reverse().map((dateStr) =>
-                            renderDateGroup(dateStr, pastGroups[dateStr])
-                          );
-                        })()}
-                      </CollapsibleContent>
-                    </div>
-                  </Collapsible>
                 )}
               </div>
             </div>
