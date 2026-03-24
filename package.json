@@ -10,8 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "postinstall": "sed -i 's/type ReactI18NextChildren = React.ReactNode | ObjectOrNever;/type ReactI18NextChildren = React.ReactNode;/' node_modules/react-i18next/index.d.ts 2>/dev/null || true"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
