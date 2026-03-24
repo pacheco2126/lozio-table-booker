@@ -183,7 +183,7 @@ const Admin = () => {
     );
   };
 
-  const totalActive = filtered.filter(r => r.status !== "cancelled").length;
+  const totalActive = filteredForDate.filter(r => r.status !== "cancelled").length;
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
