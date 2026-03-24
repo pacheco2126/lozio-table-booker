@@ -359,6 +359,26 @@ const Admin = () => {
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
         </Tabs>
       </div>
+      <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingToggleValue ? "¿Activar reservas?" : "¿Desactivar reservas?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingToggleValue
+                ? "Los usuarios podrán volver a hacer reservas online."
+                : "Los usuarios no podrán hacer nuevas reservas hasta que las reactives."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmToggleReservations}>
+              Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
