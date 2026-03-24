@@ -8,6 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
 import FloorPlan from "@/components/FloorPlan";
@@ -46,6 +48,9 @@ const Admin = () => {
   const [tableNames, setTableNames] = useState<Record<string, string>>({});
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(!isMobile);
+  const [reservationsEnabled, setReservationsEnabled] = useState(true);
+  const [showToggleDialog, setShowToggleDialog] = useState(false);
+  const [pendingToggleValue, setPendingToggleValue] = useState(false);
 
   const statusLabels: Record<string, { label: string; className: string }> = {
     pending: { label: t("admin.statusPending"), className: "bg-accent/20 text-accent-foreground" },
@@ -58,10 +63,32 @@ const Admin = () => {
     if (!adminLoading && isAdmin) {
       fetchReservations();
       fetchTableNames();
+      fetchReservationsEnabled();
     } else if (!adminLoading) {
       setLoading(false);
     }
   }, [isAdmin, adminLoading]);
+
+  const fetchReservationsEnabled = async () => {
+    const { data } = await supabase.from("site_settings").select("value").eq("key", "reservations_enabled").single();
+    if (data) setReservationsEnabled(data.value === true);
+  };
+
+  const handleToggleReservations = (checked: boolean) => {
+    setPendingToggleValue(checked);
+    setShowToggleDialog(true);
+  };
+
+  const confirmToggleReservations = async () => {
+    const { error } = await supabase.from("site_settings").update({ value: pendingToggleValue, updated_at: new Date().toISOString() }).eq("key", "reservations_enabled");
+    if (error) {
+      toast.error("Error al actualizar el estado de las reservas");
+    } else {
+      setReservationsEnabled(pendingToggleValue);
+      toast.success(pendingToggleValue ? "Reservas activadas" : "Reservas desactivadas");
+    }
+    setShowToggleDialog(false);
+  };
 
   const fetchReservations = async () => {
     const { data, error } = await supabase.from("reservations").select("*").order("reservation_date", { ascending: true }).order("reservation_time", { ascending: true });
@@ -206,6 +233,22 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="reservations" className="space-y-6">
+            {/* Toggle reservas */}
+            <div className="flex items-center justify-between bg-card rounded-lg p-4 border border-border shadow-sm">
+              <div>
+                <p className="font-body font-bold text-foreground text-sm">
+                  {reservationsEnabled ? "Reservas activas" : "Reservas desactivadas"}
+                </p>
+                <p className="text-muted-foreground font-body text-xs mt-0.5">
+                  {reservationsEnabled ? "Los usuarios pueden hacer reservas online" : "Las reservas online están pausadas"}
+                </p>
+              </div>
+              <Switch
+                checked={reservationsEnabled}
+                onCheckedChange={handleToggleReservations}
+              />
+            </div>
+
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
@@ -316,6 +359,26 @@ const Admin = () => {
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
         </Tabs>
       </div>
+      <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingToggleValue ? "¿Activar reservas?" : "¿Desactivar reservas?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingToggleValue
+                ? "Los usuarios podrán volver a hacer reservas online."
+                : "Los usuarios no podrán hacer nuevas reservas hasta que las reactives."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmToggleReservations}>
+              Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

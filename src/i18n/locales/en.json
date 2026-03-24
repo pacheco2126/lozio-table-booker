@@ -73,6 +73,8 @@
     "title": "Reserve Your Table",
     "subtitle": "Choose one of our two locations and enjoy the best artisan pizza.",
     "pizzeria": "Pizzeria",
+    "disabledTitle": "Reservations unavailable",
+    "disabledMessage": "Online reservations are temporarily disabled. Please try again later or call us.",
     "guests": "Guests",
     "date": "Date",
     "selectTime": "Select a time",

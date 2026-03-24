@@ -73,6 +73,8 @@
     "title": "Reserva tu Mesa",
     "subtitle": "Elige uno de nuestros dos locales y disfruta de la mejor pizza artesanal.",
     "pizzeria": "Pizzería",
+    "disabledTitle": "Reservas no disponibles",
+    "disabledMessage": "Las reservas online están temporalmente desactivadas. Por favor, inténtalo más tarde o llámanos por teléfono.",
     "guests": "Personas",
     "date": "Fecha",
     "selectTime": "Selecciona una hora",

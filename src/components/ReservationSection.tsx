@@ -68,6 +68,17 @@ const ReservationSection = () => {
   const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [confirmationMsg, setConfirmationMsg] = useState("");
+  const [reservationsEnabled, setReservationsEnabled] = useState(true);
+  const [loadingEnabled, setLoadingEnabled] = useState(true);
+
+  useEffect(() => {
+    const fetchEnabled = async () => {
+      const { data } = await supabase.from("site_settings").select("value").eq("key", "reservations_enabled").single();
+      if (data) setReservationsEnabled(data.value === true);
+      setLoadingEnabled(false);
+    };
+    fetchEnabled();
+  }, []);
 
   const loc = locations.find((l) => l.id === selectedLocation)!;
   const guestsNum = parseInt(guests) || 2;
@@ -227,7 +238,15 @@ const ReservationSection = () => {
           })}
         </div>
 
-        {COMING_SOON_LOCATIONS.includes(selectedLocation) && !isAdmin ? (
+        {!reservationsEnabled && !isAdmin ? (
+          <div className="max-w-xl mx-auto bg-card rounded-xl shadow-lg border border-dashed border-muted-foreground/30 overflow-hidden text-center py-16 px-6">
+            <AlertTriangle className="w-12 h-12 text-destructive/60 mx-auto mb-4" />
+            <h3 className="font-display text-2xl font-bold text-foreground mb-2">{t("reservation.disabledTitle", "Reservas no disponibles")}</h3>
+            <p className="text-muted-foreground font-body text-sm mt-3">
+              {t("reservation.disabledMessage", "Las reservas online están temporalmente desactivadas. Por favor, inténtalo más tarde o llámanos por teléfono.")}
+            </p>
+          </div>
+        ) : COMING_SOON_LOCATIONS.includes(selectedLocation) && !isAdmin ? (
           <div className="max-w-xl mx-auto bg-card rounded-xl shadow-lg border border-dashed border-muted-foreground/30 overflow-hidden text-center py-16 px-6">
             <Clock className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
             <h3 className="font-display text-2xl font-bold text-foreground mb-2">{loc.name}</h3>
