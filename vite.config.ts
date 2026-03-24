@@ -83,7 +83,6 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "react-i18next": path.resolve(__dirname, "./src/lib/react-i18next.ts"),
     },
   },
 }));

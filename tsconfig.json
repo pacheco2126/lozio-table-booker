@@ -7,9 +7,6 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "react-i18next": [
-        "./src/lib/react-i18next.ts"
       ]
     },
     "skipLibCheck": true,

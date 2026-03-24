@@ -41,11 +41,11 @@ const Admin = () => {
   const isMobile = useIsMobile();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterLocation, setFilterLocation] = useState("arrabassada");
+  const [filterLocation, setFilterLocation] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [tableNames, setTableNames] = useState<Record<string, string>>({});
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [showPast, setShowPast] = useState(false);
+  const [showPast, setShowPast] = useState(true);
   const [calendarOpen, setCalendarOpen] = useState(!isMobile);
 
   const statusLabels: Record<string, { label: string; className: string }> = {
@@ -357,8 +357,8 @@ const Admin = () => {
                   </div>
                 )}
 
-                {/* Past reservations — only via calendar selection */}
-                {selectedDate && pastReservations.length > 0 && (
+                {/* Past reservations collapsible */}
+                {!selectedDate && pastReservations.length > 0 && (
                   <Collapsible open={showPast} onOpenChange={setShowPast}>
                     <div className="border-t border-border pt-4 mt-4">
                       <CollapsibleTrigger asChild>
