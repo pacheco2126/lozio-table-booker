@@ -1,10 +1,12 @@
-// Override react-i18next's children type to be compatible with React 18 + Radix UI
-// See: https://github.com/i18next/react-i18next/issues/1587
-import "react-i18next";
-import type { ReactNode } from "react";
+// Fix react-i18next augmenting React.HTMLAttributes.children with ObjectOrNever,
+// which breaks Radix UI components expecting standard ReactNode children.
+// Setting allowObjectInHTMLChildren makes ObjectOrNever resolve to `never`,
+// so ReactI18NextChildren collapses to just React.ReactNode.
+import "i18next";
 
-declare module "react-i18next" {
-  export interface TransProps<TOpt = {}> {
-    children?: ReactNode;
+declare module "i18next" {
+  interface CustomTypeOptions {
+    allowObjectInHTMLChildren: true;
+    returnNull: false;
   }
 }
