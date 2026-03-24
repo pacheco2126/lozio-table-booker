@@ -199,3 +199,6 @@
   border-radius: 50%;
   background-color: hsl(var(--destructive));
 }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
