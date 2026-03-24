@@ -210,9 +210,9 @@ const Admin = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: t("admin.total"), count: totalActive },
-                { label: t("admin.pending"), count: filtered.filter((r) => r.status === "pending").length },
-                { label: t("admin.confirmed"), count: filtered.filter((r) => r.status === "confirmed").length },
-                { label: t("admin.cancelled"), count: filtered.filter((r) => r.status === "cancelled").length },
+                { label: t("admin.pending"), count: filteredForDate.filter((r) => r.status === "pending").length },
+                { label: t("admin.confirmed"), count: filteredForDate.filter((r) => r.status === "confirmed").length },
+                { label: t("admin.cancelled"), count: filteredForDate.filter((r) => r.status === "cancelled").length },
               ].map((s) => (
                 <div key={s.label} className="bg-card rounded-lg p-5 border border-border shadow-sm">
                   <p className="text-muted-foreground font-body text-sm">{s.label}</p>
