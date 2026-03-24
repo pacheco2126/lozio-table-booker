@@ -63,10 +63,32 @@ const Admin = () => {
     if (!adminLoading && isAdmin) {
       fetchReservations();
       fetchTableNames();
+      fetchReservationsEnabled();
     } else if (!adminLoading) {
       setLoading(false);
     }
   }, [isAdmin, adminLoading]);
+
+  const fetchReservationsEnabled = async () => {
+    const { data } = await supabase.from("site_settings").select("value").eq("key", "reservations_enabled").single();
+    if (data) setReservationsEnabled(data.value === true);
+  };
+
+  const handleToggleReservations = (checked: boolean) => {
+    setPendingToggleValue(checked);
+    setShowToggleDialog(true);
+  };
+
+  const confirmToggleReservations = async () => {
+    const { error } = await supabase.from("site_settings").update({ value: pendingToggleValue, updated_at: new Date().toISOString() }).eq("key", "reservations_enabled");
+    if (error) {
+      toast.error("Error al actualizar el estado de las reservas");
+    } else {
+      setReservationsEnabled(pendingToggleValue);
+      toast.success(pendingToggleValue ? "Reservas activadas" : "Reservas desactivadas");
+    }
+    setShowToggleDialog(false);
+  };
 
   const fetchReservations = async () => {
     const { data, error } = await supabase.from("reservations").select("*").order("reservation_date", { ascending: true }).order("reservation_time", { ascending: true });
