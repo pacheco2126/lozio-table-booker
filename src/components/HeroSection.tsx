@@ -37,7 +37,7 @@ const HeroSection = () => {
             className="text-primary-foreground/60 font-display italic text-base md:text-lg tracking-wide animate-fade-in-up"
             style={{ animationDelay: "0.2s" }}
           >
-            "La vita è un brivido che vola via..."
+            "la vita è un brivido che vola via, è tutto un equilibrio sopra la follia"
           </p>
         </div>
 
