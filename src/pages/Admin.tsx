@@ -233,6 +233,22 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="reservations" className="space-y-6">
+            {/* Toggle reservas */}
+            <div className="flex items-center justify-between bg-card rounded-lg p-4 border border-border shadow-sm">
+              <div>
+                <p className="font-body font-bold text-foreground text-sm">
+                  {reservationsEnabled ? "Reservas activas" : "Reservas desactivadas"}
+                </p>
+                <p className="text-muted-foreground font-body text-xs mt-0.5">
+                  {reservationsEnabled ? "Los usuarios pueden hacer reservas online" : "Las reservas online están pausadas"}
+                </p>
+              </div>
+              <Switch
+                checked={reservationsEnabled}
+                onCheckedChange={handleToggleReservations}
+              />
+            </div>
+
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
