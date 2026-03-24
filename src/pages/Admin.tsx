@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { format, isToday, isBefore, startOfDay, parseISO, isAfter } from "date-fns";
+import { format, isToday, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -44,8 +44,7 @@ const Admin = () => {
   const [filterLocation, setFilterLocation] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [tableNames, setTableNames] = useState<Record<string, string>>({});
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [showPast, setShowPast] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(!isMobile);
 
   const statusLabels: Record<string, { label: string; className: string }> = {
@@ -93,58 +92,23 @@ const Admin = () => {
     return dates;
   }, [reservations]);
 
-  // Filtered reservations
-  const filtered = useMemo(() => {
+  // Filtered reservations for selected date
+  const filteredForDate = useMemo(() => {
+    const selStr = format(selectedDate, "yyyy-MM-dd");
     return reservations.filter((r) => {
+      if (r.reservation_date !== selStr) return false;
       if (filterLocation !== "all" && r.location !== filterLocation) return false;
       if (filterStatus !== "all" && r.status !== filterStatus) return false;
       return true;
-    });
-  }, [reservations, filterLocation, filterStatus]);
-
-  // Group reservations
-  const { todayReservations, futureGroups, pastReservations } = useMemo(() => {
-    const today = format(new Date(), "yyyy-MM-dd");
-    const todayStart = startOfDay(new Date());
-
-    if (selectedDate) {
-      const selStr = format(selectedDate, "yyyy-MM-dd");
-      const selected = filtered.filter((r) => r.reservation_date === selStr);
-      if (selStr === today) {
-        return { todayReservations: selected, futureGroups: {} as Record<string, Reservation[]>, pastReservations: [] as Reservation[] };
-      }
-      if (isBefore(parseISO(selStr), todayStart)) {
-        return { todayReservations: [] as Reservation[], futureGroups: {} as Record<string, Reservation[]>, pastReservations: selected };
-      }
-      return { todayReservations: [] as Reservation[], futureGroups: { [selStr]: selected }, pastReservations: [] as Reservation[] };
-    }
-
-    const todayRes = filtered.filter((r) => r.reservation_date === today);
-    const future: Record<string, Reservation[]> = {};
-    const past: Reservation[] = [];
-
-    filtered.forEach((r) => {
-      if (r.reservation_date === today) return;
-      const rDate = parseISO(r.reservation_date);
-      if (isBefore(rDate, todayStart)) {
-        past.push(r);
-      } else {
-        if (!future[r.reservation_date]) future[r.reservation_date] = [];
-        future[r.reservation_date].push(r);
-      }
-    });
-
-    past.sort((a, b) => b.reservation_date.localeCompare(a.reservation_date) || b.reservation_time.localeCompare(a.reservation_time));
-
-    return { todayReservations: todayRes, futureGroups: future, pastReservations: past };
-  }, [filtered, selectedDate]);
+    }).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
+  }, [reservations, selectedDate, filterLocation, filterStatus]);
 
   const handleDateSelect = (d: Date | undefined) => {
-    setSelectedDate(d);
+    if (d) setSelectedDate(d);
   };
 
   const handleGoToToday = () => {
-    setSelectedDate(undefined);
+    setSelectedDate(new Date());
   };
 
   if (authLoading || adminLoading || loading) {
@@ -219,7 +183,7 @@ const Admin = () => {
     );
   };
 
-  const totalActive = filtered.filter(r => r.status !== "cancelled").length;
+  const totalActive = filteredForDate.filter(r => r.status !== "cancelled").length;
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -246,9 +210,9 @@ const Admin = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: t("admin.total"), count: totalActive },
-                { label: t("admin.pending"), count: filtered.filter((r) => r.status === "pending").length },
-                { label: t("admin.confirmed"), count: filtered.filter((r) => r.status === "confirmed").length },
-                { label: t("admin.cancelled"), count: filtered.filter((r) => r.status === "cancelled").length },
+                { label: t("admin.pending"), count: filteredForDate.filter((r) => r.status === "pending").length },
+                { label: t("admin.confirmed"), count: filteredForDate.filter((r) => r.status === "confirmed").length },
+                { label: t("admin.cancelled"), count: filteredForDate.filter((r) => r.status === "cancelled").length },
               ].map((s) => (
                 <div key={s.label} className="bg-card rounded-lg p-5 border border-border shadow-sm">
                   <p className="text-muted-foreground font-body text-sm">{s.label}</p>
@@ -267,7 +231,7 @@ const Admin = () => {
                       <Button variant="outline" className="w-full justify-between font-body text-sm">
                         <span className="flex items-center gap-2">
                           <CalendarIcon className="h-4 w-4" />
-                          {selectedDate ? format(selectedDate, "EEE d MMM", { locale: es }) : 'Hoy — ' + format(new Date(), "d MMM", { locale: es })}
+                          {format(selectedDate, "EEE d MMM", { locale: es })}
                         </span>
                         {calendarOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                       </Button>
@@ -328,59 +292,20 @@ const Admin = () => {
                     <option value="confirmed">{t("admin.confirmed")}</option>
                     <option value="cancelled">{t("admin.cancelled")}</option>
                   </select>
-                  {selectedDate && (
+                  {format(selectedDate, "yyyy-MM-dd") !== format(new Date(), "yyyy-MM-dd") && (
                     <Button size="sm" variant="ghost" onClick={handleGoToToday} className="font-body text-xs text-primary">
-                      ✕ Quitar filtro de fecha
+                      ✕ Volver a hoy
                     </Button>
                   )}
                 </div>
 
-                {/* Today's reservations */}
-                {todayReservations.length > 0 && (
-                  <>
-                    {renderDateGroup(format(new Date(), "yyyy-MM-dd"), todayReservations, true)}
-                    {Object.keys(futureGroups).length > 0 && (
-                      <div className="border-t-2 border-primary/20 my-4" />
-                    )}
-                  </>
-                )}
-
-                {/* Future reservations grouped by date */}
-                {Object.keys(futureGroups).sort().map((dateStr) => (
-                  renderDateGroup(dateStr, futureGroups[dateStr])
-                ))}
-
-                {/* Empty state */}
-                {todayReservations.length === 0 && Object.keys(futureGroups).length === 0 && pastReservations.length === 0 && (
+                {/* Reservations for selected date */}
+                {filteredForDate.length > 0 ? (
+                  renderDateGroup(format(selectedDate, "yyyy-MM-dd"), filteredForDate, format(selectedDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd"))
+                ) : (
                   <div className="bg-card rounded-lg p-12 border border-border text-center">
                     <p className="text-muted-foreground font-body text-lg">{t("admin.noReservations")}</p>
                   </div>
-                )}
-
-                {/* Past reservations collapsible */}
-                {!selectedDate && pastReservations.length > 0 && (
-                  <Collapsible open={showPast} onOpenChange={setShowPast}>
-                    <div className="border-t border-border pt-4 mt-4">
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" className="w-full justify-between font-body text-sm text-muted-foreground">
-                          <span>Ver reservas pasadas ({pastReservations.length})</span>
-                          {showPast ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                        </Button>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="mt-3 space-y-6">
-                        {(() => {
-                          const pastGroups: Record<string, Reservation[]> = {};
-                          pastReservations.forEach((r) => {
-                            if (!pastGroups[r.reservation_date]) pastGroups[r.reservation_date] = [];
-                            pastGroups[r.reservation_date].push(r);
-                          });
-                          return Object.keys(pastGroups).sort().reverse().map((dateStr) =>
-                            renderDateGroup(dateStr, pastGroups[dateStr])
-                          );
-                        })()}
-                      </CollapsibleContent>
-                    </div>
-                  </Collapsible>
                 )}
               </div>
             </div>
