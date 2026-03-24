@@ -27,9 +27,12 @@
     "filterHint": "(nascondi piatti che contengono)",
     "clearFilters": "Cancella filtri",
     "pizzas": "Pizze",
+    "focaccias": "Focacce",
+    "calzones": "Calzoni",
     "extras": "Extra",
     "drinks": "Bevande",
     "dessert": "Dolce",
+    "addToOrder": "Aggiungi",
     "addedToOrder": "{{name}} aggiunto all'ordine",
     "desc": {
       "MARINARA": "Pomodoro, aglio e origano.",
