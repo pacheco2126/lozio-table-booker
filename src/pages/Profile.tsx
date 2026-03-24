@@ -59,7 +59,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <Navbar />
+      <Navbar forceSolid />
       <div className="pt-24 md:pt-32 pb-16 px-3 md:px-4">
         <div className="max-w-xl mx-auto">
           <div className="flex items-center justify-between mb-8">

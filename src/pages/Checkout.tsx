@@ -111,7 +111,7 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <Navbar />
+      <Navbar forceSolid />
       <div className="pt-24 md:pt-28 pb-24 px-3 md:px-4">
         <div className="max-w-5xl mx-auto">
           <Button variant="ghost" onClick={() => navigate("/#menu")} className="mb-6 text-muted-foreground hover:text-foreground">

@@ -187,7 +187,7 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <Navbar />
+      <Navbar forceSolid />
       <div className="pt-24 md:pt-28 pb-16 px-3 md:px-4 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
