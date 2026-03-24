@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { UtensilsCrossed, Bike } from "lucide-react";
+import { UtensilsCrossed, Bike, Clock } from "lucide-react";
 import heroPizza from "@/assets/hero-pizza.jpg";
 import logoZio from "@/assets/logozio.png";
 
@@ -61,26 +61,25 @@ const HeroSection = () => {
             <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/40 rounded-xl transition-colors" />
           </button>
 
-          {/* Pedir a Domicilio */}
-          <button
-            onClick={() => {
-              const el = document.getElementById("menu");
-              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
-            className="group relative flex-1 rounded-xl overflow-hidden border border-primary-foreground/20 backdrop-blur-sm bg-foreground/40 hover:bg-foreground/50 transition-all duration-300 min-h-[140px] md:min-h-[200px] animate-fade-in-up"
+          {/* Pedir a Domicilio — Próximamente */}
+          <div
+            className="relative flex-1 rounded-xl overflow-hidden border border-dashed border-primary-foreground/20 backdrop-blur-sm bg-foreground/30 min-h-[140px] md:min-h-[200px] animate-fade-in-up opacity-60 cursor-not-allowed"
             style={{ animationDelay: "0.5s" }}
           >
             <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
-              <Bike className="w-10 h-10 md:w-12 md:h-12 text-accent mb-3 group-hover:scale-110 transition-transform" />
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground mb-1">
+              <Bike className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground mb-3" />
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground/50 mb-1">
                 {t("hero.orderCta", "Pedir a Domicilio")}
               </h2>
-              <p className="text-primary-foreground/60 text-sm font-body">
-                {t("hero.orderSubtitle", "Ver carta y hacer tu pedido")}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-dashed border-primary-foreground/30 bg-foreground/40 text-primary-foreground/60 font-body text-xs font-semibold uppercase tracking-wider mt-2">
+                <Clock className="w-3.5 h-3.5" />
+                {t("hero.comingSoon", "Próximamente")}
+              </span>
+              <p className="text-primary-foreground/40 text-xs font-body italic mt-2">
+                {t("hero.orderComingSoonHint", "Muy pronto podrás pedir online")}
               </p>
             </div>
-            <div className="absolute inset-0 border-2 border-transparent group-hover:border-accent/40 rounded-xl transition-colors" />
-          </button>
+          </div>
         </div>
       </div>
     </section>
