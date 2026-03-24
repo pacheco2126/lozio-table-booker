@@ -27,9 +27,12 @@
     "filterHint": "(ocultar platos que contengan)",
     "clearFilters": "Limpiar filtros",
     "pizzas": "Pizzas",
+    "focaccias": "Focaccias",
+    "calzones": "Calzones",
     "extras": "Extras",
     "drinks": "Bebidas",
     "dessert": "Postre",
+    "addToOrder": "Añadir",
     "addedToOrder": "{{name}} añadido al pedido",
     "desc": {
       "MARINARA": "Tomate, ajo y orégano.",

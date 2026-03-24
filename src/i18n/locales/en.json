@@ -27,9 +27,12 @@
     "filterHint": "(hide dishes containing)",
     "clearFilters": "Clear filters",
     "pizzas": "Pizzas",
+    "focaccias": "Focaccias",
+    "calzones": "Calzones",
     "extras": "Extras",
     "drinks": "Drinks",
     "dessert": "Dessert",
+    "addToOrder": "Add",
     "addedToOrder": "{{name}} added to order",
     "desc": {
       "MARINARA": "Tomato, garlic and oregano.",

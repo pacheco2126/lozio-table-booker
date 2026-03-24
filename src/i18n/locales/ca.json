@@ -27,9 +27,12 @@
     "filterHint": "(amagar plats que continguin)",
     "clearFilters": "Netejar filtres",
     "pizzas": "Pizzes",
+    "focaccias": "Focacces",
+    "calzones": "Calzones",
     "extras": "Extres",
     "drinks": "Begudes",
     "dessert": "Postres",
+    "addToOrder": "Afegir",
     "addedToOrder": "{{name}} afegit a la comanda",
     "desc": {
       "MARINARA": "Tomàquet, all i orenga.",
