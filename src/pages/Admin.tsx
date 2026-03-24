@@ -357,8 +357,8 @@ const Admin = () => {
                   </div>
                 )}
 
-                {/* Past reservations collapsible */}
-                {!selectedDate && pastReservations.length > 0 && (
+                {/* Past reservations — only via calendar selection */}
+                {selectedDate && pastReservations.length > 0 && (
                   <Collapsible open={showPast} onOpenChange={setShowPast}>
                     <div className="border-t border-border pt-4 mt-4">
                       <CollapsibleTrigger asChild>
