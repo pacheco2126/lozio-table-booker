@@ -92,51 +92,16 @@ const Admin = () => {
     return dates;
   }, [reservations]);
 
-  // Filtered reservations
-  const filtered = useMemo(() => {
+  // Filtered reservations for selected date
+  const filteredForDate = useMemo(() => {
+    const selStr = format(selectedDate, "yyyy-MM-dd");
     return reservations.filter((r) => {
+      if (r.reservation_date !== selStr) return false;
       if (filterLocation !== "all" && r.location !== filterLocation) return false;
       if (filterStatus !== "all" && r.status !== filterStatus) return false;
       return true;
-    });
-  }, [reservations, filterLocation, filterStatus]);
-
-  // Group reservations
-  const { todayReservations, futureGroups, pastReservations } = useMemo(() => {
-    const today = format(new Date(), "yyyy-MM-dd");
-    const todayStart = startOfDay(new Date());
-
-    if (selectedDate) {
-      const selStr = format(selectedDate, "yyyy-MM-dd");
-      const selected = filtered.filter((r) => r.reservation_date === selStr);
-      if (selStr === today) {
-        return { todayReservations: selected, futureGroups: {} as Record<string, Reservation[]>, pastReservations: [] as Reservation[] };
-      }
-      if (isBefore(parseISO(selStr), todayStart)) {
-        return { todayReservations: [] as Reservation[], futureGroups: {} as Record<string, Reservation[]>, pastReservations: selected };
-      }
-      return { todayReservations: [] as Reservation[], futureGroups: { [selStr]: selected }, pastReservations: [] as Reservation[] };
-    }
-
-    const todayRes = filtered.filter((r) => r.reservation_date === today);
-    const future: Record<string, Reservation[]> = {};
-    const past: Reservation[] = [];
-
-    filtered.forEach((r) => {
-      if (r.reservation_date === today) return;
-      const rDate = parseISO(r.reservation_date);
-      if (isBefore(rDate, todayStart)) {
-        past.push(r);
-      } else {
-        if (!future[r.reservation_date]) future[r.reservation_date] = [];
-        future[r.reservation_date].push(r);
-      }
-    });
-
-    past.sort((a, b) => b.reservation_date.localeCompare(a.reservation_date) || b.reservation_time.localeCompare(a.reservation_time));
-
-    return { todayReservations: todayRes, futureGroups: future, pastReservations: past };
-  }, [filtered, selectedDate]);
+    }).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
+  }, [reservations, selectedDate, filterLocation, filterStatus]);
 
   const handleDateSelect = (d: Date | undefined) => {
     setSelectedDate(d);
