@@ -6,7 +6,7 @@ import { Menu, X } from "lucide-react";
 import logoZio from "@/assets/logozio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-const Navbar = () => {
+const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
@@ -19,10 +19,12 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const solid = forceSolid || scrolled;
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-foreground/95 backdrop-blur-sm py-3 shadow-lg" : "bg-transparent py-6"
+        solid ? "bg-foreground/95 backdrop-blur-sm py-3 shadow-lg" : "bg-transparent py-6"
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
