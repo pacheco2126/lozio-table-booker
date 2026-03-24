@@ -5,7 +5,7 @@ import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
 import { AlertTriangle, CalendarIcon, Clock, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getUnavailableSlots, MAX_ONLINE_GUESTS } from "@/lib/availability";
+import { getUnavailableSlots, MAX_ONLINE_GUESTS, CALL_PHONE } from "@/lib/availability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -316,9 +316,14 @@ const ReservationSection = () => {
                   {loadingSlots && <span className="font-body text-xs text-muted-foreground animate-pulse">{t("reservation.checkingAvailability")}</span>}
                 </div>
                 {guestsNum > MAX_ONLINE_GUESTS ? (
-                  <p className="font-body text-sm text-destructive text-center py-4">
-                    Para grupos de más de {MAX_ONLINE_GUESTS} personas, por favor llámanos directamente.
-                  </p>
+                  <div className="text-center py-6 space-y-3">
+                    <p className="font-body text-sm text-muted-foreground">
+                      {t("reservation.largeGroupMessage", "Para grupos de más de {{max}} personas, por favor llámanos directamente.", { max: MAX_ONLINE_GUESTS })}
+                    </p>
+                    <a href={`tel:${CALL_PHONE}`} className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-body font-bold text-sm hover:opacity-90 transition-opacity">
+                      📞 {CALL_PHONE}
+                    </a>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-3 gap-2">
                     {timeSlots.map((slot) => {
