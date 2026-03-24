@@ -48,6 +48,9 @@ const Admin = () => {
   const [tableNames, setTableNames] = useState<Record<string, string>>({});
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(!isMobile);
+  const [reservationsEnabled, setReservationsEnabled] = useState(true);
+  const [showToggleDialog, setShowToggleDialog] = useState(false);
+  const [pendingToggleValue, setPendingToggleValue] = useState(false);
 
   const statusLabels: Record<string, { label: string; className: string }> = {
     pending: { label: t("admin.statusPending"), className: "bg-accent/20 text-accent-foreground" },
