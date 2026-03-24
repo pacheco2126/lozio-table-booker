@@ -1,7 +1,7 @@
 // Online reservation tables: Mesa 1-8, capacity 1-6 each
 export const ONLINE_TABLES = 8;
-export const MAX_ONLINE_GUESTS = 6;
-export const ONLINE_TABLE_NAMES = ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5","Mesa 6","Mesa 7","Mesa 8"];
+export const MAX_ONLINE_GUESTS = 15;
+export const ONLINE_TABLE_NAMES = ["Mesa 1", "Mesa 2", "Mesa 3", "Mesa 4", "Mesa 5", "Mesa 6", "Mesa 7", "Mesa 8"];
 
 /**
  * Fixed duration: 90 minutes (1h 30min) for all reservations.
@@ -44,14 +44,14 @@ export function getUnavailableSlots(
   existingReservations: Reservation[],
   timeSlots: string[],
   requestedGuests: number,
-  tables?: TableInfo[]
+  tables?: TableInfo[],
 ): Set<string> {
   const unavailable = new Set<string>();
   const requestedDuration = estimatedDuration(requestedGuests);
 
   // Filter to only online tables that can fit the requested guests
   const suitableTables = tables
-    ? tables.filter(t => ONLINE_TABLE_NAMES.includes(t.name) && t.capacity >= requestedGuests)
+    ? tables.filter((t) => ONLINE_TABLE_NAMES.includes(t.name) && t.capacity >= requestedGuests)
     : null;
 
   // If we have table info and no table can fit the guests, all slots unavailable
@@ -68,9 +68,9 @@ export function getUnavailableSlots(
 
     if (suitableTables) {
       // Check if at least one suitable table is free during this slot
-      const hasAvailableTable = suitableTables.some(table => {
+      const hasAvailableTable = suitableTables.some((table) => {
         // Check if this table has any overlapping reservation
-        const isOccupied = existingReservations.some(res => {
+        const isOccupied = existingReservations.some((res) => {
           if (res.table_id !== table.id) return false;
           const resStart = timeToMinutes(res.reservation_time);
           const resEnd = resStart + 90;
