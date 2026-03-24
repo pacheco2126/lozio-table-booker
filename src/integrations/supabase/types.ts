@@ -308,6 +308,15 @@ export type Database = {
         }
         Returns: string
       }
+      find_available_tables_multi: {
+        Args: {
+          _date: string
+          _guests: number
+          _location: string
+          _time: string
+        }
+        Returns: string[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
