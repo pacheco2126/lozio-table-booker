@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Menu, X } from "lucide-react";
-import logoZio from "@/assets/logozio.png";
+import logo_app_inicio from "/logo_app_inicio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
+const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
@@ -19,23 +19,27 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const solid = forceSolid || scrolled;
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        solid ? "bg-foreground/95 backdrop-blur-sm py-3 shadow-lg" : "bg-transparent py-6"
+        scrolled ? "bg-foreground/95 backdrop-blur-sm py-3 shadow-lg" : "bg-transparent py-6"
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
         <a href="/" className="flex items-center">
-          <img src={logoZio} alt="Lo Zio" className="h-10 w-auto brightness-0 invert" />
+          <img src={logo_app_inicio} alt="Lo Zio" className="h-10 w-auto brightness-0 invert" />
         </a>
         <div className="hidden md:flex items-center gap-6">
-          <a href="/#menu" className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors">
+          <a
+            href="/#menu"
+            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
+          >
             {t("nav.menu")}
           </a>
-          <a href="/#reservar" className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors">
+          <a
+            href="/#reservar"
+            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
+          >
             {t("nav.locations")}
           </a>
           <a
@@ -73,13 +77,43 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
       </div>
       {menuOpen && (
         <div className="landscape-dropdown md:hidden bg-foreground/95 backdrop-blur-sm border-t border-border px-4 py-3 flex flex-wrap gap-4">
-          <a href="/#menu" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{t("nav.menu")}</a>
-          <a href="/#reservar" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{t("nav.reserve")}</a>
-          <a href="/pedido" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{t("nav.order")}</a>
+          <a
+            href="/#menu"
+            onClick={() => setMenuOpen(false)}
+            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
+          >
+            {t("nav.menu")}
+          </a>
+          <a
+            href="/#reservar"
+            onClick={() => setMenuOpen(false)}
+            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
+          >
+            {t("nav.reserve")}
+          </a>
+          <a
+            href="/pedido"
+            onClick={() => setMenuOpen(false)}
+            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
+          >
+            {t("nav.order")}
+          </a>
           {isAdmin && (
-            <a href="/admin" onClick={() => setMenuOpen(false)} className="text-accent font-body text-sm uppercase tracking-widest font-bold">Admin</a>
+            <a
+              href="/admin"
+              onClick={() => setMenuOpen(false)}
+              className="text-accent font-body text-sm uppercase tracking-widest font-bold"
+            >
+              Admin
+            </a>
           )}
-          <a href={user ? "/perfil" : "/auth"} onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">{user ? t("nav.profile") : t("nav.login")}</a>
+          <a
+            href={user ? "/perfil" : "/auth"}
+            onClick={() => setMenuOpen(false)}
+            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
+          >
+            {user ? t("nav.profile") : t("nav.login")}
+          </a>
         </div>
       )}
     </nav>
