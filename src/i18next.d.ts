@@ -1,14 +1,8 @@
-import "react-i18next";
 import "react";
 
-declare module "react-i18next" {
-  interface CustomTypeOptions {
-    defaultNS: "translation";
-  }
-}
-
 declare module "react" {
-  interface HTMLAttributes<T> {
-    children?: React.ReactNode;
+  // Fixes react-i18next children type incompatibility with React 18
+  interface FunctionComponent<P = {}> {
+    (props: P & { children?: React.ReactNode }, context?: any): React.ReactElement<any, any> | null;
   }
 }
