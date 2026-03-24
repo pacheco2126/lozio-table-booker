@@ -68,6 +68,17 @@ const ReservationSection = () => {
   const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [confirmationMsg, setConfirmationMsg] = useState("");
+  const [reservationsEnabled, setReservationsEnabled] = useState(true);
+  const [loadingEnabled, setLoadingEnabled] = useState(true);
+
+  useEffect(() => {
+    const fetchEnabled = async () => {
+      const { data } = await supabase.from("site_settings").select("value").eq("key", "reservations_enabled").single();
+      if (data) setReservationsEnabled(data.value === true);
+      setLoadingEnabled(false);
+    };
+    fetchEnabled();
+  }, []);
 
   const loc = locations.find((l) => l.id === selectedLocation)!;
   const guestsNum = parseInt(guests) || 2;
