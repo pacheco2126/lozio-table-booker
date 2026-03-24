@@ -77,6 +77,7 @@ const AllergenBadges = ({ allergens }: { allergens?: string[] }) => {
 };
 
 const MenuItem = ({ item, onAdd }: { item: MenuItemData; onAdd: () => void }) => {
+  const { t } = useTranslation();
   return (
     <div className="group flex items-center gap-3 py-3 border-b border-menu-teal/15 last:border-0 hover:bg-menu-teal/5 px-2 -mx-2 rounded transition-colors">
       <div className="w-14 h-14 md:w-20 md:h-20 rounded-lg shrink-0 overflow-hidden">
@@ -84,7 +85,7 @@ const MenuItem = ({ item, onAdd }: { item: MenuItemData; onAdd: () => void }) =>
       </div>
       <div className="flex-1 min-w-0">
         <span className="font-display font-bold text-menu-teal text-sm tracking-wide">{item.name}</span>
-        {item.desc && <p className="text-muted-foreground text-xs mt-0.5 leading-relaxed line-clamp-2">{item.desc}</p>}
+        {item.desc && <p className="text-muted-foreground text-xs mt-0.5 leading-relaxed line-clamp-2">{t(`menu.desc.${item.name}`, item.desc)}</p>}
         <AllergenBadges allergens={item.allergens} />
       </div>
       <div className="flex items-center gap-2 shrink-0">
