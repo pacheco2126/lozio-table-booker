@@ -1,8 +1,7 @@
-import "react";
+import "react-i18next";
 
-declare module "react" {
-  // Fixes react-i18next children type incompatibility with React 18
-  interface FunctionComponent<P = {}> {
-    (props: P & { children?: React.ReactNode }, context?: any): React.ReactElement<any, any> | null;
+declare module "react-i18next" {
+  interface CustomTypeOptions {
+    allowChildren: false;
   }
 }
