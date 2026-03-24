@@ -231,7 +231,7 @@ const Admin = () => {
                       <Button variant="outline" className="w-full justify-between font-body text-sm">
                         <span className="flex items-center gap-2">
                           <CalendarIcon className="h-4 w-4" />
-                          {selectedDate ? format(selectedDate, "EEE d MMM", { locale: es }) : 'Hoy — ' + format(new Date(), "d MMM", { locale: es })}
+                          {format(selectedDate, "EEE d MMM", { locale: es })}
                         </span>
                         {calendarOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                       </Button>
