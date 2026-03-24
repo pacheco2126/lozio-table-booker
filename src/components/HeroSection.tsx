@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { UtensilsCrossed, Bike } from "lucide-react";
+import { UtensilsCrossed, Bike, Clock } from "lucide-react";
 import heroPizza from "@/assets/hero-pizza.jpg";
 import logoZio from "@/assets/logozio.png";
 
