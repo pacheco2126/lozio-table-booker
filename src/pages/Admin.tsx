@@ -41,7 +41,7 @@ const Admin = () => {
   const isMobile = useIsMobile();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterLocation, setFilterLocation] = useState("all");
+  const [filterLocation, setFilterLocation] = useState("arrabassada");
   const [filterStatus, setFilterStatus] = useState("all");
   const [tableNames, setTableNames] = useState<Record<string, string>>({});
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
