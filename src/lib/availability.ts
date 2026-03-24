@@ -1,6 +1,7 @@
 // Online reservation tables: Mesa 1-8, capacity 1-6 each
 export const ONLINE_TABLES = 8;
-export const MAX_ONLINE_GUESTS = 15;
+export const MAX_ONLINE_GUESTS = 10;
+export const CALL_PHONE = "+34 682239035";
 export const ONLINE_TABLE_NAMES = ["Mesa 1", "Mesa 2", "Mesa 3", "Mesa 4", "Mesa 5", "Mesa 6", "Mesa 7", "Mesa 8"];
 
 /**
@@ -15,7 +16,7 @@ export const TABLES_PER_LOCATION = 15;
 export const TABLE_CAPACITY = 6;
 
 export function tablesNeeded(guests: number): number {
-  return 1; // Now 1 table per reservation since each fits up to 6
+  return guests <= 6 ? 1 : 2;
 }
 
 interface Reservation {
@@ -37,8 +38,8 @@ function timeToMinutes(time: string): number {
 
 /**
  * Given existing reservations for a location+date and available tables,
- * compute which time slots are unavailable because no suitable table
- * (with enough capacity for the requested guests) is free.
+ * compute which time slots are unavailable because no suitable table(s)
+ * (with enough combined capacity for the requested guests) are free.
  */
 export function getUnavailableSlots(
   existingReservations: Reservation[],
@@ -49,16 +50,13 @@ export function getUnavailableSlots(
   const unavailable = new Set<string>();
   const requestedDuration = estimatedDuration(requestedGuests);
 
-  // Filter to only online tables that can fit the requested guests
-  const suitableTables = tables
-    ? tables.filter((t) => ONLINE_TABLE_NAMES.includes(t.name) && t.capacity >= requestedGuests)
+  // Filter to only online tables
+  const onlineTables = tables
+    ? tables.filter((t) => ONLINE_TABLE_NAMES.includes(t.name))
     : null;
 
-  // If we have table info and no table can fit the guests, all slots unavailable
-  if (suitableTables && suitableTables.length === 0) {
-    for (const slot of timeSlots) {
-      unavailable.add(slot);
-    }
+  if (onlineTables && onlineTables.length === 0) {
+    for (const slot of timeSlots) unavailable.add(slot);
     return unavailable;
   }
 
@@ -66,10 +64,9 @@ export function getUnavailableSlots(
     const slotStart = timeToMinutes(slot);
     const slotEnd = slotStart + requestedDuration;
 
-    if (suitableTables) {
-      // Check if at least one suitable table is free during this slot
-      const hasAvailableTable = suitableTables.some((table) => {
-        // Check if this table has any overlapping reservation
+    if (onlineTables) {
+      // Find all free tables during this slot
+      const freeTables = onlineTables.filter((table) => {
         const isOccupied = existingReservations.some((res) => {
           if (res.table_id !== table.id) return false;
           const resStart = timeToMinutes(res.reservation_time);
@@ -79,8 +76,20 @@ export function getUnavailableSlots(
         return !isOccupied;
       });
 
-      if (!hasAvailableTable) {
-        unavailable.add(slot);
+      if (requestedGuests <= 6) {
+        // Single table: need one table with enough capacity
+        const hasTable = freeTables.some((t) => t.capacity >= requestedGuests);
+        if (!hasTable) unavailable.add(slot);
+      } else {
+        // Multi-table: need enough combined capacity from free tables
+        // Sort by capacity desc and greedily pick
+        const sorted = [...freeTables].sort((a, b) => b.capacity - a.capacity);
+        let totalCap = 0;
+        for (const t of sorted) {
+          totalCap += t.capacity;
+          if (totalCap >= requestedGuests) break;
+        }
+        if (totalCap < requestedGuests) unavailable.add(slot);
       }
     } else {
       // Fallback: count total tables in use

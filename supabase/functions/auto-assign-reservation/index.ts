@@ -21,16 +21,16 @@ serve(async (req) => {
     }
 
     const guestsNum = parseInt(guests) || 2;
-    if (guestsNum < 1 || guestsNum > 15) {
-      throw new Error("El número de comensales debe ser entre 1 y 6 para reservas online.");
+    if (guestsNum < 1 || guestsNum > 10) {
+      throw new Error("El número de comensales debe ser entre 1 y 10 para reservas online.");
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Find available table using the DB function
-    const { data: tableId, error: rpcError } = await supabase.rpc("find_available_table", {
+    // Find available tables using the multi-table DB function
+    const { data: tableIds, error: rpcError } = await supabase.rpc("find_available_tables_multi", {
       _location: location,
       _date: reservation_date,
       _time: reservation_time,
@@ -42,7 +42,7 @@ serve(async (req) => {
       throw new Error("Error checking table availability");
     }
 
-    if (!tableId) {
+    if (!tableIds || tableIds.length === 0) {
       return new Response(
         JSON.stringify({
           success: false,
@@ -54,29 +54,29 @@ serve(async (req) => {
       );
     }
 
-    // Get table name for the confirmation message
-    const { data: tableData } = await supabase.from("tables").select("name").eq("id", tableId).single();
+    // Get table names for the confirmation message
+    const { data: tablesData } = await supabase.from("tables").select("id, name").in("id", tableIds);
+    const tableNames = tablesData?.map((t) => t.name).join(" + ") || "asignada";
 
-    const tableName = tableData?.name || "asignada";
+    // Create one reservation per table (linked by same details)
+    const reservationInserts = tableIds.map((tableId: string) => ({
+      location,
+      guest_name,
+      email: "online@reserva.lozio",
+      phone,
+      reservation_date,
+      reservation_time,
+      guests: String(guestsNum),
+      notes: tableIds.length > 1 ? `${notes || ""} [Grupo ${guestsNum}p: ${tableNames}]`.trim() : (notes || null),
+      user_id: user_id || null,
+      table_id: tableId,
+      status: "confirmed",
+    }));
 
-    // Create reservation with auto-assigned table, already confirmed
-    const { data: reservation, error: insertError } = await supabase
+    const { data: reservations, error: insertError } = await supabase
       .from("reservations")
-      .insert({
-        location,
-        guest_name,
-        email: "online@reserva.lozio",
-        phone,
-        reservation_date,
-        reservation_time,
-        guests: String(guestsNum),
-        notes: notes || null,
-        user_id: user_id || null,
-        table_id: tableId,
-        status: "confirmed",
-      })
-      .select()
-      .single();
+      .insert(reservationInserts)
+      .select();
 
     if (insertError) {
       console.error("Insert error:", insertError);
@@ -102,7 +102,7 @@ serve(async (req) => {
           `👥 Personas: ${guestsNum}\n` +
           `📅 Fecha: ${formattedDate}\n` +
           `🕐 Hora: ${formattedTime}\n` +
-          `🪑 Mesa: ${tableName}\n` +
+          `🪑 Mesa${tableIds.length > 1 ? "s" : ""}: ${tableNames}\n` +
           `📍 Local: ${location}${notes ? `\n📝 Notas: ${notes}` : ""}`;
 
         await fetch(`https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_ID}/messages`, {
@@ -126,9 +126,9 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        reservation_id: reservation.id,
-        table_name: tableName,
-        message: `¡Reserva confirmada! Te esperamos el ${reservation_date} a las ${reservation_time.substring(0, 5)} en la ${tableName}.`,
+        reservation_id: reservations?.[0]?.id,
+        table_name: tableNames,
+        message: `¡Reserva confirmada! Te esperamos el ${reservation_date} a las ${reservation_time.substring(0, 5)} en ${tableIds.length > 1 ? "las mesas" : "la"} ${tableNames}.`,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
