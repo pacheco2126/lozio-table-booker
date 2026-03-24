@@ -104,11 +104,11 @@ const Admin = () => {
   }, [reservations, selectedDate, filterLocation, filterStatus]);
 
   const handleDateSelect = (d: Date | undefined) => {
-    setSelectedDate(d);
+    if (d) setSelectedDate(d);
   };
 
   const handleGoToToday = () => {
-    setSelectedDate(undefined);
+    setSelectedDate(new Date());
   };
 
   if (authLoading || adminLoading || loading) {
