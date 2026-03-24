@@ -14,7 +14,9 @@
     "cta": "Reserve a Table",
     "reserveSubtitle": "Choose location, date and time",
     "orderCta": "Make an order",
-    "orderSubtitle": "Browse menu and place your order"
+    "orderSubtitle": "Browse menu and place your order",
+    "comingSoon": "Coming Soon",
+    "orderComingSoonHint": "Online ordering available very soon"
   },
   "menu": {
     "header": "Our Menu",

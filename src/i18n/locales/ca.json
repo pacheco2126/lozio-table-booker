@@ -14,7 +14,9 @@
     "cta": "Reservar Taula",
     "reserveSubtitle": "Tria local, data i hora",
     "orderCta": "Fer una comanda",
-    "orderSubtitle": "Veure carta i fer la comanda"
+    "orderSubtitle": "Veure carta i fer la comanda",
+    "comingSoon": "Pròximament",
+    "orderComingSoonHint": "Molt aviat podràs demanar online"
   },
   "menu": {
     "header": "La Nostra Carta",

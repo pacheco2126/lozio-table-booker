@@ -14,7 +14,9 @@
     "cta": "Reservar Mesa",
     "reserveSubtitle": "Elige local, fecha y hora",
     "orderCta": "Hacer un pedido",
-    "orderSubtitle": "Ver carta y hacer tu pedido"
+    "orderSubtitle": "Ver carta y hacer tu pedido",
+    "comingSoon": "Próximamente",
+    "orderComingSoonHint": "Muy pronto podrás pedir online"
   },
   "menu": {
     "header": "Nuestra Carta",

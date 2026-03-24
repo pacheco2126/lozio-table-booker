@@ -14,7 +14,9 @@
     "cta": "Prenota un Tavolo",
     "reserveSubtitle": "Scegli locale, data e ora",
     "orderCta": "Ordinare",
-    "orderSubtitle": "Vedi il menu e fai il tuo ordine"
+    "orderSubtitle": "Vedi il menu e fai il tuo ordine",
+    "comingSoon": "Prossimamente",
+    "orderComingSoonHint": "Presto potrai ordinare online"
   },
   "menu": {
     "header": "Il Nostro Menu",
