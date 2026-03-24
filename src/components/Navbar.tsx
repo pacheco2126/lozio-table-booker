@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Menu, X } from "lucide-react";
-import logo_app_inicio from "@../../logo_app_inicio.png";
+const logo_app_inicio = "/logo_app_inicio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-const Navbar = () => {
+const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
@@ -22,7 +22,7 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-foreground/95 backdrop-blur-sm py-3 shadow-lg" : "bg-transparent py-6"
+        (forceSolid || scrolled) ? "bg-foreground/95 backdrop-blur-sm py-3 shadow-lg" : "bg-transparent py-6"
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
