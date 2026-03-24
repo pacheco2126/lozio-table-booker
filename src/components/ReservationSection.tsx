@@ -5,7 +5,7 @@ import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
 import { AlertTriangle, CalendarIcon, Clock, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getUnavailableSlots, MAX_ONLINE_GUESTS } from "@/lib/availability";
+import { getUnavailableSlots, MAX_ONLINE_GUESTS, CALL_PHONE } from "@/lib/availability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
