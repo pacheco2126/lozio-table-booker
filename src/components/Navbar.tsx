@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Menu, X } from "lucide-react";
-import logo_app_inicio from "/logo_app_inicio.png";
+import logo_app_inicio from "@/logo_app_inicio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Navbar = () => {
