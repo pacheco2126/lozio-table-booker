@@ -222,6 +222,30 @@ export type Database = {
           },
         ]
       }
+      reviews: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          message: string | null
+          rating: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          rating: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          rating?: number
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string
