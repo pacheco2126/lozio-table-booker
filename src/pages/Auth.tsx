@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import logoZio from '@/assets/logozio.png';
+import heroPizza from '@/assets/hero-pizza.jpg';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -71,11 +73,17 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 landscape-compact">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-4 landscape-compact relative">
+      <div className="absolute inset-0 z-0">
+        <img src={heroPizza} alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-foreground/80" />
+      </div>
+      <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <a href="/" className="font-display text-3xl font-bold text-primary">Lo Zio</a>
-          <p className="text-muted-foreground font-body mt-2">
+          <a href="/">
+            <img src={logoZio} alt="Lo Zio" className="h-16 w-auto mx-auto brightness-0 invert" />
+          </a>
+          <p className="text-primary-foreground/80 font-body mt-2">
             {isLogin ? t('auth.loginTitle') : t('auth.signupTitle')}
           </p>
         </div>
