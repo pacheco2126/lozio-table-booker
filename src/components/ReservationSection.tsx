@@ -21,8 +21,7 @@ const timeSlots = [
   "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00",
 ];
 
-const MAX_GUEST_SELECTOR = 15;
-const guestOptions = Array.from({ length: MAX_GUEST_SELECTOR }, (_, i) => i + 1);
+const guestOptions = Array.from({ length: 10 }, (_, i) => i + 1);
 
 const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 
@@ -284,6 +283,7 @@ const ReservationSection = () => {
                   <select value={guests} onChange={(e) => setGuests(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                     {guestOptions.map((n) => (<option key={n} value={n}>{n}</option>))}
+                    <option value="10+">+10</option>
                   </select>
                 </div>
                 <div>
