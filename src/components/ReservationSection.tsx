@@ -78,6 +78,21 @@ const ReservationSection = () => {
       setLoadingEnabled(false);
     };
     fetchEnabled();
+
+    const channel = supabase
+      .channel('site_settings_realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'site_settings',
+        filter: 'key=eq.reservations_enabled',
+      }, (payload) => {
+        const newVal = (payload.new as { value: boolean })?.value;
+        if (typeof newVal === 'boolean') setReservationsEnabled(newVal);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const loc = locations.find((l) => l.id === selectedLocation)!;
