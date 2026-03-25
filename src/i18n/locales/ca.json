@@ -378,5 +378,25 @@
     "a7": "Per descomptat! Tota la nostra massa s'elabora diàriament amb ingredients frescos seguint la recepta tradicional italiana.",
     "q8": "On esteu ubicats?",
     "a8": "Tenim dos locals: un al centre de Tarragona i un altre a la zona de l'Arrabassada. Consulta la secció de locals per a adreces exactes."
+  },
+  "reviews": {
+    "badge": "La teva opinió compta",
+    "title": "Deixa'ns la teva ressenya",
+    "subtitle": "Els teus comentaris ens ajuden a millorar. Les ressenyes són completament anònimes, ningú sabrà qui les ha escrit.",
+    "categoryLabel": "Sobre què vols opinar?",
+    "cat_restaurant": "🍽️ Restaurant",
+    "cat_food": "🍕 Menjar",
+    "cat_web": "💻 Web / App",
+    "ratingLabel": "La teva valoració",
+    "ratingRequired": "Selecciona una valoració",
+    "messageLabel": "Comentari (opcional)",
+    "messagePlaceholder": "Explica'ns què t'ha agradat o què podem millorar...",
+    "submit": "Enviar ressenya",
+    "submitting": "Enviant...",
+    "success": "Gràcies per la teva ressenya!",
+    "error": "Error en enviar la ressenya. Torna-ho a provar.",
+    "thankYou": "Moltes gràcies!",
+    "thankYouDesc": "La teva opinió anònima ens ajuda a seguir millorant cada dia.",
+    "another": "Enviar una altra ressenya"
   }
 }
