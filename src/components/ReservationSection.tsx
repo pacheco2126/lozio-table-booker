@@ -283,6 +283,7 @@ const ReservationSection = () => {
                   <select value={guests} onChange={(e) => setGuests(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                     {guestOptions.map((n) => (<option key={n} value={n}>{n}</option>))}
+                    <option value="10+">+10</option>
                   </select>
                 </div>
                 <div>
