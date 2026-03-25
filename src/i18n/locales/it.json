@@ -378,5 +378,25 @@
     "a7": "Certamente! Tutto il nostro impasto viene preparato ogni giorno con ingredienti freschi seguendo la ricetta tradizionale italiana.",
     "q8": "Dove siete?",
     "a8": "Abbiamo due locali: uno nel centro di Tarragona e un altro nella zona dell'Arrabassada. Consulta la sezione locali per gli indirizzi esatti."
+  },
+  "reviews": {
+    "badge": "La tua opinione conta",
+    "title": "Lasciaci una recensione",
+    "subtitle": "I tuoi commenti ci aiutano a migliorare. Le recensioni sono completamente anonime, nessuno saprà chi le ha scritte.",
+    "categoryLabel": "Di cosa vuoi parlare?",
+    "cat_restaurant": "🍽️ Ristorante",
+    "cat_food": "🍕 Cibo",
+    "cat_web": "💻 Web / App",
+    "ratingLabel": "La tua valutazione",
+    "ratingRequired": "Seleziona una valutazione",
+    "messageLabel": "Commento (opzionale)",
+    "messagePlaceholder": "Raccontaci cosa ti è piaciuto o cosa possiamo migliorare...",
+    "submit": "Invia recensione",
+    "submitting": "Invio...",
+    "success": "Grazie per la tua recensione!",
+    "error": "Errore nell'invio della recensione. Riprova.",
+    "thankYou": "Grazie mille!",
+    "thankYouDesc": "La tua opinione anonima ci aiuta a migliorare ogni giorno.",
+    "another": "Invia un'altra recensione"
   }
 }

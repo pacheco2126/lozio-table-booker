@@ -378,5 +378,25 @@
     "a7": "¡Por supuesto! Toda nuestra masa se elabora a diario con ingredientes frescos y siguiendo la receta tradicional italiana.",
     "q8": "¿Dónde estáis ubicados?",
     "a8": "Tenemos dos locales: uno en el centro de Tarragona y otro en la zona de la Arrabassada. Consulta la sección de locales para direcciones exactas."
+  },
+  "reviews": {
+    "badge": "Tu opinión cuenta",
+    "title": "Déjanos tu reseña",
+    "subtitle": "Tus comentarios nos ayudan a mejorar. Las reseñas son completamente anónimas, nadie sabrá quién las ha escrito.",
+    "categoryLabel": "¿Sobre qué quieres opinar?",
+    "cat_restaurant": "🍽️ Restaurante",
+    "cat_food": "🍕 Comida",
+    "cat_web": "💻 Web / App",
+    "ratingLabel": "Tu valoración",
+    "ratingRequired": "Selecciona una valoración",
+    "messageLabel": "Comentario (opcional)",
+    "messagePlaceholder": "Cuéntanos qué te ha gustado o qué podemos mejorar...",
+    "submit": "Enviar reseña",
+    "submitting": "Enviando...",
+    "success": "¡Gracias por tu reseña!",
+    "error": "Error al enviar la reseña. Inténtalo de nuevo.",
+    "thankYou": "¡Muchas gracias!",
+    "thankYouDesc": "Tu opinión anónima nos ayuda a seguir mejorando cada día.",
+    "another": "Enviar otra reseña"
   }
 }
