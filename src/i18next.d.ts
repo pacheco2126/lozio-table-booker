@@ -1,14 +1,11 @@
 import "react-i18next";
-import "react";
+import es from "./i18n/locales/es.json";
 
 declare module "react-i18next" {
   interface CustomTypeOptions {
-    allowObjectInHTMLChildren: true;
-  }
-}
-
-declare module "react" {
-  interface HTMLAttributes<T> {
-    children?: React.ReactNode;
+    defaultNS: "translation";
+    resources: {
+      translation: typeof es;
+    };
   }
 }
