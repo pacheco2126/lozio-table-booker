@@ -316,7 +316,7 @@ const ReservationSection = () => {
                   <p className="font-body text-sm text-muted-foreground">{t("reservation.selectTime")}</p>
                   {loadingSlots && <span className="font-body text-xs text-muted-foreground animate-pulse">{t("reservation.checkingAvailability")}</span>}
                 </div>
-                {guestsNum > MAX_ONLINE_GUESTS ? (
+                {guests === "10+" || guestsNum > MAX_ONLINE_GUESTS ? (
                   <div className="text-center py-6 space-y-3">
                     <p className="font-body text-sm text-muted-foreground">
                       {t("reservation.largeGroupMessage", "Para grupos de más de {{max}} personas, por favor llámanos directamente.", { max: MAX_ONLINE_GUESTS })}
