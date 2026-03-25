@@ -357,5 +357,26 @@
   "pwa": {
     "installBanner": "Installa la nostra app per un'esperienza migliore",
     "install": "Installa"
+  },
+  "faq": {
+    "badge": "Domande frequenti",
+    "title": "Hai domande?",
+    "subtitle": "Qui troverai le risposte alle domande più comuni sul nostro ristorante.",
+    "q1": "Devo prenotare un tavolo?",
+    "a1": "Consigliamo di prenotare, soprattutto nei fine settimana. Puoi farlo da questo sito o chiamarci al +34 682 239 035.",
+    "q2": "Fate consegna a domicilio?",
+    "a2": "Presto attiveremo il servizio di ordini e consegna a domicilio. Resta sintonizzato!",
+    "q3": "Avete opzioni per allergici o intolleranti?",
+    "a3": "Sì, tutti i nostri piatti hanno gli allergeni indicati. Inoltre puoi filtrare il menu per allergeni direttamente da questo sito.",
+    "q4": "Si può pagare con carta?",
+    "a4": "Sì, accettiamo pagamento con carta di credito/debito e contanti in entrambi i locali.",
+    "q5": "Qual è l'orario del ristorante?",
+    "a5": "Tarragona: Mar–Dom 19:00–23:30. Arrabassada: Mer–Mar 10:00–23:30. Consulta la sezione locali per maggiori dettagli.",
+    "q6": "Posso prenotare per gruppi numerosi?",
+    "a6": "Per gruppi di più di 10 persone, chiamaci direttamente al +34 682 239 035 per organizzare la prenotazione.",
+    "q7": "L'impasto è artigianale?",
+    "a7": "Certamente! Tutto il nostro impasto viene preparato ogni giorno con ingredienti freschi seguendo la ricetta tradizionale italiana.",
+    "q8": "Dove siete?",
+    "a8": "Abbiamo due locali: uno nel centro di Tarragona e un altro nella zona dell'Arrabassada. Consulta la sezione locali per gli indirizzi esatti."
   }
 }

@@ -357,5 +357,26 @@
   "pwa": {
     "installBanner": "Install our app for a better experience",
     "install": "Install"
+  },
+  "faq": {
+    "badge": "FAQ",
+    "title": "Got questions?",
+    "subtitle": "Here you'll find answers to the most common questions about our restaurant.",
+    "q1": "Do I need to book a table?",
+    "a1": "We recommend booking, especially on weekends. You can do it from this website or call us at +34 682 239 035.",
+    "q2": "Do you offer home delivery?",
+    "a2": "We will be launching our online ordering and delivery service very soon. Stay tuned!",
+    "q3": "Do you have options for allergies or intolerances?",
+    "a3": "Yes, all our dishes have allergens listed. You can also filter the menu by allergens right here on the website.",
+    "q4": "Can I pay by card?",
+    "a4": "Yes, we accept credit/debit card and cash at both locations.",
+    "q5": "What are the restaurant opening hours?",
+    "a5": "Tarragona: Tue–Sun 19:00–23:30. Arrabassada: Wed–Tue 10:00–23:30. Check the locations section for more details.",
+    "q6": "Can I book for large groups?",
+    "a6": "For groups of more than 10, please call us directly at +34 682 239 035 to arrange your booking.",
+    "q7": "Is the dough handmade?",
+    "a7": "Absolutely! All our dough is made fresh daily with quality ingredients following the traditional Italian recipe.",
+    "q8": "Where are you located?",
+    "a8": "We have two locations: one in Tarragona city centre and another in the Arrabassada area. Check the locations section for exact addresses."
   }
 }
