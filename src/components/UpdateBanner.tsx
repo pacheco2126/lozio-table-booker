@@ -1,39 +1,70 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const CHECK_INTERVAL = 60 * 1000; // Check every 60 seconds
 
 const UpdateBanner = () => {
   const [showUpdate, setShowUpdate] = useState(false);
 
-  useEffect(() => {
-    const handleUpdate = () => setShowUpdate(true);
+  const triggerUpdate = useCallback(() => setShowUpdate(true), []);
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.ready.then((registration) => {
-        registration.addEventListener("updatefound", () => {
-          const newWorker = registration.installing;
-          if (!newWorker) return;
-          newWorker.addEventListener("statechange", () => {
-            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-              handleUpdate();
-            }
-          });
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+
+    let refreshing = false;
+
+    // Listen for controllerchange → auto-reload
+    const onControllerChange = () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    };
+    navigator.serviceWorker.addEventListener("controllerchange", onControllerChange);
+
+    // Watch for new SW installations
+    navigator.serviceWorker.ready.then((registration) => {
+      // If a waiting worker already exists (e.g. from a previous visit)
+      if (registration.waiting) {
+        triggerUpdate();
+      }
+
+      registration.addEventListener("updatefound", () => {
+        const newWorker = registration.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener("statechange", () => {
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            triggerUpdate();
+          }
         });
       });
+    });
 
-      // Also listen for controller change (skipWaiting activated)
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (!refreshing) {
-          refreshing = true;
-          window.location.reload();
+    // Periodically check for updates
+    const interval = setInterval(() => {
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        reg?.update().catch(() => {});
+      });
+    }, CHECK_INTERVAL);
+
+    return () => {
+      clearInterval(interval);
+      navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
+    };
+  }, [triggerUpdate]);
+
+  const handleRefresh = () => {
+    // Tell the waiting SW to activate, then reload
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (reg?.waiting) {
+          reg.waiting.postMessage({ type: "SKIP_WAITING" });
         }
       });
     }
-  }, []);
-
-  const handleRefresh = () => {
-    window.location.reload();
+    // Fallback: just reload after a short delay
+    setTimeout(() => window.location.reload(), 300);
   };
 
   if (!showUpdate) return null;
