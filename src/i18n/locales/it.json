@@ -78,6 +78,8 @@
     "pizzeria": "Pizzeria",
     "disabledTitle": "Prenotazioni non disponibili",
     "disabledMessage": "Le prenotazioni online sono temporaneamente disattivate. Riprova più tardi o chiamaci.",
+    "temporarilyClosed": "Temporaneamente chiuso",
+    "temporarilyClosedMessage": "Le prenotazioni online sono temporaneamente chiuse. Riprova più tardi o chiamaci.",
     "guests": "Persone",
     "date": "Data",
     "selectTime": "Seleziona un orario",
