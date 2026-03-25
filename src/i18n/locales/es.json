@@ -357,5 +357,26 @@
   "pwa": {
     "installBanner": "Instala nuestra app para una mejor experiencia",
     "install": "Instalar"
+  },
+  "faq": {
+    "badge": "Preguntas frecuentes",
+    "title": "¿Tienes dudas?",
+    "subtitle": "Aquí encontrarás las respuestas a las preguntas más habituales sobre nuestro restaurante.",
+    "q1": "¿Necesito reservar mesa?",
+    "a1": "Recomendamos reservar, especialmente los fines de semana. Puedes hacerlo desde esta web o llamarnos al +34 682 239 035.",
+    "q2": "¿Hacéis envío a domicilio?",
+    "a2": "Próximamente activaremos el servicio de pedidos y envío a domicilio. ¡Estate atento!",
+    "q3": "¿Tenéis opciones para alérgicos o intolerantes?",
+    "a3": "Sí, todos nuestros platos tienen los alérgenos indicados. Además puedes filtrar el menú por alérgenos desde esta misma web.",
+    "q4": "¿Se puede pagar con tarjeta?",
+    "a4": "Sí, aceptamos pago con tarjeta de crédito/débito y efectivo en ambos locales.",
+    "q5": "¿Cuál es el horario del restaurante?",
+    "a5": "Tarragona: Mar–Dom de 19:00 a 23:30. Arrabassada: Mié–Mar de 10:00 a 23:30. Consulta la sección de locales para más detalle.",
+    "q6": "¿Puedo reservar para grupos grandes?",
+    "a6": "Para grupos de más de 10 personas, por favor llámanos directamente al +34 682 239 035 para organizar tu reserva.",
+    "q7": "¿La masa es artesanal?",
+    "a7": "¡Por supuesto! Toda nuestra masa se elabora a diario con ingredientes frescos y siguiendo la receta tradicional italiana.",
+    "q8": "¿Dónde estáis ubicados?",
+    "a8": "Tenemos dos locales: uno en el centro de Tarragona y otro en la zona de la Arrabassada. Consulta la sección de locales para direcciones exactas."
   }
 }
