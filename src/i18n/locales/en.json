@@ -78,6 +78,8 @@
     "pizzeria": "Pizzeria",
     "disabledTitle": "Reservations unavailable",
     "disabledMessage": "Online reservations are temporarily disabled. Please try again later or call us.",
+    "temporarilyClosed": "Temporarily closed",
+    "temporarilyClosedMessage": "Online reservations are temporarily closed. Please try again later or call us.",
     "guests": "Guests",
     "date": "Date",
     "selectTime": "Select a time",

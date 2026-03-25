@@ -78,6 +78,8 @@
     "pizzeria": "Pizzeria",
     "disabledTitle": "Reserves no disponibles",
     "disabledMessage": "Les reserves en línia estan temporalment desactivades. Si us plau, torna-ho a provar més tard o truca'ns per telèfon.",
+    "temporarilyClosed": "Temporalment tancat",
+    "temporarilyClosedMessage": "Les reserves en línia estan temporalment tancades. Si us plau, torna-ho a provar més tard o truca'ns per telèfon.",
     "guests": "Persones",
     "date": "Data",
     "selectTime": "Selecciona una hora",

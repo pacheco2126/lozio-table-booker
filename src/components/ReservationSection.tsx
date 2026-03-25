@@ -240,10 +240,12 @@ const ReservationSection = () => {
 
         {!reservationsEnabled && !isAdmin ? (
           <div className="max-w-xl mx-auto bg-card rounded-xl shadow-lg border border-dashed border-muted-foreground/30 overflow-hidden text-center py-16 px-6">
-            <AlertTriangle className="w-12 h-12 text-destructive/60 mx-auto mb-4" />
-            <h3 className="font-display text-2xl font-bold text-foreground mb-2">{t("reservation.disabledTitle", "Reservas no disponibles")}</h3>
+            <Clock className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+            <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-dashed border-muted-foreground/40 bg-muted text-muted-foreground font-body text-sm font-semibold uppercase tracking-wider mb-3">
+              🔒 {t("reservation.temporarilyClosed", "Temporalment tancat")}
+            </span>
             <p className="text-muted-foreground font-body text-sm mt-3">
-              {t("reservation.disabledMessage", "Las reservas online están temporalmente desactivadas. Por favor, inténtalo más tarde o llámanos por teléfono.")}
+              {t("reservation.temporarilyClosedMessage", "Les reserves online estan temporalment tancades. Si us plau, torna-ho a provar més tard o truca'ns per telèfon.")}
             </p>
           </div>
         ) : COMING_SOON_LOCATIONS.includes(selectedLocation) && !isAdmin ? (
