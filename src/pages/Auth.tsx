@@ -59,6 +59,17 @@ const Auth = () => {
     setGoogleLoading(false);
   };
 
+  const handleAppleSignIn = async () => {
+    setAppleLoading(true);
+    const { error } = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin,
+    });
+    if (error) {
+      toast.error(error.message || 'Error al iniciar sesión con Apple');
+    }
+    setAppleLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 landscape-compact">
       <div className="w-full max-w-md">
