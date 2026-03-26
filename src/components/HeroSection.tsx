@@ -18,7 +18,7 @@ const HeroSection = () => {
       {/* Background */}
       <img
         src={heroPizza}
-        alt="Pizza artesanal italiana"
+        alt="Pizza artesanal Lo Zio Tarragona"
         className="absolute inset-0 w-full h-full object-cover"
         loading="eager"
       />
@@ -30,14 +30,14 @@ const HeroSection = () => {
         <div className="text-center mb-auto">
           <img
             src={logoZio}
-            alt="Lo Zio"
+            alt="Pizza artesanal Lo Zio Tarragona"
             className="h-16 md:h-20 w-auto mx-auto brightness-0 invert mb-4 animate-fade-in-up"
           />
           <p
             className="text-primary-foreground/60 font-display italic text-base md:text-lg tracking-wide animate-fade-in-up"
             style={{ animationDelay: "0.2s" }}
           >
-            "la vita è un brivido che vola via, è tutto un equilibrio sopra la follia"
+            Pizzería artesanal en Tarragona
           </p>
         </div>
 
@@ -55,7 +55,7 @@ const HeroSection = () => {
                 {t("hero.cta")}
               </h2>
               <p className="text-primary-foreground/60 text-sm font-body">
-                {t("hero.reserveSubtitle", "Elige local, fecha y hora")}
+                {t("hero.reserveSubtitle", "Reserva en nuestras pizzerías de Tarragona")}
               </p>
             </div>
             <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/40 rounded-xl transition-colors" />
