@@ -45,7 +45,7 @@ const Locales = () => {
         <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground text-center mb-4">
           Nuestros Locales
         </h1>
-        <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+        <p className="text-muted-foreground text-center mb-12 max-w-3xl mx-auto px-2 text-sm md:text-base">
           Descubre nuestras pizzerías y locales en Tarragona. Cada uno con su encanto único.
         </p>
 
