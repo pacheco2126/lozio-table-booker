@@ -93,28 +93,17 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
         </div>
       </div>
       {menuOpen && (
-        <div className="landscape-dropdown md:hidden bg-foreground/95 backdrop-blur-sm border-t border-border px-4 py-3 flex flex-wrap gap-4">
-          <a
-            href="/#menu"
-            onClick={() => setMenuOpen(false)}
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
-          >
+        <div className="landscape-dropdown md:hidden bg-foreground/95 backdrop-blur-sm border-t border-border px-4 py-3 flex flex-col gap-3">
+          <a href="/#menu" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">
             {t("nav.menu")}
           </a>
-          <a
-            href="/#reservar"
-            onClick={() => setMenuOpen(false)}
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
-          >
+          <a href="/#reservar" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">
             {t("nav.reserve")}
           </a>
-          <a
-            href="/pedido"
-            onClick={() => setMenuOpen(false)}
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
-          >
-            {t("nav.order")}
-          </a>
+          <span className="text-primary-foreground/50 font-body text-xs uppercase tracking-widest">{t("nav.locations")}</span>
+          <a href="/locales/tarragona" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm pl-3">Lo Zio Tarragona</a>
+          <a href="/locales/arrabassada" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm pl-3">Lo Zio Arrabassada</a>
+          <a href="/locales/rincon" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm pl-3">El Rincón de Lo Zio</a>
           {isAdmin && (
             <a
               href="/admin"
