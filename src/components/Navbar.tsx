@@ -42,12 +42,23 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
           >
             {t("nav.menu")}
           </a>
-          <a
-            href="/locales"
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
-          >
-            {t("nav.locations")}
-          </a>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors flex items-center gap-1 outline-none">
+              {t("nav.locations")}
+              <ChevronDown className="w-3.5 h-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="min-w-[200px]">
+              <DropdownMenuItem asChild>
+                <a href="/locales/tarragona" className="cursor-pointer">Lo Zio Tarragona</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a href="/locales/arrabassada" className="cursor-pointer">Lo Zio Arrabassada</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a href="/locales/rincon" className="cursor-pointer">El Rincón de Lo Zio</a>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <a
             href="/#reservar"
             className="bg-primary text-primary-foreground px-6 py-2 rounded-sm font-body font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
