@@ -37,7 +37,7 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
             {t("nav.menu")}
           </a>
           <a
-            href="/#reservar"
+            href="/locales"
             className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
           >
             {t("nav.locations")}
