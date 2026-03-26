@@ -50,7 +50,8 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
             <DropdownMenuContent
               align="center"
               sideOffset={12}
-              className="min-w-[280px] bg-foreground/98 backdrop-blur-md border-none rounded-xl p-0 overflow-hidden shadow-2xl border-t-2 border-t-primary"
+              className="min-w-[280px] backdrop-blur-md border-none rounded-xl p-0 overflow-hidden shadow-2xl border-t-2 border-t-primary"
+              style={{ backgroundColor: 'hsl(20, 14%, 12%)' }}
             >
               <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
                 <a
