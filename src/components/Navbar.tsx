@@ -2,9 +2,15 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import logo_app_inicio from "@/assets/logozio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -36,12 +42,23 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
           >
             {t("nav.menu")}
           </a>
-          <a
-            href="/locales"
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
-          >
-            {t("nav.locations")}
-          </a>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors flex items-center gap-1 outline-none">
+              {t("nav.locations")}
+              <ChevronDown className="w-3.5 h-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="min-w-[200px]">
+              <DropdownMenuItem asChild>
+                <a href="/locales/tarragona" className="cursor-pointer">Lo Zio Tarragona</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a href="/locales/arrabassada" className="cursor-pointer">Lo Zio Arrabassada</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a href="/locales/rincon" className="cursor-pointer">El Rincón de Lo Zio</a>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <a
             href="/#reservar"
             className="bg-primary text-primary-foreground px-6 py-2 rounded-sm font-body font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
@@ -76,28 +93,17 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
         </div>
       </div>
       {menuOpen && (
-        <div className="landscape-dropdown md:hidden bg-foreground/95 backdrop-blur-sm border-t border-border px-4 py-3 flex flex-wrap gap-4">
-          <a
-            href="/#menu"
-            onClick={() => setMenuOpen(false)}
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
-          >
+        <div className="landscape-dropdown md:hidden bg-foreground/95 backdrop-blur-sm border-t border-border px-4 py-3 flex flex-col gap-3">
+          <a href="/#menu" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">
             {t("nav.menu")}
           </a>
-          <a
-            href="/#reservar"
-            onClick={() => setMenuOpen(false)}
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
-          >
+          <a href="/#reservar" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest">
             {t("nav.reserve")}
           </a>
-          <a
-            href="/pedido"
-            onClick={() => setMenuOpen(false)}
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
-          >
-            {t("nav.order")}
-          </a>
+          <span className="text-primary-foreground/50 font-body text-xs uppercase tracking-widest">{t("nav.locations")}</span>
+          <a href="/locales/tarragona" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm pl-3">Lo Zio Tarragona</a>
+          <a href="/locales/arrabassada" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm pl-3">Lo Zio Arrabassada</a>
+          <a href="/locales/rincon" onClick={() => setMenuOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm pl-3">El Rincón de Lo Zio</a>
           {isAdmin && (
             <a
               href="/admin"
