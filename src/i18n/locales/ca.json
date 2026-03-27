@@ -100,10 +100,10 @@
     "successDesc": "{{date}} a les {{time}} per a {{guests}} persones.",
     "error": "Error en crear la reserva. Torna-ho a intentar.",
     "locationTarragona": {
-      "hours": "Dim–Diu: 19:00–23:30"
+      "hours": "Dim–Dll: 19:00–23:30"
     },
     "locationArrabassada": {
-      "hours": "Dim–Dim: 10:00–23:30"
+      "hours": "Dim–Diu: 19:00–23:30"
     }
   },
   "footer": {

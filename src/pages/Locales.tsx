@@ -12,7 +12,7 @@ const locations = [
     type: "Pizzería italiana",
     address: "Carrer Reding 32 Bajos, Tarragona",
     phone: "+34 682 239 035",
-    hours: "Martes - Domingo 19:00 - 23:30",
+    hours: "Miércoles - Lunes 19:00 - 23:30",
     image: "/placeholder.svg",
   },
   {
@@ -21,7 +21,7 @@ const locations = [
     type: "Pizzería italiana",
     address: "Carrer Joan Fuster 28, Tarragona",
     phone: "+34 682 239 035",
-    hours: "Miércoles - Lunes 19:00 - 23:30",
+    hours: "Martes - Domingo 19:00 - 23:30",
     image: "/placeholder.svg",
   },
   {

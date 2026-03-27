@@ -100,10 +100,10 @@
     "successDesc": "{{date}} at {{time}} for {{guests}} guests.",
     "error": "Error creating reservation. Please try again.",
     "locationTarragona": {
-      "hours": "Tue–Sun: 19:00–23:30"
+      "hours": "Wed–Mon: 19:00–23:30"
     },
     "locationArrabassada": {
-      "hours": "Wed–Tue: 10:00–23:30"
+      "hours": "Tue–Sun: 19:00–23:30"
     }
   },
   "footer": {
