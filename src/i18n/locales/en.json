@@ -382,9 +382,9 @@
     "a8": "We have two locations: one in Tarragona city centre and another in the Arrabassada area. Check the locations section for exact addresses."
   },
   "reviews": {
-    "badge": "Your opinion matters",
-    "title": "Leave us a review",
-    "subtitle": "Your feedback helps us improve. All reviews are completely anonymous — no one will know who wrote them.",
+    "badge": "Help us improve",
+    "title": "How was your experience?",
+    "subtitle": "Something you loved? Something we can do better? Tell us honestly — all reviews are 100% anonymous and help us improve every day.",
     "categoryLabel": "What would you like to review?",
     "cat_restaurant": "🍽️ Restaurant",
     "cat_food": "🍕 Food",

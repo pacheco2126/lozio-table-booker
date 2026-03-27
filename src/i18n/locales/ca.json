@@ -382,9 +382,9 @@
     "a8": "Tenim dos locals: un al centre de Tarragona i un altre a la zona de l'Arrabassada. Consulta la secció de locals per a adreces exactes."
   },
   "reviews": {
-    "badge": "La teva opinió compta",
-    "title": "Deixa'ns la teva ressenya",
-    "subtitle": "Els teus comentaris ens ajuden a millorar. Les ressenyes són completament anònimes, ningú sabrà qui les ha escrit.",
+    "badge": "Ajuda'ns a millorar",
+    "title": "Com ha anat la teva experiència?",
+    "subtitle": "Alguna cosa que t'ha encantat? Alguna cosa que podem fer millor? Digues-nos amb sinceritat — totes les ressenyes són 100% anònimes i ens ajuden a millorar cada dia.",
     "categoryLabel": "Sobre què vols opinar?",
     "cat_restaurant": "🍽️ Restaurant",
     "cat_food": "🍕 Menjar",
