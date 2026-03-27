@@ -32,9 +32,9 @@ const locationsData: Record<string, LocationData> = {
     city: "Tarragona",
     postalCode: "43001",
     phone: "+34 682 239 035",
-    hours: "Martes - Domingo 19:00 - 23:30",
+    hours: "Miércoles - Lunes 19:00 - 23:30",
     hoursSpec: [
-      { dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "19:00", closes: "23:30" },
+      { dayOfWeek: ["Monday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "19:00", closes: "23:30" },
     ],
     description:
       "Lo Zio Tarragona es nuestra pizzería artesanal ubicada en el corazón de Tarragona, en Carrer Reding. Disfruta de auténtica pizza italiana elaborada con ingredientes frescos en un ambiente acogedor en el barrio del Serrallo.",
@@ -52,9 +52,9 @@ const locationsData: Record<string, LocationData> = {
     city: "Tarragona",
     postalCode: "43007",
     phone: "+34 682 239 035",
-    hours: "Miércoles - Lunes 19:00 - 23:30",
+    hours: "Martes - Domingo 19:00 - 23:30",
     hoursSpec: [
-      { dayOfWeek: ["Monday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "19:00", closes: "23:30" },
+      { dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "19:00", closes: "23:30" },
     ],
     description:
       "Lo Zio Arrabassada se encuentra en la zona residencial de l'Arrabassada, en Carrer Joan Fuster. Un espacio familiar donde saborear nuestras pizzas artesanales con vistas a Tarragona.",
