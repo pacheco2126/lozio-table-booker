@@ -70,6 +70,22 @@ const Profile = () => {
             <button onClick={handleSignOut} className="text-destructive font-body text-sm font-bold hover:underline">{t('profile.signOut')}</button>
           </div>
 
+          {/* Points Section */}
+          <div className="bg-card rounded-lg p-6 shadow-lg border border-border mb-6">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">🏆</span>
+              <h2 className="font-display text-lg font-bold text-foreground">{t('profile.pointsTitle')}</h2>
+            </div>
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-5 text-center">
+              <span className="inline-block bg-primary/20 text-primary font-display text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">
+                {t('profile.pointsComingSoon')}
+              </span>
+              <p className="text-muted-foreground font-body text-sm leading-relaxed">
+                {t('profile.pointsComingSoonDesc')}
+              </p>
+            </div>
+          </div>
+
           <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, UserCircle, LogOut } from "lucide-react";
 import logo_app_inicio from "@/assets/logozio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
@@ -10,20 +11,27 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav
@@ -107,12 +115,46 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
               <span>Admin</span>
             </a>
           )}
-          <a
-            href={user ? "/perfil" : "/auth"}
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
-          >
-            {user ? t("nav.profile") : t("nav.login")}
-          </a>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-primary-foreground/80 hover:text-primary-foreground transition-colors outline-none">
+                <UserCircle className="w-7 h-7" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                sideOffset={12}
+                className="min-w-[200px] backdrop-blur-md border-none rounded-xl p-0 overflow-hidden shadow-2xl border-t-2 border-t-primary"
+                style={{ backgroundColor: 'hsl(20, 14%, 12%)' }}
+              >
+                <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                  <a
+                    href="/perfil"
+                    className="flex items-center gap-3 px-5 py-4 hover:bg-primary/10 transition-all duration-200 cursor-pointer"
+                  >
+                    <UserCircle className="w-5 h-5 text-primary-foreground/60" />
+                    <span className="font-body text-sm text-primary-foreground">{t("nav.profile")}</span>
+                  </a>
+                </DropdownMenuItem>
+                <div className="mx-4 h-px bg-primary-foreground/10" />
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="p-0 focus:bg-transparent cursor-pointer"
+                >
+                  <div className="flex items-center gap-3 px-5 py-4 hover:bg-primary/10 transition-all duration-200 w-full">
+                    <LogOut className="w-5 h-5 text-destructive/80" />
+                    <span className="font-body text-sm text-destructive">{t("nav.signOut")}</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <a
+              href="/auth"
+              className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest transition-colors"
+            >
+              {t("nav.login")}
+            </a>
+          )}
           <LanguageSwitcher />
         </div>
         <div className="md:hidden flex items-center gap-2">
@@ -165,13 +207,33 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
               Admin
             </a>
           )}
-          <a
-            href={user ? "/perfil" : "/auth"}
-            onClick={() => setMenuOpen(false)}
-            className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
-          >
-            {user ? t("nav.profile") : t("nav.login")}
-          </a>
+          {user ? (
+            <>
+              <a
+                href="/perfil"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
+              >
+                <UserCircle className="w-5 h-5" />
+                {t("nav.profile")}
+              </a>
+              <button
+                onClick={() => { setMenuOpen(false); handleSignOut(); }}
+                className="flex items-center gap-2 text-destructive font-body text-sm uppercase tracking-widest text-left"
+              >
+                <LogOut className="w-5 h-5" />
+                {t("nav.signOut")}
+              </button>
+            </>
+          ) : (
+            <a
+              href="/auth"
+              onClick={() => setMenuOpen(false)}
+              className="text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
+            >
+              {t("nav.login")}
+            </a>
+          )}
         </div>
       )}
     </nav>

@@ -5,7 +5,8 @@
     "reserve": "Reservar",
     "order": "Comanda",
     "profile": "El Meu Perfil",
-    "login": "Iniciar Sessió"
+    "login": "Iniciar Sessió",
+    "signOut": "Tancar sessió"
   },
   "hero": {
     "subtitle": "Autèntica pizza italiana",
@@ -145,7 +146,12 @@
     "saving": "Desant...",
     "saveSuccess": "Dades actualitzades correctament!",
     "saveError": "Error en desar les dades",
-    "loadingText": "Carregant..."
+    "loadingText": "Carregant...",
+    "pointsTitle": "Els Meus Punts Lo Zio",
+    "pointsBalance": "punts",
+    "pointsInfo": "Acumula punts amb cada comanda i bescanvia'ls per descomptes i productes gratis.",
+    "pointsComingSoon": "Pròximament",
+    "pointsComingSoonDesc": "Estem preparant un programa de fidelització amb recompenses exclusives. Molt aviat podràs acumular punts!"
   },
   "cart": {
     "title": "La Teva Comanda",
