@@ -17,6 +17,12 @@ import location2 from "@/assets/location-2.jpg";
 
 const COMING_SOON_LOCATIONS = ["tarragona"];
 
+// Days the location is CLOSED (0=Sunday, 1=Monday, ..., 6=Saturday)
+const CLOSED_DAYS: Record<string, number[]> = {
+  tarragona: [2],      // Closed Tuesday
+  arrabassada: [1],    // Closed Monday
+};
+
 const timeSlots = [
   "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00",
 ];
