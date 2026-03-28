@@ -104,8 +104,20 @@ const ReservationSection = () => {
   const loc = locations.find((l) => l.id === selectedLocation)!;
   const guestsNum = parseInt(guests) || 2;
 
+  // If selected date falls on a closed day for the location, advance to next open day
   useEffect(() => {
-    const fetchAvailability = async () => {
+    const closedDays = CLOSED_DAYS[selectedLocation] || [];
+    if (closedDays.length > 0 && closedDays.includes(date.getDay())) {
+      const newDate = new Date(date);
+      for (let i = 0; i < 7; i++) {
+        newDate.setDate(newDate.getDate() + 1);
+        if (!closedDays.includes(newDate.getDay())) break;
+      }
+      setDate(newDate);
+    }
+  }, [selectedLocation]);
+
+
       setLoadingSlots(true);
 
       const [resResult, tablesResult] = await Promise.all([
