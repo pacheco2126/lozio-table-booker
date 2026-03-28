@@ -320,7 +320,7 @@ const ReservationSection = () => {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar mode="single" selected={date} onSelect={(d) => d && setDate(d)}
-                        disabled={(d) => { const today = new Date(); today.setHours(0,0,0,0); const maxDate = new Date(today); maxDate.setDate(today.getDate() + 30); return d < today || d > maxDate; }}
+                        disabled={(d) => { const today = new Date(); today.setHours(0,0,0,0); const maxDate = new Date(today); maxDate.setDate(today.getDate() + 30); const closedDays = CLOSED_DAYS[selectedLocation] || []; return d < today || d > maxDate || closedDays.includes(d.getDay()); }}
                         locale={dfLocale} initialFocus className={cn("p-3 pointer-events-auto")} />
                     </PopoverContent>
                   </Popover>
