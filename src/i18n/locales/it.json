@@ -5,7 +5,8 @@
     "reserve": "Prenota",
     "order": "Ordine",
     "profile": "Il Mio Profilo",
-    "login": "Accedi"
+    "login": "Accedi",
+    "signOut": "Esci"
   },
   "hero": {
     "subtitle": "Autentica pizza italiana",
@@ -145,7 +146,12 @@
     "saving": "Salvando...",
     "saveSuccess": "Dati aggiornati correttamente!",
     "saveError": "Errore nel salvare i dati",
-    "loadingText": "Caricamento..."
+    "loadingText": "Caricamento...",
+    "pointsTitle": "I Miei Punti Lo Zio",
+    "pointsBalance": "punti",
+    "pointsInfo": "Accumula punti con ogni ordine e riscattali per sconti e prodotti gratis.",
+    "pointsComingSoon": "Prossimamente",
+    "pointsComingSoonDesc": "Stiamo preparando un programma fedeltà con premi esclusivi. Molto presto potrai accumulare punti!"
   },
   "cart": {
     "title": "Il Tuo Ordine",

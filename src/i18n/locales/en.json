@@ -5,7 +5,8 @@
     "reserve": "Reserve",
     "order": "Order",
     "profile": "My Profile",
-    "login": "Sign In"
+    "login": "Sign In",
+    "signOut": "Sign out"
   },
   "hero": {
     "subtitle": "Authentic Italian pizza",
@@ -145,7 +146,12 @@
     "saving": "Saving...",
     "saveSuccess": "Data updated successfully!",
     "saveError": "Error saving data",
-    "loadingText": "Loading..."
+    "loadingText": "Loading...",
+    "pointsTitle": "My Lo Zio Points",
+    "pointsBalance": "points",
+    "pointsInfo": "Earn points with every order and redeem them for discounts and free products.",
+    "pointsComingSoon": "Coming Soon",
+    "pointsComingSoonDesc": "We're preparing an exclusive loyalty program with rewards. You'll be able to earn points very soon!"
   },
   "cart": {
     "title": "Your Order",
