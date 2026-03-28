@@ -109,7 +109,8 @@
   },
   "footer": {
     "description": "Autentica pizza italiana preparata con ingredienti freschi e la passione della nostra famiglia.",
-    "copyright": "© {{year}} Pizzeria Lo Zio. Tutti i diritti riservati."
+    "copyright": "© {{year}} Pizzeria Lo Zio. Tutti i diritti riservati.",
+    "rinconHours": "Lun–Sab: 8:00–22:00"
   },
   "auth": {
     "loginTitle": "Accedi al tuo account",

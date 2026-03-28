@@ -109,7 +109,8 @@
   },
   "footer": {
     "description": "Autèntica pizza italiana elaborada amb ingredients frescos i la passió de la nostra família.",
-    "copyright": "© {{year}} Pizzeria Lo Zio. Tots els drets reservats."
+    "copyright": "© {{year}} Pizzeria Lo Zio. Tots els drets reservats.",
+    "rinconHours": "Dll–Dis: 8:00–22:00"
   },
   "auth": {
     "loginTitle": "Inicia sessió al teu compte",
