@@ -117,7 +117,8 @@ const ReservationSection = () => {
     }
   }, [selectedLocation]);
 
-
+  useEffect(() => {
+    const fetchAvailability = async () => {
       setLoadingSlots(true);
 
       const [resResult, tablesResult] = await Promise.all([
