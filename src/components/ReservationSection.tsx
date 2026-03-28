@@ -17,6 +17,12 @@ import location2 from "@/assets/location-2.jpg";
 
 const COMING_SOON_LOCATIONS = ["tarragona"];
 
+// Days the location is CLOSED (0=Sunday, 1=Monday, ..., 6=Saturday)
+const CLOSED_DAYS: Record<string, number[]> = {
+  tarragona: [2],      // Closed Tuesday
+  arrabassada: [1],    // Closed Monday
+};
+
 const timeSlots = [
   "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00",
 ];
@@ -97,6 +103,19 @@ const ReservationSection = () => {
 
   const loc = locations.find((l) => l.id === selectedLocation)!;
   const guestsNum = parseInt(guests) || 2;
+
+  // If selected date falls on a closed day for the location, advance to next open day
+  useEffect(() => {
+    const closedDays = CLOSED_DAYS[selectedLocation] || [];
+    if (closedDays.length > 0 && closedDays.includes(date.getDay())) {
+      const newDate = new Date(date);
+      for (let i = 0; i < 7; i++) {
+        newDate.setDate(newDate.getDate() + 1);
+        if (!closedDays.includes(newDate.getDay())) break;
+      }
+      setDate(newDate);
+    }
+  }, [selectedLocation]);
 
   useEffect(() => {
     const fetchAvailability = async () => {
@@ -314,7 +333,7 @@ const ReservationSection = () => {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar mode="single" selected={date} onSelect={(d) => d && setDate(d)}
-                        disabled={(d) => { const today = new Date(); today.setHours(0,0,0,0); const maxDate = new Date(today); maxDate.setDate(today.getDate() + 30); return d < today || d > maxDate; }}
+                        disabled={(d) => { const today = new Date(); today.setHours(0,0,0,0); const maxDate = new Date(today); maxDate.setDate(today.getDate() + 30); const closedDays = CLOSED_DAYS[selectedLocation] || []; return d < today || d > maxDate || closedDays.includes(d.getDay()); }}
                         locale={dfLocale} initialFocus className={cn("p-3 pointer-events-auto")} />
                     </PopoverContent>
                   </Popover>
