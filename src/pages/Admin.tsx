@@ -15,6 +15,7 @@ import AdminManualReservation from "@/components/AdminManualReservation";
 import FloorPlan from "@/components/FloorPlan";
 import AdminCustomers from "@/components/AdminCustomers";
 import AdminReports from "@/components/AdminReports";
+import AdminReviews from "@/components/AdminReviews";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -229,6 +230,7 @@ const Admin = () => {
             <TabsTrigger value="reservations" className="font-bold">{t("admin.reservations")}</TabsTrigger>
             <TabsTrigger value="floorplan" className="font-bold">{t("admin.floorPlan")}</TabsTrigger>
             <TabsTrigger value="reports" className="font-bold">{t("admin.reports.title")}</TabsTrigger>
+            <TabsTrigger value="reviews" className="font-bold">Reseñas</TabsTrigger>
             <TabsTrigger value="customers" className="font-bold">{t("admin.customers")}</TabsTrigger>
           </TabsList>
 
@@ -356,6 +358,7 @@ const Admin = () => {
 
           <TabsContent value="floorplan"><FloorPlan /></TabsContent>
           <TabsContent value="reports"><AdminReports /></TabsContent>
+          <TabsContent value="reviews"><AdminReviews /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
         </Tabs>
       </div>
