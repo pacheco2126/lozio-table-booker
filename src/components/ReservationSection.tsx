@@ -1,4 +1,4 @@
-6import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
