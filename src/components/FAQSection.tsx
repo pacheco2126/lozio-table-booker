@@ -1,10 +1,5 @@
 import { useTranslation } from "react-i18next";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
 
 const FAQSection = () => {
@@ -13,6 +8,7 @@ const FAQSection = () => {
   const faqs = [
     { q: t("faq.q1"), a: t("faq.a1") },
     { q: t("faq.q2"), a: t("faq.a2") },
+    { q: t("faq.q9"), a: t("faq.a9") },
     { q: t("faq.q3"), a: t("faq.a3") },
     { q: t("faq.q4"), a: t("faq.a4") },
     { q: t("faq.q5"), a: t("faq.a5") },
@@ -29,12 +25,8 @@ const FAQSection = () => {
             <HelpCircle className="h-4 w-4" />
             {t("faq.badge")}
           </div>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-            {t("faq.title")}
-          </h2>
-          <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-            {t("faq.subtitle")}
-          </p>
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">{t("faq.title")}</h2>
+          <p className="mt-3 text-muted-foreground max-w-xl mx-auto">{t("faq.subtitle")}</p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">
@@ -47,9 +39,7 @@ const FAQSection = () => {
               <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline py-5 text-base">
                 {faq.q}
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground leading-relaxed pb-5">
-                {faq.a}
-              </AccordionContent>
+              <AccordionContent className="text-muted-foreground leading-relaxed pb-5">{faq.a}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
