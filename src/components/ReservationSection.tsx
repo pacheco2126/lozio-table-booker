@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+6import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
@@ -42,7 +42,7 @@ const ReservationSection = () => {
       id: "tarragona",
       name: "Lo Zio Tarragona",
       address: "Carrer Reding 32, Tarragona",
-      phone: "+34 912 345 678",
+      phone: "+34 687 60 56 47",
       hours: t("reservation.locationTarragona.hours"),
       image: location1,
       alt: "Interior acogedor del restaurante Lo Zio Tarragona",
@@ -52,7 +52,7 @@ const ReservationSection = () => {
       id: "arrabassada",
       name: "Lo Zio Arrabassada",
       address: "Carrer Joan Fuster 28, Tarragona",
-      phone: "+34 912 876 543",
+      phone: "+34 682 23 90 35",
       hours: t("reservation.locationArrabassada.hours"),
       image: location2,
       alt: "Terraza del restaurante Lo Zio Arrabassada",
