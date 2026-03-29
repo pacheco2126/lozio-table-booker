@@ -66,6 +66,10 @@ const HeroSection = () => {
             className="relative flex-1 rounded-xl overflow-hidden border border-dashed border-primary-foreground/20 backdrop-blur-sm bg-foreground/30 min-h-[140px] md:min-h-[200px] animate-fade-in-up opacity-60 cursor-not-allowed"
             style={{ animationDelay: "0.5s" }}
           >
+            {/* Badge JustEat */}
+            <span className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[10px] md:text-xs font-bold shadow-lg animate-fade-in-up" style={{ animationDelay: "0.7s" }}>
+              🏆 Mejor Restaurante JustEat Catalunya
+            </span>
             <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
               <Bike className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground mb-3" />
               <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground/50 mb-1">
