@@ -54,8 +54,13 @@ const Locales = () => {
             <Link
               key={loc.slug}
               to={`/locales/${loc.slug}`}
-              className="group block rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
+              className="group block rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 relative"
             >
+              {loc.slug === "tarragona" && (
+                <span className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[10px] md:text-xs font-bold shadow-lg">
+                  🏆 Mejor Restaurante JustEat Catalunya
+                </span>
+              )}
               <div className="aspect-video overflow-hidden">
                 <img
                   src={loc.image}
