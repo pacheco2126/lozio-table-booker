@@ -90,7 +90,7 @@ const locationsData: Record<string, LocationData> = {
       },
     ],
     description:
-      "El Rincón de Lo Zio es nuestro bar de paninis artesanales en Tarragona, en Carrer dels Castellers. Perfecto para desayunos, almuerzos y meriendas con productos italianos de calidad.",
+      "El Rincón de Lo Zio es nuestro bar de paninis artesanales en Tarragona. Perfecto para desayunos, almuerzos y meriendas.",
     h1: "El Rincón de Lo Zio — Bar de Paninis en Tarragona",
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3019.8!2d1.2556!3d41.1197!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sCarrer+dels+Castellers+Tarragona!5e0!3m2!1ses!2ses",
