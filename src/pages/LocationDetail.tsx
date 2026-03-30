@@ -66,7 +66,7 @@ const locationsData: Record<string, LocationData> = {
       },
     ],
     description:
-      "Lo Zio Arrabassada se encuentra en la zona residencial de l'Arrabassada, en Carrer Joan Fuster. Un espacio familiar donde saborear nuestras pizzas artesanales con vistas a Tarragona.",
+      "Lo Zio Arrabassada se encuentra en la zona residencial del barrio de Arrabassada, a 1 minuto de una de las mejores playas de Tarragona.",
     h1: "Lo Zio Arrabassada — Pizzería en Carrer Joan Fuster",
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3019.8!2d1.2656!3d41.1267!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sCarrer+Joan+Fuster+28+Tarragona!5e0!3m2!1ses!2ses",
