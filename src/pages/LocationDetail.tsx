@@ -147,7 +147,7 @@ const LocationDetail = () => {
         {/* Hero */}
         <div className="relative h-64 md:h-80 overflow-hidden">
           <img
-            src={location.image}
+            src={uploadedImage || location.image}
             alt={`Pizza artesanal Lo Zio Tarragona — ${location.name}`}
             className="w-full h-full object-cover"
           />
