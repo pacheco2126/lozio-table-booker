@@ -35,10 +35,14 @@ const locationsData: Record<string, LocationData> = {
     phone: "+34 682 239 035",
     hours: "Miércoles - Lunes 19:00 - 23:30",
     hoursSpec: [
-      { dayOfWeek: ["Monday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "19:00", closes: "23:30" },
+      {
+        dayOfWeek: ["Monday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        opens: "19:00",
+        closes: "23:30",
+      },
     ],
     description:
-      "Lo Zio Tarragona es nuestra pizzería artesanal ubicada en el corazón de Tarragona, en Carrer Reding. Disfruta de auténtica pizza italiana elaborada con ingredientes frescos en un ambiente acogedor en el barrio del Serrallo.",
+      "Lo Zio Tarragona es nuestra pizzería artesanal ubicada en el corazón de Tarragona, delante del emblemático mercado de Tarragona del 1915. Disfruta de auténtica pizza italiana elaborada con ingredientes frescos.",
     h1: "Lo Zio Tarragona — Pizzería en Carrer Reding",
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3019.8!2d1.2456!3d41.1167!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sCarrer+Reding+32+Tarragona!5e0!3m2!1ses!2ses",
@@ -55,7 +59,11 @@ const locationsData: Record<string, LocationData> = {
     phone: "+34 682 239 035",
     hours: "Martes - Domingo 19:00 - 23:30",
     hoursSpec: [
-      { dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "19:00", closes: "23:30" },
+      {
+        dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        opens: "19:00",
+        closes: "23:30",
+      },
     ],
     description:
       "Lo Zio Arrabassada se encuentra en la zona residencial de l'Arrabassada, en Carrer Joan Fuster. Un espacio familiar donde saborear nuestras pizzas artesanales con vistas a Tarragona.",
@@ -75,7 +83,11 @@ const locationsData: Record<string, LocationData> = {
     phone: "+34 682 239 035",
     hours: "Lunes - Sábado 8:00 - 22:00",
     hoursSpec: [
-      { dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], opens: "08:00", closes: "22:00" },
+      {
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        opens: "08:00",
+        closes: "22:00",
+      },
     ],
     description:
       "El Rincón de Lo Zio es nuestro bar de paninis artesanales en Tarragona, en Carrer dels Castellers. Perfecto para desayunos, almuerzos y meriendas con productos italianos de calidad.",
@@ -163,9 +175,7 @@ const LocationDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Info */}
             <div>
-              <p className="text-muted-foreground font-body text-lg leading-relaxed mb-8">
-                {location.description}
-              </p>
+              <p className="text-muted-foreground font-body text-lg leading-relaxed mb-8">{location.description}</p>
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-start gap-3">
