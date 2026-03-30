@@ -320,7 +320,6 @@ const ReservationSection = () => {
               <div className="px-6 pb-8 pt-6 text-center">
                 <CheckCircle className="w-16 h-16 text-secondary mx-auto mb-4" />
                 <p className="font-display text-xl font-bold text-foreground mb-3">{confirmationMsg}</p>
-                <p className="text-muted-foreground font-body text-sm mb-6">{t("reservation.confirmationNote")}</p>
                 <Button onClick={handleNewReservation} variant="outline" className="font-body font-bold">
                   {t("reservation.newReservation", "Hacer otra reserva")}
                 </Button>
