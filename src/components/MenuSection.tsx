@@ -384,6 +384,7 @@ const MenuSection = () => {
   const { addItem } = useCart();
   const { isAdmin } = useIsAdmin();
   const { t } = useTranslation();
+  const { getImageForItem } = useMedia("menu_item");
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
