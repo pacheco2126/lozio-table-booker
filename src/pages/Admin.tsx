@@ -16,6 +16,7 @@ import FloorPlan from "@/components/FloorPlan";
 import AdminCustomers from "@/components/AdminCustomers";
 import AdminReports from "@/components/AdminReports";
 import AdminReviews from "@/components/AdminReviews";
+import AdminMedia from "@/components/AdminMedia";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -232,6 +233,7 @@ const Admin = () => {
             <TabsTrigger value="reports" className="font-bold">{t("admin.reports.title")}</TabsTrigger>
             <TabsTrigger value="reviews" className="font-bold">Reseñas</TabsTrigger>
             <TabsTrigger value="customers" className="font-bold">{t("admin.customers")}</TabsTrigger>
+            <TabsTrigger value="media" className="font-bold">📷 Media</TabsTrigger>
           </TabsList>
 
           <TabsContent value="reservations" className="space-y-6">
@@ -360,6 +362,7 @@ const Admin = () => {
           <TabsContent value="reports"><AdminReports /></TabsContent>
           <TabsContent value="reviews"><AdminReviews /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
+          <TabsContent value="media"><AdminMedia /></TabsContent>
         </Tabs>
       </div>
       <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>

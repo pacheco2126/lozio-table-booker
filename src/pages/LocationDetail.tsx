@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { MapPin, Clock, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMedia } from "@/hooks/useMedia";
 
 interface LocationData {
   slug: string;
@@ -88,6 +89,8 @@ const locationsData: Record<string, LocationData> = {
 const LocationDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const location = slug ? locationsData[slug] : null;
+  const { getImageForItem } = useMedia("location");
+  const uploadedImage = slug ? getImageForItem(slug) : null;
 
   if (!location) {
     return (
@@ -144,7 +147,7 @@ const LocationDetail = () => {
         {/* Hero */}
         <div className="relative h-64 md:h-80 overflow-hidden">
           <img
-            src={location.image}
+            src={uploadedImage || location.image}
             alt={`Pizza artesanal Lo Zio Tarragona — ${location.name}`}
             className="w-full h-full object-cover"
           />

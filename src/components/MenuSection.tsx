@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import pizzaPlaceholder from "@/assets/pizza-placeholder.png";
 import { useCart } from "@/contexts/CartContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useMedia } from "@/hooks/useMedia";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getAllergenById } from "@/lib/allergens";
@@ -331,10 +332,12 @@ const MenuCard = ({
   item,
   onAdd,
   showAddButton,
+  imageUrl,
 }: {
   item: MenuItemData;
   onAdd: () => void;
   showAddButton: boolean;
+  imageUrl?: string | null;
 }) => {
   const { t } = useTranslation();
   return (
@@ -342,8 +345,8 @@ const MenuCard = ({
       {/* Image */}
       <div className="relative overflow-hidden" style={{ paddingBottom: "60%" }}>
         <img
-          src={pizzaPlaceholder}
-          alt={item.name}
+          src={imageUrl || pizzaPlaceholder}
+          alt={`Pizza artesanal ${item.name} Lo Zio Tarragona`}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
@@ -381,6 +384,7 @@ const MenuSection = () => {
   const { addItem } = useCart();
   const { isAdmin } = useIsAdmin();
   const { t } = useTranslation();
+  const { getImageForItem } = useMedia("menu_item");
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
@@ -501,7 +505,7 @@ const MenuSection = () => {
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
                   {items.map((item) => (
-                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} showAddButton={isAdmin} />
+                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} showAddButton={isAdmin} imageUrl={getImageForItem(item.name)} />
                   ))}
                 </div>
               </div>
