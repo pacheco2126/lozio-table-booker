@@ -233,6 +233,7 @@ const Admin = () => {
             <TabsTrigger value="reports" className="font-bold">{t("admin.reports.title")}</TabsTrigger>
             <TabsTrigger value="reviews" className="font-bold">Reseñas</TabsTrigger>
             <TabsTrigger value="customers" className="font-bold">{t("admin.customers")}</TabsTrigger>
+            <TabsTrigger value="media" className="font-bold">📷 Media</TabsTrigger>
           </TabsList>
 
           <TabsContent value="reservations" className="space-y-6">
