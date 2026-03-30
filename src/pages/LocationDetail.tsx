@@ -89,6 +89,8 @@ const locationsData: Record<string, LocationData> = {
 const LocationDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const location = slug ? locationsData[slug] : null;
+  const { getImageForItem } = useMedia("location");
+  const uploadedImage = slug ? getImageForItem(slug) : null;
 
   if (!location) {
     return (
