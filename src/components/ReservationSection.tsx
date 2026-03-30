@@ -192,8 +192,9 @@ const ReservationSection = () => {
       if (data?.success) {
         const dateParts = format(date, "yyyy-MM-dd").split("-");
         const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+        const formattedTime = selectedTime ? selectedTime.substring(0, 5) : "";
         setConfirmationMsg(
-          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${selectedTime} en la ${data.table_name}.`
+          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${formattedTime}.`
         );
         setStep("success");
         toast.success("¡Reserva confirmada!");
