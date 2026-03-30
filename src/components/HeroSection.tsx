@@ -3,10 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { UtensilsCrossed, Bike, Clock } from "lucide-react";
 import heroPizza from "@/assets/hero-pizza.jpg";
 import logoZio from "@/assets/logozio.png";
+import { useMedia } from "@/hooks/useMedia";
 
 const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { getBackgroundVideos, loading } = useMedia("background_video");
+
+  const backgroundVideos = getBackgroundVideos();
+  const videoUrl = backgroundVideos.length > 0 ? backgroundVideos[0] : null;
 
   const scrollToReservation = () => {
     const el = document.getElementById("reservar");
@@ -15,11 +20,21 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-[100dvh] flex flex-col overflow-hidden hero-section">
-      {/* Background */}
+      {/* Background — video on desktop, fallback image */}
+      {videoUrl ? (
+        <video
+          src={videoUrl}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover hidden md:block"
+        />
+      ) : null}
       <img
         src={heroPizza}
         alt="Pizza artesanal Lo Zio Tarragona"
-        className="absolute inset-0 w-full h-full object-cover"
+        className={`absolute inset-0 w-full h-full object-cover ${videoUrl ? "md:hidden" : ""}`}
         loading="eager"
       />
       <div className="absolute inset-0 bg-foreground/70" />
