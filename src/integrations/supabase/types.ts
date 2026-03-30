@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      media: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          file_path: string
+          file_type: string
+          file_url: string
+          id: string
+          media_category: string
+          reference_key: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          file_path: string
+          file_type?: string
+          file_url: string
+          id?: string
+          media_category: string
+          reference_key?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          file_path?: string
+          file_type?: string
+          file_url?: string
+          id?: string
+          media_category?: string
+          reference_key?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
