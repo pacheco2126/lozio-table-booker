@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { MapPin, Clock, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMedia } from "@/hooks/useMedia";
 
 interface LocationData {
   slug: string;
