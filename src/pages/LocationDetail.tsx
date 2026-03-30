@@ -32,7 +32,7 @@ const locationsData: Record<string, LocationData> = {
     street: "Carrer Reding 32 Bajos",
     city: "Tarragona",
     postalCode: "43001",
-    phone: "+34 682 239 035",
+    phone: "+34 687 605 647",
     hours: "Miércoles - Lunes 19:00 - 23:30",
     hoursSpec: [
       {
@@ -80,7 +80,7 @@ const locationsData: Record<string, LocationData> = {
     street: "Carrer dels Castellers de Tarragona 1",
     city: "Tarragona",
     postalCode: "43003",
-    phone: "+34 682 239 035",
+    phone: "+34 687 605 647",
     hours: "Lunes - Sábado 8:00 - 22:00",
     hoursSpec: [
       {
