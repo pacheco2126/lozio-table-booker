@@ -362,6 +362,7 @@ const Admin = () => {
           <TabsContent value="reports"><AdminReports /></TabsContent>
           <TabsContent value="reviews"><AdminReviews /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
+          <TabsContent value="media"><AdminMedia /></TabsContent>
         </Tabs>
       </div>
       <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
