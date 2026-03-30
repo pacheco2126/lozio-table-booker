@@ -332,10 +332,12 @@ const MenuCard = ({
   item,
   onAdd,
   showAddButton,
+  imageUrl,
 }: {
   item: MenuItemData;
   onAdd: () => void;
   showAddButton: boolean;
+  imageUrl?: string | null;
 }) => {
   const { t } = useTranslation();
   return (
