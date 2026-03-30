@@ -345,8 +345,8 @@ const MenuCard = ({
       {/* Image */}
       <div className="relative overflow-hidden" style={{ paddingBottom: "60%" }}>
         <img
-          src={pizzaPlaceholder}
-          alt={item.name}
+          src={imageUrl || pizzaPlaceholder}
+          alt={`Pizza artesanal ${item.name} Lo Zio Tarragona`}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
