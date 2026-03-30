@@ -505,7 +505,7 @@ const MenuSection = () => {
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
                   {items.map((item) => (
-                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} showAddButton={isAdmin} />
+                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} showAddButton={isAdmin} imageUrl={getImageForItem(item.name)} />
                   ))}
                 </div>
               </div>
