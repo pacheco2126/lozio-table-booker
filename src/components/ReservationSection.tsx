@@ -192,7 +192,9 @@ const ReservationSection = () => {
         const dateParts = format(date, "yyyy-MM-dd").split("-");
         const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
         const formattedTime = selectedTime ? selectedTime.substring(0, 5) : "";
-        setConfirmationMsg(`¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${formattedTime}.`);
+        setConfirmationMsg(
+          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${formattedTime}. Recuerda que para cancelar o modificar la reserva deberás llamar al número del restaurante.`,
+        );
         setStep("success");
         toast.success("¡Reserva confirmada!");
       } else if (data?.error === "no_tables") {
