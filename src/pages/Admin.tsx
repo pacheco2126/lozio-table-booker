@@ -125,13 +125,21 @@ const Admin = () => {
   // Filtered reservations for selected date
   const filteredForDate = useMemo(() => {
     const selStr = format(selectedDate, "yyyy-MM-dd");
+    const isTodaySelected = selStr === format(new Date(), "yyyy-MM-dd");
     return reservations.filter((r) => {
       if (r.reservation_date !== selStr) return false;
       if (filterLocation !== "all" && r.location !== filterLocation) return false;
       if (filterStatus !== "all" && r.status !== filterStatus) return false;
+      if (isTodaySelected && !showCancelledToday && r.status === "cancelled") return false;
       return true;
     }).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
-  }, [reservations, selectedDate, filterLocation, filterStatus]);
+  }, [reservations, selectedDate, filterLocation, filterStatus, showCancelledToday]);
+
+  const cancelledTodayCount = useMemo(() => {
+    const todayStr = format(new Date(), "yyyy-MM-dd");
+    return reservations.filter((r) => r.reservation_date === todayStr && r.status === "cancelled" &&
+      (filterLocation === "all" || r.location === filterLocation)).length;
+  }, [reservations, filterLocation]);
 
   const handleDateSelect = (d: Date | undefined) => {
     if (d) setSelectedDate(d);
