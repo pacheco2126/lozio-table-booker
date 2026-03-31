@@ -50,7 +50,7 @@ export const useAdminNotifications = () => {
         icon: '/icon-192.png',
         badge: '/icon-192.png',
         tag: 'new-reservation',
-        renotify: true,
+        vibrate: [200, 100, 200],
       });
     }
 
