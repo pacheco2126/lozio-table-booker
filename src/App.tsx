@@ -12,6 +12,7 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import InstallBanner from "@/components/InstallBanner";
 import UpdateBanner from "@/components/UpdateBanner";
 import AdminFAB from "@/components/AdminFAB";
+import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 import Index from "./pages/Index.tsx";
 import Auth from "./pages/Auth.tsx";
 import Profile from "./pages/Profile.tsx";
@@ -23,6 +24,11 @@ import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
+const AdminNotificationListener = () => {
+  useAdminNotifications();
+  return null;
+};
+
 const App = () => (
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
@@ -31,6 +37,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <AdminNotificationListener />
           <BrowserRouter>
             <InstallBanner />
             <UpdateBanner />
