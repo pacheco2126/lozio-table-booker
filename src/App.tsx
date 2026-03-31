@@ -24,6 +24,11 @@ import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
+const AdminNotificationListener = () => {
+  useAdminNotifications();
+  return null;
+};
+
 const App = () => (
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
@@ -32,6 +37,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <AdminNotificationListener />
           <BrowserRouter>
             <InstallBanner />
             <UpdateBanner />
