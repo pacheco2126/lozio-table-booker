@@ -53,6 +53,7 @@ const Admin = () => {
   const [reservationsEnabled, setReservationsEnabled] = useState(true);
   const [showToggleDialog, setShowToggleDialog] = useState(false);
   const [pendingToggleValue, setPendingToggleValue] = useState(false);
+  const [showCancelledToday, setShowCancelledToday] = useState(false);
 
   const statusLabels: Record<string, { label: string; className: string }> = {
     pending: { label: t("admin.statusPending"), className: "bg-accent/20 text-accent-foreground" },
@@ -124,13 +125,21 @@ const Admin = () => {
   // Filtered reservations for selected date
   const filteredForDate = useMemo(() => {
     const selStr = format(selectedDate, "yyyy-MM-dd");
+    const isTodaySelected = selStr === format(new Date(), "yyyy-MM-dd");
     return reservations.filter((r) => {
       if (r.reservation_date !== selStr) return false;
       if (filterLocation !== "all" && r.location !== filterLocation) return false;
       if (filterStatus !== "all" && r.status !== filterStatus) return false;
+      if (isTodaySelected && !showCancelledToday && r.status === "cancelled") return false;
       return true;
     }).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
-  }, [reservations, selectedDate, filterLocation, filterStatus]);
+  }, [reservations, selectedDate, filterLocation, filterStatus, showCancelledToday]);
+
+  const cancelledTodayCount = useMemo(() => {
+    const todayStr = format(new Date(), "yyyy-MM-dd");
+    return reservations.filter((r) => r.reservation_date === todayStr && r.status === "cancelled" &&
+      (filterLocation === "all" || r.location === filterLocation)).length;
+  }, [reservations, filterLocation]);
 
   const handleDateSelect = (d: Date | undefined) => {
     if (d) setSelectedDate(d);
@@ -339,6 +348,16 @@ const Admin = () => {
                     <option value="confirmed">{t("admin.confirmed")}</option>
                     <option value="cancelled">{t("admin.cancelled")}</option>
                   </select>
+                  {format(selectedDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd") && cancelledTodayCount > 0 && filterStatus === "all" && (
+                    <Button
+                      size="sm"
+                      variant={showCancelledToday ? "secondary" : "outline"}
+                      onClick={() => setShowCancelledToday(!showCancelledToday)}
+                      className="font-body text-xs"
+                    >
+                      {showCancelledToday ? "Ocultar canceladas" : `Mostrar canceladas (${cancelledTodayCount})`}
+                    </Button>
+                  )}
                   {format(selectedDate, "yyyy-MM-dd") !== format(new Date(), "yyyy-MM-dd") && (
                     <Button size="sm" variant="ghost" onClick={handleGoToToday} className="font-body text-xs text-primary">
                       ✕ Volver a hoy
