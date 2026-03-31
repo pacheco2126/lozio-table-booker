@@ -348,16 +348,17 @@ const Admin = () => {
                     <option value="confirmed">{t("admin.confirmed")}</option>
                     <option value="cancelled">{t("admin.cancelled")}</option>
                   </select>
-                {format(selectedDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd") && cancelledTodayCount > 0 && filterStatus === "all" && (
-                  <Button
-                    size="sm"
-                    variant={showCancelledToday ? "secondary" : "outline"}
-                    onClick={() => setShowCancelledToday(!showCancelledToday)}
-                    className="font-body text-xs"
-                  >
-                    {showCancelledToday ? "Ocultar canceladas" : `Mostrar canceladas (${cancelledTodayCount})`}
-                  </Button>
-                )}
+                  {format(selectedDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd") && cancelledTodayCount > 0 && filterStatus === "all" && (
+                    <Button
+                      size="sm"
+                      variant={showCancelledToday ? "secondary" : "outline"}
+                      onClick={() => setShowCancelledToday(!showCancelledToday)}
+                      className="font-body text-xs"
+                    >
+                      {showCancelledToday ? "Ocultar canceladas" : `Mostrar canceladas (${cancelledTodayCount})`}
+                    </Button>
+                  )}
+                  {format(selectedDate, "yyyy-MM-dd") !== format(new Date(), "yyyy-MM-dd") && (
                     <Button size="sm" variant="ghost" onClick={handleGoToToday} className="font-body text-xs text-primary">
                       ✕ Volver a hoy
                     </Button>
