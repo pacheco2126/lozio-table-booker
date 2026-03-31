@@ -48,9 +48,7 @@ export const useAdminNotifications = () => {
       new Notification('🍕 Nueva reserva en Lo Zio', {
         body,
         icon: '/icon-192.png',
-        badge: '/icon-192.png',
         tag: 'new-reservation',
-        vibrate: [200, 100, 200],
       });
     }
 
