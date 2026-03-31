@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { UtensilsCrossed, Plus, ShoppingCart, Flame } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import pizzaPlaceholder from "@/assets/pizza-placeholder.png";
+import pizzaPlaceholder from "@/assets/pizza-placeholder.jpg";
 import { useCart } from "@/contexts/CartContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useMedia } from "@/hooks/useMedia";
