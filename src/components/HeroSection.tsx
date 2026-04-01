@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { UtensilsCrossed, Bike, Clock } from "lucide-react";
-import heroPizza from "@/assets/hero-pizza.jpg";
+import heroPizza from "fondopizza.jpg";
 import logoZio from "@/assets/logozio.png";
 import { useMedia } from "@/hooks/useMedia";
 
@@ -82,7 +82,10 @@ const HeroSection = () => {
             style={{ animationDelay: "0.5s" }}
           >
             {/* Badge JustEat */}
-            <span className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[10px] md:text-xs font-bold shadow-lg animate-fade-in-up" style={{ animationDelay: "0.7s" }}>
+            <span
+              className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[10px] md:text-xs font-bold shadow-lg animate-fade-in-up"
+              style={{ animationDelay: "0.7s" }}
+            >
               🏆 Mejor Restaurante JustEat Catalunya
             </span>
             <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
