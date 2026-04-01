@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
-import { AlertTriangle, CalendarIcon, Clock, CheckCircle } from "lucide-react";
+import { AlertTriangle, CalendarIcon, Clock, CheckCircle, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getUnavailableSlots, MAX_ONLINE_GUESTS, CALL_PHONE } from "@/lib/availability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -12,8 +12,30 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useAuth } from "@/hooks/useAuth";
 import location1 from "@/assets/location-1.jpg";
 import location2 from "@/assets/location-2.jpg";
+
+const COUNTRY_CODES = [
+  { code: "+34", flag: "🇪🇸", name: "España" },
+  { code: "+39", flag: "🇮🇹", name: "Italia" },
+  { code: "+33", flag: "🇫🇷", name: "Francia" },
+  { code: "+44", flag: "🇬🇧", name: "UK" },
+  { code: "+49", flag: "🇩🇪", name: "Alemania" },
+  { code: "+351", flag: "🇵🇹", name: "Portugal" },
+  { code: "+31", flag: "🇳🇱", name: "Países Bajos" },
+  { code: "+32", flag: "🇧🇪", name: "Bélgica" },
+  { code: "+41", flag: "🇨🇭", name: "Suiza" },
+  { code: "+1", flag: "🇺🇸", name: "USA" },
+  { code: "+52", flag: "🇲🇽", name: "México" },
+  { code: "+54", flag: "🇦🇷", name: "Argentina" },
+  { code: "+55", flag: "🇧🇷", name: "Brasil" },
+  { code: "+57", flag: "🇨🇴", name: "Colombia" },
+  { code: "+212", flag: "🇲🇦", name: "Marruecos" },
+  { code: "+213", flag: "🇩🇿", name: "Argelia" },
+  { code: "+216", flag: "🇹🇳", name: "Túnez" },
+  { code: "+40", flag: "🇷🇴", name: "Rumanía" },
+];
 
 const COMING_SOON_LOCATIONS = ["tarragona"];
 
