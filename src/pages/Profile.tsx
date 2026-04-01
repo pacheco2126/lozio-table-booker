@@ -86,6 +86,32 @@ const Profile = () => {
             </div>
           </div>
 
+          {/* Change Password Section */}
+          <div className="bg-card rounded-lg p-6 shadow-lg border border-border mb-6">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">🔒</span>
+              <h2 className="font-display text-lg font-bold text-foreground">{t('profile.changePassword')}</h2>
+            </div>
+            <form onSubmit={handlePasswordChange} className="space-y-4">
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t('profile.newPassword')}</label>
+                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="••••••••" minLength={6} required />
+              </div>
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t('profile.confirmPassword')}</label>
+                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="••••••••" minLength={6} required />
+              </div>
+              <button type="submit" disabled={passwordLoading}
+                className="w-full bg-foreground text-background py-3 min-h-[48px] rounded-sm font-body font-bold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
+                {passwordLoading ? t('profile.changingPassword') : t('profile.changePassword')}
+              </button>
+            </form>
+          </div>
+
           <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>

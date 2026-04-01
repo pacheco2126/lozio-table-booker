@@ -152,7 +152,16 @@
     "pointsBalance": "puntos",
     "pointsInfo": "Acumula puntos con cada pedido y canjéalos por descuentos y productos gratis.",
     "pointsComingSoon": "Próximamente",
-    "pointsComingSoonDesc": "Estamos preparando un programa de fidelización con recompensas exclusivas. ¡Muy pronto podrás acumular puntos!"
+    "pointsComingSoonDesc": "Estamos preparando un programa de fidelización con recompensas exclusivas. ¡Muy pronto podrás acumular puntos!",
+    "changePassword": "Cambiar contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar nueva contraseña",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
+    "passwordChanged": "¡Contraseña actualizada correctamente!",
+    "passwordChangeError": "Error al cambiar la contraseña",
+    "changingPassword": "Cambiando..."
   },
   "cart": {
     "title": "Tu Pedido",
