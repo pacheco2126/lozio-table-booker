@@ -6,7 +6,8 @@
     "order": "Ordine",
     "profile": "Il Mio Profilo",
     "login": "Accedi",
-    "signOut": "Esci"
+    "signOut": "Esci",
+    "myReservations": "Le Mie Prenotazioni"
   },
   "hero": {
     "subtitle": "Autentica pizza italiana",

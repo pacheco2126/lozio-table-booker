@@ -6,7 +6,8 @@
     "order": "Comanda",
     "profile": "El Meu Perfil",
     "login": "Iniciar Sessió",
-    "signOut": "Tancar sessió"
+    "signOut": "Tancar sessió",
+    "myReservations": "Les Meves Reserves"
   },
   "hero": {
     "subtitle": "Autèntica pizza italiana",

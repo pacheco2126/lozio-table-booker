@@ -6,7 +6,8 @@
     "order": "Order",
     "profile": "My Profile",
     "login": "Sign In",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "myReservations": "My Reservations"
   },
   "hero": {
     "subtitle": "Authentic Italian pizza",
