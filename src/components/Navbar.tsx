@@ -227,6 +227,14 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
                 <UserCircle className="w-5 h-5" />
                 {t("nav.profile")}
               </a>
+              <a
+                href="/mis-reservas"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
+              >
+                <CalendarIcon className="w-5 h-5" />
+                {t("nav.myReservations")}
+              </a>
               <button
                 onClick={() => { setMenuOpen(false); handleSignOut(); }}
                 className="flex items-center gap-2 text-destructive font-body text-sm uppercase tracking-widest text-left"
