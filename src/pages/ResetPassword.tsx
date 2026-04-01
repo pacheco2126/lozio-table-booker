@@ -15,8 +15,9 @@ const ResetPassword = () => {
   const [isRecovery, setIsRecovery] = useState(false);
 
   useEffect(() => {
+    // Check hash for recovery tokens (from email link)
     const hash = window.location.hash;
-    if (hash && hash.includes('type=recovery')) {
+    if (hash && (hash.includes('type=recovery') || hash.includes('access_token'))) {
       setIsRecovery(true);
     }
 
@@ -25,6 +26,14 @@ const ResetPassword = () => {
         setIsRecovery(true);
       }
     });
+
+    // Also check current session - if user landed here with a valid session, show password form
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session && hash.includes('type=recovery')) {
+        setIsRecovery(true);
+      }
+    });
+
     return () => subscription.unsubscribe();
   }, []);
 
