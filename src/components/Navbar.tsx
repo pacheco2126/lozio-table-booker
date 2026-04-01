@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { Menu, X, ChevronDown, UserCircle, LogOut } from "lucide-react";
+import { Menu, X, ChevronDown, UserCircle, LogOut, CalendarIcon } from "lucide-react";
 import logo_app_inicio from "@/assets/logozio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
@@ -136,6 +136,16 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
                   </a>
                 </DropdownMenuItem>
                 <div className="mx-4 h-px bg-primary-foreground/10" />
+                <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                  <a
+                    href="/mis-reservas"
+                    className="flex items-center gap-3 px-5 py-4 hover:bg-primary/10 transition-all duration-200 cursor-pointer"
+                  >
+                    <CalendarIcon className="w-5 h-5 text-primary-foreground/60" />
+                    <span className="font-body text-sm text-primary-foreground">{t("nav.myReservations")}</span>
+                  </a>
+                </DropdownMenuItem>
+                <div className="mx-4 h-px bg-primary-foreground/10" />
                 <DropdownMenuItem
                   onClick={handleSignOut}
                   className="p-0 focus:bg-transparent cursor-pointer"
@@ -216,6 +226,14 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
               >
                 <UserCircle className="w-5 h-5" />
                 {t("nav.profile")}
+              </a>
+              <a
+                href="/mis-reservas"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground font-body text-sm uppercase tracking-widest"
+              >
+                <CalendarIcon className="w-5 h-5" />
+                {t("nav.myReservations")}
               </a>
               <button
                 onClick={() => { setMenuOpen(false); handleSignOut(); }}

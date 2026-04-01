@@ -21,6 +21,7 @@ import Checkout from "./pages/Checkout.tsx";
 import Locales from "./pages/Locales.tsx";
 import LocationDetail from "./pages/LocationDetail.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
+import MyReservations from "./pages/MyReservations.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/mis-reservas" element={<MyReservations />} />
               <Route path="/perfil" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/pedido" element={<Checkout />} />

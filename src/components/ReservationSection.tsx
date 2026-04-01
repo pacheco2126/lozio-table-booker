@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
-import { AlertTriangle, CalendarIcon, Clock, CheckCircle } from "lucide-react";
+import { AlertTriangle, CalendarIcon, Clock, CheckCircle, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getUnavailableSlots, MAX_ONLINE_GUESTS, CALL_PHONE } from "@/lib/availability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -12,8 +12,30 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useAuth } from "@/hooks/useAuth";
 import location1 from "@/assets/location-1.jpg";
 import location2 from "@/assets/location-2.jpg";
+
+const COUNTRY_CODES = [
+  { code: "+34", flag: "🇪🇸", name: "España" },
+  { code: "+39", flag: "🇮🇹", name: "Italia" },
+  { code: "+33", flag: "🇫🇷", name: "Francia" },
+  { code: "+44", flag: "🇬🇧", name: "UK" },
+  { code: "+49", flag: "🇩🇪", name: "Alemania" },
+  { code: "+351", flag: "🇵🇹", name: "Portugal" },
+  { code: "+31", flag: "🇳🇱", name: "Países Bajos" },
+  { code: "+32", flag: "🇧🇪", name: "Bélgica" },
+  { code: "+41", flag: "🇨🇭", name: "Suiza" },
+  { code: "+1", flag: "🇺🇸", name: "USA" },
+  { code: "+52", flag: "🇲🇽", name: "México" },
+  { code: "+54", flag: "🇦🇷", name: "Argentina" },
+  { code: "+55", flag: "🇧🇷", name: "Brasil" },
+  { code: "+57", flag: "🇨🇴", name: "Colombia" },
+  { code: "+212", flag: "🇲🇦", name: "Marruecos" },
+  { code: "+213", flag: "🇩🇿", name: "Argelia" },
+  { code: "+216", flag: "🇹🇳", name: "Túnez" },
+  { code: "+40", flag: "🇷🇴", name: "Rumanía" },
+];
 
 const COMING_SOON_LOCATIONS = ["tarragona"];
 
@@ -34,6 +56,7 @@ const ReservationSection = () => {
   const dfLocale = dateFnsLocales[i18n.language] || es;
   const [highlight, setHighlight] = useState(false);
   const { isAdmin } = useIsAdmin();
+  const { user } = useAuth();
 
   const locations = [
     {
@@ -67,6 +90,8 @@ const ReservationSection = () => {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "details" | "success">("select");
   const [formData, setFormData] = useState({ name: "", phone: "", notes: "" });
+  const [phonePrefix, setPhonePrefix] = useState("+34");
+  const [phoneError, setPhoneError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -166,9 +191,23 @@ const ReservationSection = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const validatePhone = (phone: string): boolean => {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length < 6 || digits.length > 15) return false;
+    return /^\d{6,15}$/.test(digits);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validatePhone(formData.phone)) {
+      setPhoneError(t("reservation.phoneError", "Introduce un número de teléfono válido"));
+      return;
+    }
+    setPhoneError("");
     setSubmitting(true);
+
+    const fullPhone = `${phonePrefix} ${formData.phone}`;
 
     try {
       const userId = (await supabase.auth.getUser()).data.user?.id || null;
@@ -177,7 +216,7 @@ const ReservationSection = () => {
         body: {
           location: selectedLocation,
           guest_name: formData.name,
-          phone: formData.phone,
+          phone: fullPhone,
           reservation_date: format(date, "yyyy-MM-dd"),
           reservation_time: selectedTime,
           guests,
@@ -193,7 +232,7 @@ const ReservationSection = () => {
         const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
         const formattedTime = selectedTime ? selectedTime.substring(0, 5) : "";
         setConfirmationMsg(
-          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${formattedTime}. Recuerda que para cancelar o modificar la reserva deberás llamar al número del restaurante.`,
+          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${formattedTime}.`,
         );
         setStep("success");
         toast.success("¡Reserva confirmada!");
@@ -476,6 +515,21 @@ const ReservationSection = () => {
                   </div>
                 </div>
 
+                {!user && (
+                  <Alert className="border-blue-500/50 bg-blue-50 dark:bg-blue-950/30 mb-4">
+                    <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <AlertDescription className="text-blue-800 dark:text-blue-200 font-body text-sm flex items-center justify-between gap-2 flex-wrap">
+                      <span>{t("reservation.loginWarning", "Si quieres poder modificar tu reserva, inicia sesión.")}</span>
+                      <a
+                        href="/auth"
+                        className="inline-block px-3 py-1 rounded bg-primary text-primary-foreground font-body text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity whitespace-nowrap"
+                      >
+                        {t("nav.login")}
+                      </a>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 <div className="space-y-4 landscape-form-grid">
                   <div>
                     <label className="block font-body text-sm font-bold text-foreground mb-1.5">
@@ -495,15 +549,37 @@ const ReservationSection = () => {
                     <label className="block font-body text-sm font-bold text-foreground mb-1.5">
                       {t("reservation.phone")} *
                     </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      required
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                      placeholder="+34 600 000 000"
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        value={phonePrefix}
+                        onChange={(e) => setPhonePrefix(e.target.value)}
+                        className="w-[110px] px-2 py-3 rounded-lg bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                      >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.flag} {c.code}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="tel"
+                        name="phone"
+                        required
+                        value={formData.phone}
+                        onChange={(e) => {
+                          handleChange(e);
+                          if (phoneError) setPhoneError("");
+                        }}
+                        className={cn(
+                          "flex-1 px-4 py-3 min-h-[44px] rounded-lg bg-background border font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary",
+                          phoneError ? "border-destructive" : "border-input"
+                        )}
+                        placeholder="600 000 000"
+                      />
+                    </div>
+                    {phoneError && (
+                      <p className="text-destructive font-body text-xs mt-1">{phoneError}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block font-body text-sm font-bold text-foreground mb-1.5">

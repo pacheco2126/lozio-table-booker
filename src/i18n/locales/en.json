@@ -6,7 +6,8 @@
     "order": "Order",
     "profile": "My Profile",
     "login": "Sign In",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "myReservations": "My Reservations"
   },
   "hero": {
     "subtitle": "Authentic Italian pizza",
@@ -105,9 +106,29 @@
     },
     "locationArrabassada": {
       "hours": "Tue–Sun: 19:00–23:30"
-    }
+    },
+    "loginWarning": "If you want to modify your reservation, please sign in.",
+    "phoneError": "Please enter a valid phone number"
   },
-  "footer": {
+  "myReservations": {
+    "title": "My Reservations",
+    "back": "Back",
+    "loading": "Loading...",
+    "empty": "You have no reservations.",
+    "edit": "Modify",
+    "cancel": "Cancel",
+    "cancelling": "Cancelling...",
+    "cancelSuccess": "Reservation cancelled",
+    "cancelError": "Error cancelling reservation",
+    "editTitle": "Modify Reservation",
+    "editError": "No availability for that date/time",
+    "editSuccess": "Reservation modified successfully",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "statusConfirmed": "Confirmed",
+    "statusPending": "Pending",
+    "statusCancelled": "Cancelled"
+  },
     "description": "Authentic Italian pizza made with fresh ingredients and the passion of our family.",
     "copyright": "© {{year}} Pizzeria Lo Zio. All rights reserved.",
     "rinconHours": "Mon–Sat: 8:00–22:00"
