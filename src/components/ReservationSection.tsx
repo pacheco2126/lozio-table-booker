@@ -190,9 +190,23 @@ const ReservationSection = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const validatePhone = (phone: string): boolean => {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length < 6 || digits.length > 15) return false;
+    return /^\d{6,15}$/.test(digits);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validatePhone(formData.phone)) {
+      setPhoneError(t("reservation.phoneError", "Introduce un número de teléfono válido"));
+      return;
+    }
+    setPhoneError("");
     setSubmitting(true);
+
+    const fullPhone = `${phonePrefix} ${formData.phone}`;
 
     try {
       const userId = (await supabase.auth.getUser()).data.user?.id || null;
@@ -201,7 +215,7 @@ const ReservationSection = () => {
         body: {
           location: selectedLocation,
           guest_name: formData.name,
-          phone: formData.phone,
+          phone: fullPhone,
           reservation_date: format(date, "yyyy-MM-dd"),
           reservation_time: selectedTime,
           guests,
@@ -217,7 +231,7 @@ const ReservationSection = () => {
         const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
         const formattedTime = selectedTime ? selectedTime.substring(0, 5) : "";
         setConfirmationMsg(
-          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${formattedTime}. Recuerda que para cancelar o modificar la reserva deberás llamar al número del restaurante.`,
+          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${formattedTime}.`,
         );
         setStep("success");
         toast.success("¡Reserva confirmada!");
