@@ -129,6 +129,7 @@
     "statusPending": "Pending",
     "statusCancelled": "Cancelled"
   },
+  "footer": {
     "description": "Authentic Italian pizza made with fresh ingredients and the passion of our family.",
     "copyright": "© {{year}} Pizzeria Lo Zio. All rights reserved.",
     "rinconHours": "Mon–Sat: 8:00–22:00"
