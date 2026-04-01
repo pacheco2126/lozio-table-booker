@@ -12,6 +12,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [profile, setProfile] = useState({
     full_name: '', phone: '', address: '', city: '', postal_code: '',
     allergies: [] as string[], food_preferences: '', favorite_table_area: '',
