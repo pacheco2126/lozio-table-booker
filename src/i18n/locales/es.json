@@ -123,7 +123,17 @@
     "noAccount": "¿No tienes cuenta? Regístrate",
     "hasAccount": "¿Ya tienes cuenta? Inicia sesión",
     "welcomeBack": "¡Bienvenido de nuevo!",
-    "accountCreated": "¡Cuenta creada! Revisa tu email para confirmar."
+    "accountCreated": "¡Cuenta creada! Revisa tu email para confirmar.",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "forgotPasswordTitle": "Recuperar contraseña",
+    "forgotPasswordDesc": "Te enviaremos un enlace para restablecer tu contraseña.",
+    "sendResetLink": "Enviar enlace",
+    "resetLinkSent": "¡Enlace enviado! Revisa tu bandeja de entrada.",
+    "resetPasswordTitle": "Nueva contraseña",
+    "resetPasswordDesc": "Introduce tu nueva contraseña.",
+    "resetPassword": "Cambiar contraseña",
+    "passwordResetSuccess": "¡Contraseña actualizada! Ya puedes iniciar sesión.",
+    "passwordResetError": "Error al cambiar la contraseña"
   },
   "profile": {
     "title": "Mi Perfil",

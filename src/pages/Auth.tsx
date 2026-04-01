@@ -157,7 +157,15 @@ const Auth = () => {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
+            {isLogin && (
+              <button
+                onClick={() => navigate('/reset-password')}
+                className="text-muted-foreground font-body text-sm hover:underline block mx-auto"
+              >
+                {t('auth.forgotPassword')}
+              </button>
+            )}
             <button
               onClick={() => setIsLogin(!isLogin)}
               className="text-primary font-body text-sm hover:underline"
