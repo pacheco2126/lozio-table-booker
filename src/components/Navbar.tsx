@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { Menu, X, ChevronDown, UserCircle, LogOut } from "lucide-react";
+import { Menu, X, ChevronDown, UserCircle, LogOut, CalendarIcon } from "lucide-react";
 import logo_app_inicio from "@/assets/logozio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
