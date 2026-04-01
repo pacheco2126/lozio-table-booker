@@ -89,6 +89,8 @@ const ReservationSection = () => {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "details" | "success">("select");
   const [formData, setFormData] = useState({ name: "", phone: "", notes: "" });
+  const [phonePrefix, setPhonePrefix] = useState("+34");
+  const [phoneError, setPhoneError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
