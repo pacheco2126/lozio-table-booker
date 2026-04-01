@@ -56,6 +56,7 @@ const ReservationSection = () => {
   const dfLocale = dateFnsLocales[i18n.language] || es;
   const [highlight, setHighlight] = useState(false);
   const { isAdmin } = useIsAdmin();
+  const { user } = useAuth();
 
   const locations = [
     {
