@@ -21,6 +21,7 @@ import Checkout from "./pages/Checkout.tsx";
 import Locales from "./pages/Locales.tsx";
 import LocationDetail from "./pages/LocationDetail.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
+import MyReservations from "./pages/MyReservations.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
