@@ -106,9 +106,29 @@
     },
     "locationArrabassada": {
       "hours": "Dim–Diu: 19:00–23:30"
-    }
+    },
+    "loginWarning": "Si vols poder modificar la teva reserva, inicia sessió.",
+    "phoneError": "Introdueix un número de telèfon vàlid"
   },
-  "footer": {
+  "myReservations": {
+    "title": "Les Meves Reserves",
+    "back": "Tornar",
+    "loading": "Carregant...",
+    "empty": "No tens reserves.",
+    "edit": "Modificar",
+    "cancel": "Cancel·lar",
+    "cancelling": "Cancel·lant...",
+    "cancelSuccess": "Reserva cancel·lada",
+    "cancelError": "Error en cancel·lar la reserva",
+    "editTitle": "Modificar Reserva",
+    "editError": "No hi ha disponibilitat per a aquesta data/hora",
+    "editSuccess": "Reserva modificada correctament",
+    "saving": "Desant...",
+    "saveChanges": "Desar Canvis",
+    "statusConfirmed": "Confirmada",
+    "statusPending": "Pendent",
+    "statusCancelled": "Cancel·lada"
+  },
     "description": "Autèntica pizza italiana elaborada amb ingredients frescos i la passió de la nostra família.",
     "copyright": "© {{year}} Pizzeria Lo Zio. Tots els drets reservats.",
     "rinconHours": "Dll–Dis: 8:00–22:00"

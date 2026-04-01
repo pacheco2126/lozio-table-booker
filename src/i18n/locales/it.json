@@ -106,9 +106,29 @@
     },
     "locationArrabassada": {
       "hours": "Mar–Dom: 19:00–23:30"
-    }
+    },
+    "loginWarning": "Se vuoi poter modificare la tua prenotazione, accedi.",
+    "phoneError": "Inserisci un numero di telefono valido"
   },
-  "footer": {
+  "myReservations": {
+    "title": "Le Mie Prenotazioni",
+    "back": "Indietro",
+    "loading": "Caricamento...",
+    "empty": "Non hai prenotazioni.",
+    "edit": "Modifica",
+    "cancel": "Annulla",
+    "cancelling": "Annullando...",
+    "cancelSuccess": "Prenotazione annullata",
+    "cancelError": "Errore nell'annullamento della prenotazione",
+    "editTitle": "Modifica Prenotazione",
+    "editError": "Nessuna disponibilità per quella data/ora",
+    "editSuccess": "Prenotazione modificata con successo",
+    "saving": "Salvando...",
+    "saveChanges": "Salva Modifiche",
+    "statusConfirmed": "Confermata",
+    "statusPending": "In attesa",
+    "statusCancelled": "Annullata"
+  },
     "description": "Autentica pizza italiana preparata con ingredienti freschi e la passione della nostra famiglia.",
     "copyright": "© {{year}} Pizzeria Lo Zio. Tutti i diritti riservati.",
     "rinconHours": "Lun–Sab: 8:00–22:00"
