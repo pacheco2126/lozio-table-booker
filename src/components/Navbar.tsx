@@ -136,6 +136,16 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
                   </a>
                 </DropdownMenuItem>
                 <div className="mx-4 h-px bg-primary-foreground/10" />
+                <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                  <a
+                    href="/mis-reservas"
+                    className="flex items-center gap-3 px-5 py-4 hover:bg-primary/10 transition-all duration-200 cursor-pointer"
+                  >
+                    <CalendarIcon className="w-5 h-5 text-primary-foreground/60" />
+                    <span className="font-body text-sm text-primary-foreground">{t("nav.myReservations")}</span>
+                  </a>
+                </DropdownMenuItem>
+                <div className="mx-4 h-px bg-primary-foreground/10" />
                 <DropdownMenuItem
                   onClick={handleSignOut}
                   className="p-0 focus:bg-transparent cursor-pointer"
