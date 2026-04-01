@@ -54,6 +54,16 @@ const Profile = () => {
     setProfile((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) { toast.error(t('profile.passwordMismatch')); return; }
+    if (newPassword.length < 6) { toast.error(t('profile.passwordTooShort')); return; }
+    setPasswordLoading(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) { toast.error(t('profile.passwordChangeError')); } else { toast.success(t('profile.passwordChanged')); setNewPassword(''); setConfirmPassword(''); }
+    setPasswordLoading(false);
+  };
+
   const handleSignOut = async () => { await signOut(); navigate('/'); };
 
   if (authLoading) {
