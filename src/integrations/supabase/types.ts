@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      media: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          file_path: string
+          file_type: string
+          file_url: string
+          id: string
+          media_category: string
+          reference_key: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          file_path: string
+          file_type?: string
+          file_url: string
+          id?: string
+          media_category: string
+          reference_key?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          file_path?: string
+          file_type?: string
+          file_url?: string
+          id?: string
+          media_category?: string
+          reference_key?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
@@ -222,6 +258,48 @@ export type Database = {
           },
         ]
       }
+      reviews: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          message: string | null
+          rating: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          rating: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          rating?: number
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       tables: {
         Row: {
           capacity: number
@@ -289,6 +367,15 @@ export type Database = {
           _time: string
         }
         Returns: string
+      }
+      find_available_tables_multi: {
+        Args: {
+          _date: string
+          _guests: number
+          _location: string
+          _time: string
+        }
+        Returns: string[]
       }
       has_role: {
         Args: {

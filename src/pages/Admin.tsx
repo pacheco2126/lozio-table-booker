@@ -1,18 +1,22 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { format, isToday, isBefore, startOfDay, parseISO, isAfter } from "date-fns";
+import { format, isToday, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
 import FloorPlan from "@/components/FloorPlan";
 import AdminCustomers from "@/components/AdminCustomers";
 import AdminReports from "@/components/AdminReports";
+import AdminReviews from "@/components/AdminReviews";
+import AdminMedia from "@/components/AdminMedia";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -41,12 +45,15 @@ const Admin = () => {
   const isMobile = useIsMobile();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterLocation, setFilterLocation] = useState("arrabassada");
+  const [filterLocation, setFilterLocation] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [tableNames, setTableNames] = useState<Record<string, string>>({});
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [showPast, setShowPast] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(!isMobile);
+  const [reservationsEnabled, setReservationsEnabled] = useState(true);
+  const [showToggleDialog, setShowToggleDialog] = useState(false);
+  const [pendingToggleValue, setPendingToggleValue] = useState(false);
+  const [showCancelledToday, setShowCancelledToday] = useState(false);
 
   const statusLabels: Record<string, { label: string; className: string }> = {
     pending: { label: t("admin.statusPending"), className: "bg-accent/20 text-accent-foreground" },
@@ -59,10 +66,32 @@ const Admin = () => {
     if (!adminLoading && isAdmin) {
       fetchReservations();
       fetchTableNames();
+      fetchReservationsEnabled();
     } else if (!adminLoading) {
       setLoading(false);
     }
   }, [isAdmin, adminLoading]);
+
+  const fetchReservationsEnabled = async () => {
+    const { data } = await supabase.from("site_settings").select("value").eq("key", "reservations_enabled").single();
+    if (data) setReservationsEnabled(data.value === true);
+  };
+
+  const handleToggleReservations = (checked: boolean) => {
+    setPendingToggleValue(checked);
+    setShowToggleDialog(true);
+  };
+
+  const confirmToggleReservations = async () => {
+    const { error } = await supabase.from("site_settings").update({ value: pendingToggleValue, updated_at: new Date().toISOString() }).eq("key", "reservations_enabled");
+    if (error) {
+      toast.error("Error al actualizar el estado de las reservas");
+    } else {
+      setReservationsEnabled(pendingToggleValue);
+      toast.success(pendingToggleValue ? "Reservas activadas" : "Reservas desactivadas");
+    }
+    setShowToggleDialog(false);
+  };
 
   const fetchReservations = async () => {
     const { data, error } = await supabase.from("reservations").select("*").order("reservation_date", { ascending: true }).order("reservation_time", { ascending: true });
@@ -93,58 +122,31 @@ const Admin = () => {
     return dates;
   }, [reservations]);
 
-  // Filtered reservations
-  const filtered = useMemo(() => {
+  // Filtered reservations for selected date
+  const filteredForDate = useMemo(() => {
+    const selStr = format(selectedDate, "yyyy-MM-dd");
+    const isTodaySelected = selStr === format(new Date(), "yyyy-MM-dd");
     return reservations.filter((r) => {
+      if (r.reservation_date !== selStr) return false;
       if (filterLocation !== "all" && r.location !== filterLocation) return false;
       if (filterStatus !== "all" && r.status !== filterStatus) return false;
+      if (isTodaySelected && !showCancelledToday && r.status === "cancelled") return false;
       return true;
-    });
-  }, [reservations, filterLocation, filterStatus]);
+    }).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
+  }, [reservations, selectedDate, filterLocation, filterStatus, showCancelledToday]);
 
-  // Group reservations
-  const { todayReservations, futureGroups, pastReservations } = useMemo(() => {
-    const today = format(new Date(), "yyyy-MM-dd");
-    const todayStart = startOfDay(new Date());
-
-    if (selectedDate) {
-      const selStr = format(selectedDate, "yyyy-MM-dd");
-      const selected = filtered.filter((r) => r.reservation_date === selStr);
-      if (selStr === today) {
-        return { todayReservations: selected, futureGroups: {} as Record<string, Reservation[]>, pastReservations: [] as Reservation[] };
-      }
-      if (isBefore(parseISO(selStr), todayStart)) {
-        return { todayReservations: [] as Reservation[], futureGroups: {} as Record<string, Reservation[]>, pastReservations: selected };
-      }
-      return { todayReservations: [] as Reservation[], futureGroups: { [selStr]: selected }, pastReservations: [] as Reservation[] };
-    }
-
-    const todayRes = filtered.filter((r) => r.reservation_date === today);
-    const future: Record<string, Reservation[]> = {};
-    const past: Reservation[] = [];
-
-    filtered.forEach((r) => {
-      if (r.reservation_date === today) return;
-      const rDate = parseISO(r.reservation_date);
-      if (isBefore(rDate, todayStart)) {
-        past.push(r);
-      } else {
-        if (!future[r.reservation_date]) future[r.reservation_date] = [];
-        future[r.reservation_date].push(r);
-      }
-    });
-
-    past.sort((a, b) => b.reservation_date.localeCompare(a.reservation_date) || b.reservation_time.localeCompare(a.reservation_time));
-
-    return { todayReservations: todayRes, futureGroups: future, pastReservations: past };
-  }, [filtered, selectedDate]);
+  const cancelledTodayCount = useMemo(() => {
+    const todayStr = format(new Date(), "yyyy-MM-dd");
+    return reservations.filter((r) => r.reservation_date === todayStr && r.status === "cancelled" &&
+      (filterLocation === "all" || r.location === filterLocation)).length;
+  }, [reservations, filterLocation]);
 
   const handleDateSelect = (d: Date | undefined) => {
-    setSelectedDate(d);
+    if (d) setSelectedDate(d);
   };
 
   const handleGoToToday = () => {
-    setSelectedDate(undefined);
+    setSelectedDate(new Date());
   };
 
   if (authLoading || adminLoading || loading) {
@@ -219,11 +221,11 @@ const Admin = () => {
     );
   };
 
-  const totalActive = filtered.filter(r => r.status !== "cancelled").length;
+  const totalActive = filteredForDate.filter(r => r.status !== "cancelled").length;
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <Navbar />
+      <Navbar forceSolid />
       <div className="pt-24 md:pt-28 pb-16 px-3 md:px-4 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -238,17 +240,35 @@ const Admin = () => {
             <TabsTrigger value="reservations" className="font-bold">{t("admin.reservations")}</TabsTrigger>
             <TabsTrigger value="floorplan" className="font-bold">{t("admin.floorPlan")}</TabsTrigger>
             <TabsTrigger value="reports" className="font-bold">{t("admin.reports.title")}</TabsTrigger>
+            <TabsTrigger value="reviews" className="font-bold">Reseñas</TabsTrigger>
             <TabsTrigger value="customers" className="font-bold">{t("admin.customers")}</TabsTrigger>
+            <TabsTrigger value="media" className="font-bold">📷 Media</TabsTrigger>
           </TabsList>
 
           <TabsContent value="reservations" className="space-y-6">
+            {/* Toggle reservas */}
+            <div className="flex items-center justify-between bg-card rounded-lg p-4 border border-border shadow-sm">
+              <div>
+                <p className="font-body font-bold text-foreground text-sm">
+                  {reservationsEnabled ? "Reservas activas" : "Reservas desactivadas"}
+                </p>
+                <p className="text-muted-foreground font-body text-xs mt-0.5">
+                  {reservationsEnabled ? "Los usuarios pueden hacer reservas online" : "Las reservas online están pausadas"}
+                </p>
+              </div>
+              <Switch
+                checked={reservationsEnabled}
+                onCheckedChange={handleToggleReservations}
+              />
+            </div>
+
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: t("admin.total"), count: totalActive },
-                { label: t("admin.pending"), count: filtered.filter((r) => r.status === "pending").length },
-                { label: t("admin.confirmed"), count: filtered.filter((r) => r.status === "confirmed").length },
-                { label: t("admin.cancelled"), count: filtered.filter((r) => r.status === "cancelled").length },
+                { label: t("admin.pending"), count: filteredForDate.filter((r) => r.status === "pending").length },
+                { label: t("admin.confirmed"), count: filteredForDate.filter((r) => r.status === "confirmed").length },
+                { label: t("admin.cancelled"), count: filteredForDate.filter((r) => r.status === "cancelled").length },
               ].map((s) => (
                 <div key={s.label} className="bg-card rounded-lg p-5 border border-border shadow-sm">
                   <p className="text-muted-foreground font-body text-sm">{s.label}</p>
@@ -267,7 +287,7 @@ const Admin = () => {
                       <Button variant="outline" className="w-full justify-between font-body text-sm">
                         <span className="flex items-center gap-2">
                           <CalendarIcon className="h-4 w-4" />
-                          {selectedDate ? format(selectedDate, "EEE d MMM", { locale: es }) : 'Hoy — ' + format(new Date(), "d MMM", { locale: es })}
+                          {format(selectedDate, "EEE d MMM", { locale: es })}
                         </span>
                         {calendarOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                       </Button>
@@ -328,59 +348,30 @@ const Admin = () => {
                     <option value="confirmed">{t("admin.confirmed")}</option>
                     <option value="cancelled">{t("admin.cancelled")}</option>
                   </select>
-                  {selectedDate && (
+                  {format(selectedDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd") && cancelledTodayCount > 0 && filterStatus === "all" && (
+                    <Button
+                      size="sm"
+                      variant={showCancelledToday ? "secondary" : "outline"}
+                      onClick={() => setShowCancelledToday(!showCancelledToday)}
+                      className="font-body text-xs"
+                    >
+                      {showCancelledToday ? "Ocultar canceladas" : `Mostrar canceladas (${cancelledTodayCount})`}
+                    </Button>
+                  )}
+                  {format(selectedDate, "yyyy-MM-dd") !== format(new Date(), "yyyy-MM-dd") && (
                     <Button size="sm" variant="ghost" onClick={handleGoToToday} className="font-body text-xs text-primary">
-                      ✕ Quitar filtro de fecha
+                      ✕ Volver a hoy
                     </Button>
                   )}
                 </div>
 
-                {/* Today's reservations */}
-                {todayReservations.length > 0 && (
-                  <>
-                    {renderDateGroup(format(new Date(), "yyyy-MM-dd"), todayReservations, true)}
-                    {Object.keys(futureGroups).length > 0 && (
-                      <div className="border-t-2 border-primary/20 my-4" />
-                    )}
-                  </>
-                )}
-
-                {/* Future reservations grouped by date */}
-                {Object.keys(futureGroups).sort().map((dateStr) => (
-                  renderDateGroup(dateStr, futureGroups[dateStr])
-                ))}
-
-                {/* Empty state */}
-                {todayReservations.length === 0 && Object.keys(futureGroups).length === 0 && pastReservations.length === 0 && (
+                {/* Reservations for selected date */}
+                {filteredForDate.length > 0 ? (
+                  renderDateGroup(format(selectedDate, "yyyy-MM-dd"), filteredForDate, format(selectedDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd"))
+                ) : (
                   <div className="bg-card rounded-lg p-12 border border-border text-center">
                     <p className="text-muted-foreground font-body text-lg">{t("admin.noReservations")}</p>
                   </div>
-                )}
-
-                {/* Past reservations — only via calendar selection */}
-                {selectedDate && pastReservations.length > 0 && (
-                  <Collapsible open={showPast} onOpenChange={setShowPast}>
-                    <div className="border-t border-border pt-4 mt-4">
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" className="w-full justify-between font-body text-sm text-muted-foreground">
-                          <span>Ver reservas pasadas ({pastReservations.length})</span>
-                          {showPast ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                        </Button>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="mt-3 space-y-6">
-                        {(() => {
-                          const pastGroups: Record<string, Reservation[]> = {};
-                          pastReservations.forEach((r) => {
-                            if (!pastGroups[r.reservation_date]) pastGroups[r.reservation_date] = [];
-                            pastGroups[r.reservation_date].push(r);
-                          });
-                          return Object.keys(pastGroups).sort().reverse().map((dateStr) =>
-                            renderDateGroup(dateStr, pastGroups[dateStr])
-                          );
-                        })()}
-                      </CollapsibleContent>
-                    </div>
-                  </Collapsible>
                 )}
               </div>
             </div>
@@ -388,9 +379,31 @@ const Admin = () => {
 
           <TabsContent value="floorplan"><FloorPlan /></TabsContent>
           <TabsContent value="reports"><AdminReports /></TabsContent>
+          <TabsContent value="reviews"><AdminReviews /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
+          <TabsContent value="media"><AdminMedia /></TabsContent>
         </Tabs>
       </div>
+      <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingToggleValue ? "¿Activar reservas?" : "¿Desactivar reservas?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingToggleValue
+                ? "Los usuarios podrán volver a hacer reservas online."
+                : "Los usuarios no podrán hacer nuevas reservas hasta que las reactives."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmToggleReservations}>
+              Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

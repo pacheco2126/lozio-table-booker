@@ -5,16 +5,20 @@
     "reserve": "Reserve",
     "order": "Order",
     "profile": "My Profile",
-    "login": "Sign In"
+    "login": "Sign In",
+    "signOut": "Sign out",
+    "myReservations": "My Reservations"
   },
   "hero": {
     "subtitle": "Authentic Italian pizza",
     "title": "Lo Zio",
     "description": "",
     "cta": "Reserve a Table",
-    "reserveSubtitle": "Choose location, date and time",
-    "orderCta": "Order Delivery",
-    "orderSubtitle": "Browse menu and place your order"
+    "reserveSubtitle": "Book at our Tarragona pizzerias",
+    "orderCta": "Make an order",
+    "orderSubtitle": "Browse menu and place your order",
+    "comingSoon": "Coming Soon",
+    "orderComingSoonHint": "Online ordering available very soon"
   },
   "menu": {
     "header": "Our Menu",
@@ -25,21 +29,65 @@
     "filterHint": "(hide dishes containing)",
     "clearFilters": "Clear filters",
     "pizzas": "Pizzas",
+    "focaccias": "Focaccias",
+    "calzones": "Calzones",
     "extras": "Extras",
     "drinks": "Drinks",
     "dessert": "Dessert",
-    "addedToOrder": "{{name}} added to order"
+    "addToOrder": "Add",
+    "addedToOrder": "{{name}} added to order",
+    "desc": {
+      "MARINARA": "Tomato, garlic and oregano.",
+      "MARGHERITA": "Tomato, mozzarella.",
+      "SICILIANA": "Tomato, mozzarella, anchovies, capers and olives.",
+      "FUNGHI": "Tomato, mozzarella and mushrooms.",
+      "GRECA": "Tomato, mozzarella and black olives.",
+      "TEDESCA": "Tomato, mozzarella and frankfurter.",
+      "PICCANTE": "Tomato, mozzarella and spicy chorizo.",
+      "TARRAGONINA": "Tomato, mozzarella, ham and egg.",
+      "PROSCIUTTO": "Tomato, mozzarella and cooked ham.",
+      "RÚSTICA": "Tomato, mozzarella, bacon and onion.",
+      "CALABRESE": "Tomato, mozzarella and spicy Calabrian sausage.",
+      "TONNARA": "Tomato, mozzarella and tuna.",
+      "CATALANA": "Carbonara base and bacon.",
+      "VEGETARIANA": "Tomato, mozzarella, red pepper, courgette and aubergine.",
+      "4 STAGIONI": "Tomato, mozzarella, mushrooms, cooked ham, artichokes and spicy sausage.",
+      "ITALIANA": "Tomato, buffalo mozzarella, cherry tomatoes and basil.",
+      "CIOCIARA": "Mozzarella, Friarielli sausage and cherry tomatoes.",
+      "FANTASÍA": "Tomato, mozzarella, and 4 toppings of your choice.",
+      "MILANO": "Tomato, mozzarella and Milano salami.",
+      "BOSCAIOLA": "Tomato, mozzarella, sausage, mushrooms and black pepper.",
+      "SPECK": "Tomato, mozzarella, smoked ham and mushrooms.",
+      "TROPEA": "Mozzarella, red onion, fresh tomato and basil.",
+      "HAWAI": "Tomato, mozzarella, pineapple, sweetcorn and ham.",
+      "BRESAOLINA": "Tomato, mozzarella, bresaola, rocket and Grana Padano cheese.",
+      "4 FORMAGGI": "Tomato, mozzarella, gorgonzola, fontina, Emmental and goat cheese.",
+      "FOCACCIA CRUDO": "Oil, rosemary, salt and cured ham.",
+      "FOCACCIA CAPRESE": "Oil, fresh tomato, fresh mozzarella and basil.",
+      "LA FOCACCIA DELLO ZIO": "Mozzarella bocconcini, spicy salami, spicy sobrasada, fresh tomato, oil, oregano and chilli.",
+      "SALENTINA": "Mozzarella, burrata, sun-dried tomatoes and rocket.",
+      "LOMBARDA": "Mozzarella, porchetta, scamorza, cherry tomatoes.",
+      "CALZONE": "Tomato, mozzarella and ham.",
+      "BIG CALZONE": "Tomato, mozzarella, ham, egg and vegetables.",
+      "RUSTICELLA (Calzone)": "Tomato, mozzarella, cooked ham, cheese and vegetables.",
+      "NORVEGIA": "Mozzarella, burrata, smoked salmon and rocket."
+    }
   },
   "reservation": {
     "sectionTitle": "Our locations",
     "title": "Reserve Your Table",
     "subtitle": "Choose one of our two locations and enjoy the best artisan pizza.",
     "pizzeria": "Pizzeria",
+    "disabledTitle": "Reservations unavailable",
+    "disabledMessage": "Online reservations are temporarily disabled. Please try again later or call us.",
+    "temporarilyClosed": "Temporarily closed",
+    "temporarilyClosedMessage": "Online reservations are temporarily closed. Please try again later or call us.",
     "guests": "Guests",
     "date": "Date",
     "selectTime": "Select a time",
     "checkingAvailability": "Checking availability...",
     "maxGuestsError": "Sorry, we cannot accommodate groups of more than {{max}} guests.",
+    "largeGroupMessage": "For groups of more than {{max}} people, please call us directly.",
     "durationWarning": "You have <strong>1 hour and a half</strong> to enjoy your meal.",
     "person": "person",
     "persons": "persons",
@@ -54,15 +102,37 @@
     "successDesc": "{{date}} at {{time}} for {{guests}} guests.",
     "error": "Error creating reservation. Please try again.",
     "locationTarragona": {
-      "hours": "Tue–Sun: 19:00–23:30"
+      "hours": "Wed–Mon: 19:00–23:30"
     },
     "locationArrabassada": {
-      "hours": "Wed–Tue: 10:00–23:30"
-    }
+      "hours": "Tue–Sun: 19:00–23:30"
+    },
+    "loginWarning": "If you want to modify your reservation, please sign in.",
+    "phoneError": "Please enter a valid phone number"
+  },
+  "myReservations": {
+    "title": "My Reservations",
+    "back": "Back",
+    "loading": "Loading...",
+    "empty": "You have no reservations.",
+    "edit": "Modify",
+    "cancel": "Cancel",
+    "cancelling": "Cancelling...",
+    "cancelSuccess": "Reservation cancelled",
+    "cancelError": "Error cancelling reservation",
+    "editTitle": "Modify Reservation",
+    "editError": "No availability for that date/time",
+    "editSuccess": "Reservation modified successfully",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "statusConfirmed": "Confirmed",
+    "statusPending": "Pending",
+    "statusCancelled": "Cancelled"
   },
   "footer": {
     "description": "Authentic Italian pizza made with fresh ingredients and the passion of our family.",
-    "copyright": "© {{year}} Pizzeria Lo Zio. All rights reserved."
+    "copyright": "© {{year}} Pizzeria Lo Zio. All rights reserved.",
+    "rinconHours": "Mon–Sat: 8:00–22:00"
   },
   "auth": {
     "loginTitle": "Sign in to your account",
@@ -99,7 +169,12 @@
     "saving": "Saving...",
     "saveSuccess": "Data updated successfully!",
     "saveError": "Error saving data",
-    "loadingText": "Loading..."
+    "loadingText": "Loading...",
+    "pointsTitle": "My Lo Zio Points",
+    "pointsBalance": "points",
+    "pointsInfo": "Earn points with every order and redeem them for discounts and free products.",
+    "pointsComingSoon": "Coming Soon",
+    "pointsComingSoonDesc": "We're preparing an exclusive loyalty program with rewards. You'll be able to earn points very soon!"
   },
   "cart": {
     "title": "Your Order",
@@ -313,5 +388,48 @@
   "pwa": {
     "installBanner": "Install our app for a better experience",
     "install": "Install"
+  },
+  "faq": {
+    "badge": "FAQ",
+    "title": "Got questions?",
+    "subtitle": "Here you'll find answers to the most common questions about our restaurant.",
+    "q1": "Do I need to book a table?",
+    "a1": "We recommend booking, especially on weekends. You can book online for Arrabassada, and for Tarragona by calling +34 687 605 647.",
+    "q2": "Do you offer home delivery?",
+    "a2": "Yes, you can order delivery by calling our restaurants or through JustEat. Soon you'll also be able to order from this website, with exclusive discounts!",
+    "q3": "Do you have options for allergies or intolerances?",
+    "a3": "Yes, all our dishes have allergens listed on the menu. Please check them before placing your order.",
+    "q4": "Can I pay by card?",
+    "a4": "Yes, we accept credit/debit card and cash at all our locations.",
+    "q5": "What are the restaurant opening hours?",
+    "a5": "Tarragona: Wed–Mon 19:00–23:30. Arrabassada: Tue–Sun 19:00–23:30. El Rincón de Lo Zio: Mon–Sat 8:00–22:00. Check the locations section for more details.",
+    "q6": "Can I book for large groups?",
+    "a6": "For groups of more than 10, please call us directly: Tarragona at +34 687 605 647 or Arrabassada at +34 682 239 035, and we'll arrange your booking.",
+    "q7": "Is the dough handmade?",
+    "a7": "Absolutely! All our dough is made fresh daily with quality ingredients following the traditional Italian recipe.",
+    "q8": "Where are you located?",
+    "a8": "We have three locations: Lo Zio Tarragona at Carrer Reding 32, Lo Zio Arrabassada at Carrer Joan Fuster 28, and El Rincón de Lo Zio at Carrer dels Castellers 1. Check the locations section for more info.",
+    "q9": "Why choose Lo Zio among all the pizzerias in Tarragona?",
+    "a9": "Our customers say it best: Lo Zio was voted Best Restaurant in Catalonia at the JustEat Awards 2025, chosen by thousands of people who order delivery every day. This isn't a critics' award or a food guide, it's a direct vote from real people ordering pizza on a Friday night. That's what makes us most proud. You can see all the winners at the JustEat Awards 2025."
+  },
+  "reviews": {
+    "badge": "Help us improve",
+    "title": "How was your experience?",
+    "subtitle": "Something you loved? Something we can do better? Tell us honestly — all reviews are 100% anonymous and help us improve every day.",
+    "categoryLabel": "What would you like to review?",
+    "cat_restaurant": "🍽️ Restaurant",
+    "cat_food": "🍕 Food",
+    "cat_web": "💻 Web / App",
+    "ratingLabel": "Your rating",
+    "ratingRequired": "Please select a rating",
+    "messageLabel": "Comment (optional)",
+    "messagePlaceholder": "Tell us what you liked or what we can improve...",
+    "submit": "Send review",
+    "submitting": "Sending...",
+    "success": "Thank you for your review!",
+    "error": "Error sending review. Please try again.",
+    "thankYou": "Thank you so much!",
+    "thankYouDesc": "Your anonymous feedback helps us keep improving every day.",
+    "another": "Send another review"
   }
 }

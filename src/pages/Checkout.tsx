@@ -96,7 +96,7 @@ const Checkout = () => {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar />
+        <Navbar forceSolid />
         <div className="pt-32 pb-24 px-4 text-center">
           <h1 className="font-display text-3xl font-bold text-foreground mb-4">{t("checkout.emptyTitle")}</h1>
           <p className="text-muted-foreground font-body mb-8">{t("checkout.emptyDesc")}</p>
@@ -111,7 +111,7 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <Navbar />
+      <Navbar forceSolid />
       <div className="pt-24 md:pt-28 pb-24 px-3 md:px-4">
         <div className="max-w-5xl mx-auto">
           <Button variant="ghost" onClick={() => navigate("/#menu")} className="mb-6 text-muted-foreground hover:text-foreground">

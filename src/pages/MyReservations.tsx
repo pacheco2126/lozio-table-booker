@@ -1,0 +1,369 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { format } from "date-fns";
+import { es, enUS, ca } from "date-fns/locale";
+import { toast } from "sonner";
+import { CalendarIcon, Clock, Users, MapPin, X, Edit2, ChevronLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { getUnavailableSlots, MAX_ONLINE_GUESTS } from "@/lib/availability";
+
+const CLOSED_DAYS: Record<string, number[]> = {
+  tarragona: [2],
+  arrabassada: [1],
+};
+
+const timeSlots = ["19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00"];
+const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
+
+interface Reservation {
+  id: string;
+  reservation_date: string;
+  reservation_time: string;
+  guests: string;
+  location: string;
+  status: string;
+  notes: string | null;
+  guest_name: string;
+  table_id: string | null;
+}
+
+const MyReservations = () => {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const dfLocale = dateFnsLocales[i18n.language] || es;
+
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editDialog, setEditDialog] = useState<Reservation | null>(null);
+  const [editDate, setEditDate] = useState<Date>(new Date());
+  const [editTime, setEditTime] = useState<string>("");
+  const [editGuests, setEditGuests] = useState<string>("2");
+  const [editNotes, setEditNotes] = useState<string>("");
+  const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
+  const [saving, setSaving] = useState(false);
+  const [cancelling, setCancelling] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!authLoading && !user) navigate("/auth");
+  }, [authLoading, user, navigate]);
+
+  const fetchReservations = async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("reservations")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("reservation_date", { ascending: false });
+    if (!error && data) setReservations(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (user) fetchReservations();
+  }, [user]);
+
+  const canModify = (r: Reservation) => {
+    if (r.status === "cancelled") return false;
+    const now = new Date();
+    const resDate = new Date(`${r.reservation_date}T${r.reservation_time}`);
+    return resDate > now;
+  };
+
+  const handleCancel = async (id: string) => {
+    setCancelling(id);
+    const { error } = await supabase
+      .from("reservations")
+      .update({ status: "cancelled" })
+      .eq("id", id)
+      .eq("user_id", user!.id);
+    if (error) {
+      toast.error(t("myReservations.cancelError", "Error al cancelar la reserva"));
+    } else {
+      toast.success(t("myReservations.cancelSuccess", "Reserva cancelada"));
+      fetchReservations();
+    }
+    setCancelling(null);
+  };
+
+  const openEdit = async (r: Reservation) => {
+    setEditDialog(r);
+    const d = new Date(r.reservation_date + "T00:00:00");
+    setEditDate(d);
+    setEditTime(r.reservation_time.substring(0, 5));
+    setEditGuests(r.guests);
+    setEditNotes(r.notes || "");
+    // Load availability for that date/location
+    await loadAvailability(r.location, d, parseInt(r.guests) || 2, r.id);
+  };
+
+  const loadAvailability = async (location: string, date: Date, guests: number, excludeId: string) => {
+    const [resResult, tablesResult] = await Promise.all([
+      supabase
+        .from("reservations")
+        .select("reservation_time, guests, table_id")
+        .eq("location", location)
+        .eq("reservation_date", format(date, "yyyy-MM-dd"))
+        .in("status", ["pending", "confirmed"])
+        .neq("id", excludeId),
+      supabase.from("tables").select("id, name, capacity").eq("location", location).eq("is_active", true),
+    ]);
+    if (!resResult.error) {
+      const unavailable = getUnavailableSlots(resResult.data || [], timeSlots, guests, tablesResult.data || undefined);
+      setUnavailableSlots(unavailable);
+    }
+  };
+
+  const handleEditDateChange = async (d: Date | undefined) => {
+    if (!d || !editDialog) return;
+    setEditDate(d);
+    await loadAvailability(editDialog.location, d, parseInt(editGuests) || 2, editDialog.id);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editDialog || !user) return;
+    setSaving(true);
+
+    // Re-check availability via edge function
+    const { data, error } = await supabase.functions.invoke("auto-assign-reservation", {
+      body: {
+        location: editDialog.location,
+        guest_name: editDialog.guest_name,
+        phone: "",
+        reservation_date: format(editDate, "yyyy-MM-dd"),
+        reservation_time: editTime,
+        guests: editGuests,
+        notes: editNotes || null,
+        user_id: user.id,
+      },
+    });
+
+    if (error || !data?.success) {
+      toast.error(data?.message || t("myReservations.editError", "No hay disponibilidad para esa fecha/hora"));
+      setSaving(false);
+      return;
+    }
+
+    // Cancel old reservation
+    await supabase
+      .from("reservations")
+      .update({ status: "cancelled" })
+      .eq("id", editDialog.id)
+      .eq("user_id", user.id);
+
+    toast.success(t("myReservations.editSuccess", "Reserva modificada correctamente"));
+    setEditDialog(null);
+    fetchReservations();
+    setSaving(false);
+  };
+
+  const statusLabel = (status: string) => {
+    const map: Record<string, { label: string; class: string }> = {
+      confirmed: { label: t("myReservations.statusConfirmed", "Confirmada"), class: "bg-green-500/20 text-green-400" },
+      pending: { label: t("myReservations.statusPending", "Pendiente"), class: "bg-yellow-500/20 text-yellow-400" },
+      cancelled: { label: t("myReservations.statusCancelled", "Cancelada"), class: "bg-red-500/20 text-red-400" },
+    };
+    return map[status] || { label: status, class: "bg-muted text-muted-foreground" };
+  };
+
+  const locationName = (loc: string) => {
+    const map: Record<string, string> = {
+      tarragona: "Lo Zio Tarragona",
+      arrabassada: "Lo Zio Arrabassada",
+    };
+    return map[loc] || loc;
+  };
+
+  if (authLoading) return null;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar forceSolid />
+      <div className="max-w-2xl mx-auto px-4 pt-28 pb-32">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-primary font-body text-sm mb-6 hover:opacity-80">
+          <ChevronLeft className="w-4 h-4" />
+          {t("myReservations.back", "Volver")}
+        </button>
+        <h1 className="font-display text-3xl font-bold text-foreground mb-8">
+          {t("myReservations.title", "Mis Reservas")}
+        </h1>
+
+        {loading ? (
+          <p className="text-muted-foreground font-body">{t("myReservations.loading", "Cargando...")}</p>
+        ) : reservations.length === 0 ? (
+          <p className="text-muted-foreground font-body">{t("myReservations.empty", "No tienes reservas.")}</p>
+        ) : (
+          <div className="space-y-4">
+            {reservations.map((r) => {
+              const st = statusLabel(r.status);
+              const modifiable = canModify(r);
+              return (
+                <div key={r.id} className="bg-card border border-border rounded-xl p-5 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-display text-lg font-bold text-foreground">{locationName(r.location)}</h3>
+                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-body font-semibold ${st.class}`}>
+                        {st.label}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-sm font-body text-muted-foreground">
+                    <div className="flex items-center gap-1.5">
+                      <CalendarIcon className="w-4 h-4" />
+                      {format(new Date(r.reservation_date + "T00:00:00"), "d MMM yyyy", { locale: dfLocale })}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-4 h-4" />
+                      {r.reservation_time.substring(0, 5)}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-4 h-4" />
+                      {r.guests} {parseInt(r.guests) === 1 ? t("reservation.person") : t("reservation.persons")}
+                    </div>
+                  </div>
+                  {r.notes && (
+                    <p className="text-xs text-muted-foreground/70 font-body italic">"{r.notes}"</p>
+                  )}
+                  {modifiable && (
+                    <div className="flex gap-2 pt-1">
+                      <Button size="sm" variant="outline" onClick={() => openEdit(r)} className="font-body text-xs gap-1.5">
+                        <Edit2 className="w-3.5 h-3.5" />
+                        {t("myReservations.edit", "Modificar")}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleCancel(r.id)}
+                        disabled={cancelling === r.id}
+                        className="font-body text-xs gap-1.5"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        {cancelling === r.id
+                          ? t("myReservations.cancelling", "Cancelando...")
+                          : t("myReservations.cancel", "Cancelar")}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editDialog} onOpenChange={(o) => !o && setEditDialog(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">{t("myReservations.editTitle", "Modificar Reserva")}</DialogTitle>
+          </DialogHeader>
+          {editDialog && (
+            <div className="space-y-4">
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.date")}</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal font-body text-sm")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {format(editDate, "EEE d MMM", { locale: dfLocale })}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={editDate}
+                      onSelect={handleEditDateChange}
+                      disabled={(d) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const maxDate = new Date(today);
+                        maxDate.setDate(today.getDate() + 30);
+                        const closedDays = CLOSED_DAYS[editDialog.location] || [];
+                        return d < today || d > maxDate || closedDays.includes(d.getDay());
+                      }}
+                      locale={dfLocale}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.selectTime")}</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {timeSlots.map((slot) => {
+                    const isUnavailable = unavailableSlots.has(slot);
+                    return (
+                      <button
+                        key={slot}
+                        type="button"
+                        onClick={() => setEditTime(slot)}
+                        disabled={isUnavailable}
+                        className={`py-2 px-2 rounded-lg font-body text-xs font-medium transition-all ${
+                          isUnavailable
+                            ? "bg-muted/50 text-muted-foreground/40 cursor-not-allowed line-through"
+                            : editTime === slot
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-foreground hover:bg-primary/10"
+                        }`}
+                      >
+                        {slot}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.guests")}</label>
+                <select
+                  value={editGuests}
+                  onChange={(e) => setEditGuests(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm"
+                >
+                  {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("reservation.notes")}</label>
+                <textarea
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  rows={2}
+                  className="w-full px-4 py-3 rounded-lg bg-background border border-input font-body text-foreground resize-none"
+                />
+              </div>
+
+              <Button
+                onClick={handleSaveEdit}
+                disabled={saving || !editTime}
+                className="w-full font-body font-bold"
+              >
+                {saving ? t("myReservations.saving", "Guardando...") : t("myReservations.saveChanges", "Guardar Cambios")}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default MyReservations;
