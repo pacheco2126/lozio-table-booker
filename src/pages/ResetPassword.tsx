@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logoZio from '@/assets/logozio.png';
-import heroPizza from '@/assets/hero-pizza.jpg';
+import fondoPizza from '@/assets/fondopizza.jpg'; 
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative">
       <div className="absolute inset-0 z-0">
-        <img src={heroPizza} alt="" className="w-full h-full object-cover" />
+        <img src={fondoPizza} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-foreground/80" />
       </div>
       <div className="w-full max-w-md relative z-10">

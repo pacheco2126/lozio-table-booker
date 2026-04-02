@@ -6,7 +6,7 @@ import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import logoZio from '@/assets/logozio.png';
-import heroPizza from '@/assets/hero-pizza.jpg';
+import fondoPizza from '@/assets/fondopizza.jpg'; 
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -75,7 +75,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 landscape-compact relative">
       <div className="absolute inset-0 z-0">
-        <img src={heroPizza} alt="" className="w-full h-full object-cover" />
+        <img src={fondoPizza} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-foreground/80" />
       </div>
       <div className="w-full max-w-md relative z-10">
