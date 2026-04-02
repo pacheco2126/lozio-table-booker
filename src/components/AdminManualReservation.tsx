@@ -82,7 +82,6 @@ const AdminManualReservation = ({ onCreated }: Props) => {
             <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("admin.location")} *</label>
             <select name="location" value={form.location} onChange={handleChange}
               className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="tarragona">Lo Zio Tarragona</option>
               <option value="arrabassada">Lo Zio Arrabassada</option>
             </select>
           </div>
