@@ -22,7 +22,7 @@ const AdminManualReservation = ({ onCreated }: Props) => {
   const dfLocale = dateFnsLocales[i18n.language] || es;
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ location: "tarragona", guest_name: "", email: "", phone: "", guests: "2", time: "20:00", notes: "", source: "phone" });
+  const [form, setForm] = useState({ location: "arrabassada", guest_name: "", email: "", phone: "", guests: "2", time: "20:00", notes: "", source: "phone" });
   const [date, setDate] = useState<Date>(new Date());
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
