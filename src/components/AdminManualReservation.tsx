@@ -38,13 +38,19 @@ const AdminManualReservation = ({ onCreated }: Props) => {
     const sourceNote = `[${t(`admin.${sourceNoteKey}`)}]`;
     const fullNotes = form.notes ? `${sourceNote} ${form.notes}` : sourceNote;
 
-    const { error } = await supabase.from("reservations").insert({
-      location: form.location, guest_name: form.guest_name, email: form.email || "manual@reserva.local",
-      phone: form.phone, reservation_date: format(date, "yyyy-MM-dd"), reservation_time: form.time,
-      guests: form.guests, notes: fullNotes, status: "confirmed", user_id: null,
+    const { data, error } = await supabase.functions.invoke("auto-assign-reservation", {
+      body: {
+        location: form.location, guest_name: form.guest_name,
+        phone: form.phone, reservation_date: format(date, "yyyy-MM-dd"),
+        reservation_time: form.time + ":00", guests: form.guests, notes: fullNotes, user_id: null,
+      },
     });
     setSubmitting(false);
-    if (error) { toast.error(t("admin.manualError")); console.error(error); return; }
+    if (error || !data?.success) {
+      toast.error(data?.message || t("admin.manualError"));
+      if (error) console.error(error);
+      return;
+    }
 
     toast.success(t("admin.manualCreated"));
     setForm({ location: "tarragona", guest_name: "", email: "", phone: "", guests: "2", time: "20:00", notes: "", source: "phone" });
