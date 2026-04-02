@@ -53,7 +53,7 @@ const AdminManualReservation = ({ onCreated }: Props) => {
     }
 
     toast.success(t("admin.manualCreated"));
-    setForm({ location: "tarragona", guest_name: "", email: "", phone: "", guests: "2", time: "20:00", notes: "", source: "phone" });
+    setForm({ location: "arrabassada", guest_name: "", email: "", phone: "", guests: "2", time: "20:00", notes: "", source: "phone" });
     setDate(new Date()); setOpen(false); onCreated();
   };
 
