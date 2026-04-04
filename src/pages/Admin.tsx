@@ -226,7 +226,7 @@ const Admin = () => {
         <div className="flex items-center gap-2 shrink-0">
           <span className={`px-2 py-1 rounded-sm text-xs font-bold font-body ${st.className}`}>{st.label}</span>
           {r.status !== "cancelled" && (
-            <button onClick={() => updateStatus(r.allIds, "cancelled")}
+            <button onClick={() => { setCancelIds(r.allIds); setCancelName(r.guest_name); }}
               className="px-2 py-1 text-xs font-body font-bold bg-destructive/20 text-destructive rounded-sm hover:bg-destructive/30 transition-colors">
               {t("admin.cancel")}
             </button>
