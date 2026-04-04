@@ -234,7 +234,7 @@ const Admin = () => {
     );
   };
 
-  const renderDateGroup = (dateStr: string, items: Reservation[], isHighlighted = false) => {
+  const renderDateGroup = (dateStr: string, items: GroupedReservation[], isHighlighted = false) => {
     const dateLabel = formatDateHeader(dateStr);
     const isTodayDate = dateStr === format(new Date(), "yyyy-MM-dd");
     return (
