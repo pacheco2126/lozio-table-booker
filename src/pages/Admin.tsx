@@ -54,6 +54,8 @@ const Admin = () => {
   const [showToggleDialog, setShowToggleDialog] = useState(false);
   const [pendingToggleValue, setPendingToggleValue] = useState(false);
   const [showCancelledToday, setShowCancelledToday] = useState(false);
+  const [cancelIds, setCancelIds] = useState<string[] | null>(null);
+  const [cancelName, setCancelName] = useState("");
 
   const statusLabels: Record<string, { label: string; className: string }> = {
     pending: { label: t("admin.statusPending"), className: "bg-accent/20 text-accent-foreground" },
