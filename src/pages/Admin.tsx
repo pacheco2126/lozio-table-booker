@@ -54,6 +54,8 @@ const Admin = () => {
   const [showToggleDialog, setShowToggleDialog] = useState(false);
   const [pendingToggleValue, setPendingToggleValue] = useState(false);
   const [showCancelledToday, setShowCancelledToday] = useState(false);
+  const [cancelIds, setCancelIds] = useState<string[] | null>(null);
+  const [cancelName, setCancelName] = useState("");
 
   const statusLabels: Record<string, { label: string; className: string }> = {
     pending: { label: t("admin.statusPending"), className: "bg-accent/20 text-accent-foreground" },
@@ -224,7 +226,7 @@ const Admin = () => {
         <div className="flex items-center gap-2 shrink-0">
           <span className={`px-2 py-1 rounded-sm text-xs font-bold font-body ${st.className}`}>{st.label}</span>
           {r.status !== "cancelled" && (
-            <button onClick={() => updateStatus(r.allIds, "cancelled")}
+            <button onClick={() => { setCancelIds(r.allIds); setCancelName(r.guest_name); }}
               className="px-2 py-1 text-xs font-body font-bold bg-destructive/20 text-destructive rounded-sm hover:bg-destructive/30 transition-colors">
               {t("admin.cancel")}
             </button>
@@ -433,6 +435,23 @@ const Admin = () => {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={confirmToggleReservations}>
               Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={!!cancelIds} onOpenChange={(open) => { if (!open) setCancelIds(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Cancelar reserva de {cancelName}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción cancelará la reserva. No se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (cancelIds) updateStatus(cancelIds, "cancelled"); setCancelIds(null); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Cancelar reserva
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
