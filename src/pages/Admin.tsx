@@ -122,17 +122,45 @@ const Admin = () => {
     return dates;
   }, [reservations]);
 
-  // Filtered reservations for selected date
+  // Group key for multi-table reservations
+  const getGroupKey = (r: Reservation) =>
+    `${r.guest_name}|${r.reservation_date}|${r.reservation_time}|${r.location}|${r.phone}`;
+
+  interface GroupedReservation extends Reservation {
+    tableIds: string[];
+    allIds: string[];
+  }
+
+  // Filtered and grouped reservations for selected date
   const filteredForDate = useMemo(() => {
     const selStr = format(selectedDate, "yyyy-MM-dd");
     const isTodaySelected = selStr === format(new Date(), "yyyy-MM-dd");
-    return reservations.filter((r) => {
+    const filtered = reservations.filter((r) => {
       if (r.reservation_date !== selStr) return false;
       if (filterLocation !== "all" && r.location !== filterLocation) return false;
       if (filterStatus !== "all" && r.status !== filterStatus) return false;
       if (isTodaySelected && !showCancelledToday && r.status === "cancelled") return false;
       return true;
-    }).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
+    });
+
+    // Group by guest+date+time+location+phone
+    const groups = new Map<string, GroupedReservation>();
+    filtered.forEach((r) => {
+      const key = getGroupKey(r);
+      const existing = groups.get(key);
+      if (existing) {
+        if (r.table_id) existing.tableIds.push(r.table_id);
+        existing.allIds.push(r.id);
+      } else {
+        groups.set(key, {
+          ...r,
+          tableIds: r.table_id ? [r.table_id] : [],
+          allIds: [r.id],
+        });
+      }
+    });
+
+    return Array.from(groups.values()).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
   }, [reservations, selectedDate, filterLocation, filterStatus, showCancelledToday]);
 
   const cancelledTodayCount = useMemo(() => {
