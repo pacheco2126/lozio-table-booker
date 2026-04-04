@@ -199,10 +199,14 @@ const Admin = () => {
     return format(d, "EEEE d 'de' MMMM", { locale: es });
   };
 
-  const renderReservationCard = (r: Reservation) => {
+  const renderReservationCard = (r: GroupedReservation) => {
     const st = statusLabels[r.status] || statusLabels.pending;
+    const tableLabel = r.tableIds
+      .map((id) => tableNames[id])
+      .filter(Boolean)
+      .join(" + ");
     return (
-      <div key={r.id} className="bg-card rounded-lg border border-border p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-muted/30 transition-colors">
+      <div key={r.allIds.join("-")} className="bg-card rounded-lg border border-border p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-muted/30 transition-colors">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="text-center shrink-0 w-14">
             <p className="font-display text-lg font-bold text-foreground leading-none">{r.reservation_time.substring(0, 5)}</p>
@@ -212,7 +216,7 @@ const Admin = () => {
             <p className="font-body font-bold text-foreground truncate">{r.guest_name}</p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-body mt-0.5">
               <span>{r.guests} 👤</span>
-              {r.table_id && tableNames[r.table_id] && <span>🪑 {tableNames[r.table_id]}</span>}
+              {tableLabel && <span>🪑 {tableLabel}</span>}
               <span>{r.phone}</span>
             </div>
           </div>
@@ -220,7 +224,7 @@ const Admin = () => {
         <div className="flex items-center gap-2 shrink-0">
           <span className={`px-2 py-1 rounded-sm text-xs font-bold font-body ${st.className}`}>{st.label}</span>
           {r.status !== "cancelled" && (
-            <button onClick={() => updateStatus(r.id, "cancelled")}
+            <button onClick={() => updateStatus(r.allIds, "cancelled")}
               className="px-2 py-1 text-xs font-body font-bold bg-destructive/20 text-destructive rounded-sm hover:bg-destructive/30 transition-colors">
               {t("admin.cancel")}
             </button>
