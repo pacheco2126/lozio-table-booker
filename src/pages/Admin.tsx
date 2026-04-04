@@ -439,6 +439,23 @@ const Admin = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <AlertDialog open={!!cancelIds} onOpenChange={(open) => { if (!open) setCancelIds(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Cancelar reserva de {cancelName}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción cancelará la reserva. No se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (cancelIds) updateStatus(cancelIds, "cancelled"); setCancelIds(null); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Cancelar reserva
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
