@@ -108,8 +108,9 @@ const Admin = () => {
     }
   };
 
-  const updateStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("reservations").update({ status }).eq("id", id);
+  const updateStatus = async (ids: string | string[], status: string) => {
+    const idArray = Array.isArray(ids) ? ids : [ids];
+    const { error } = await supabase.from("reservations").update({ status }).in("id", idArray);
     if (error) { toast.error(t("admin.statusError")); } else { toast.success(t("admin.statusUpdated")); fetchReservations(); }
   };
 
