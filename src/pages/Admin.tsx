@@ -146,14 +146,27 @@ const Admin = () => {
       return true;
     });
 
-    // Group by guest+date+time+location+phone
+    // Group by guest+date+time+location+phone, but only if created within 10s of each other (multi-table)
     const groups = new Map<string, GroupedReservation>();
     filtered.forEach((r) => {
       const key = getGroupKey(r);
       const existing = groups.get(key);
       if (existing) {
-        if (r.table_id) existing.tableIds.push(r.table_id);
-        existing.allIds.push(r.id);
+        // Only group if created_at is within 10 seconds (same multi-table booking)
+        const existingTime = new Date(existing.created_at).getTime();
+        const currentTime = new Date(r.created_at).getTime();
+        if (Math.abs(existingTime - currentTime) <= 10000) {
+          if (r.table_id) existing.tableIds.push(r.table_id);
+          existing.allIds.push(r.id);
+        } else {
+          // Separate reservation, use a unique key
+          const uniqueKey = `${key}|${r.id}`;
+          groups.set(uniqueKey, {
+            ...r,
+            tableIds: r.table_id ? [r.table_id] : [],
+            allIds: [r.id],
+          });
+        }
       } else {
         groups.set(key, {
           ...r,
