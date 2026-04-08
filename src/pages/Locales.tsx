@@ -22,7 +22,11 @@ const locations = [
     address: "Carrer Joan Fuster 28, Tarragona",
     phone: "+34 682 239 035",
     hours: "Martes - Domingo 19:00 - 23:30",
-    image: "/placeholder.svg",
+    image: "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA.jpg",
+    images: [
+      "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA.jpg",
+      "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA_HORNO.jpg",
+    ],
   },
   {
     slug: "rincon",
@@ -62,11 +66,18 @@ const Locales = () => {
                 </span>
               )}
               <div className="aspect-video overflow-hidden">
-                <img
-                  src={loc.image}
-                  alt={`${loc.name} — Pizza artesanal Lo Zio Tarragona`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {loc.image === "/placeholder.svg" ? (
+                  <div className="w-full h-full bg-muted flex flex-col items-center justify-center gap-2 group-hover:bg-muted/80 transition-colors">
+                    <span className="text-3xl">📸</span>
+                    <span className="font-display text-sm font-bold text-muted-foreground uppercase tracking-widest">Próximamente</span>
+                  </div>
+                ) : (
+                  <img
+                    src={loc.image}
+                    alt={`${loc.name} — Pizza artesanal Lo Zio Tarragona`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                )}
               </div>
               <div className="p-6">
                 <h2 className="font-display text-xl font-bold text-foreground mb-1">{loc.name}</h2>

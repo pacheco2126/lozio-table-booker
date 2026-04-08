@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { MapPin, Clock, Phone } from "lucide-react";
@@ -21,6 +22,7 @@ interface LocationData {
   h1: string;
   mapEmbed: string;
   image: string;
+  images?: string[];
 }
 
 const locationsData: Record<string, LocationData> = {
@@ -70,7 +72,11 @@ const locationsData: Record<string, LocationData> = {
     h1: "Lo Zio Arrabassada — Pizzería en Carrer Joan Fuster",
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3019.8!2d1.2656!3d41.1267!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sCarrer+Joan+Fuster+28+Tarragona!5e0!3m2!1ses!2ses",
-    image: "/placeholder.svg",
+    image: "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA.jpg",
+    images: [
+      "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA.jpg",
+      "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA_HORNO.jpg",
+    ],
   },
   rincon: {
     slug: "rincon",
@@ -103,6 +109,17 @@ const LocationDetail = () => {
   const location = slug ? locationsData[slug] : null;
   const { getImageForItem } = useMedia("location");
   const uploadedImage = slug ? getImageForItem(slug) : null;
+
+  const heroImages = location?.images ?? [uploadedImage || location?.image || ""];
+  const [currentImg, setCurrentImg] = useState(0);
+
+  useEffect(() => {
+    if (heroImages.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentImg((i) => (i + 1) % heroImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [heroImages.length]);
 
   if (!location) {
     return (
@@ -155,20 +172,41 @@ const LocationDetail = () => {
 
       <Navbar forceSolid />
 
-      <div className="pt-24 pb-16">
+      <div className="pb-16">
         {/* Hero */}
-        <div className="relative h-64 md:h-80 overflow-hidden">
-          <img
-            src={uploadedImage || location.image}
-            alt={`Pizza artesanal Lo Zio Tarragona — ${location.name}`}
-            className="w-full h-full object-cover"
-          />
+        <div className="relative h-80 md:h-[420px] overflow-hidden">
+          {heroImages[0] === "/placeholder.svg" ? (
+            <div className="absolute inset-0 bg-muted flex flex-col items-center justify-center gap-2">
+              <span className="text-5xl">📸</span>
+              <span className="font-display text-sm font-bold text-muted-foreground uppercase tracking-widest">Próximamente</span>
+            </div>
+          ) : (
+            heroImages.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt={`Pizza artesanal Lo Zio Tarragona — ${location.name}`}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === currentImg ? "opacity-100" : "opacity-0"}`}
+              />
+            ))
+          )}
           <div className="absolute inset-0 bg-foreground/60" />
           <div className="absolute inset-0 flex items-center justify-center">
             <h1 className="font-display text-3xl md:text-5xl font-bold text-primary-foreground text-center px-4">
               {location.h1}
             </h1>
           </div>
+          {heroImages.length > 1 && (
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+              {heroImages.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentImg(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${i === currentImg ? "bg-white w-4" : "bg-white/50"}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="max-w-5xl mx-auto px-4 mt-12">

@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAuth } from "@/hooks/useAuth";
 import location1 from "@/assets/location-1.jpg";
-import location2 from "@/assets/location-2.jpg";
 
 const COUNTRY_CODES = [
   { code: "+34", flag: "🇪🇸", name: "España" },
@@ -75,7 +74,7 @@ const ReservationSection = () => {
       address: "Carrer Joan Fuster 28, Tarragona",
       phone: "+34 682 23 90 35",
       hours: t("reservation.locationArrabassada.hours"),
-      image: location2,
+      image: "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA.jpg",
       alt: "Terraza del restaurante Lo Zio Arrabassada",
       timeSlots,
     },

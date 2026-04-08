@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UtensilsCrossed, CalendarDays, ShoppingCart, User, Settings, LogOut, CalendarCheck } from "lucide-react";
+import { UtensilsCrossed, CalendarDays, ShoppingCart, User, Settings, LogOut, CalendarCheck, MapPin } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +26,7 @@ const MobileBottomNav = () => {
   const tabs = [
     { label: t("nav.menu"), icon: UtensilsCrossed, href: "/#menu" },
     { label: t("nav.reserve"), icon: CalendarDays, href: "/#reservar" },
+    { label: t("nav.locations", "Locales"), icon: MapPin, href: "/locales" },
     { label: t("nav.order"), icon: ShoppingCart, href: null, badge: totalItems, action: () => setIsOpen(true) },
     ...(isAdmin ? [{ label: "Admin", icon: Settings, href: "/admin" }] : []),
   ];
@@ -45,7 +46,9 @@ const MobileBottomNav = () => {
       <div className="flex items-stretch justify-around">
         {tabs.map((tab, idx) => {
           const Icon = tab.icon;
-          const isActive = tab.href === "/admin" && location.pathname === "/admin";
+          const isActive =
+            (tab.href === "/admin" && location.pathname === "/admin") ||
+            (tab.href === "/locales" && location.pathname.startsWith("/locales"));
 
           const content = (
             <>
