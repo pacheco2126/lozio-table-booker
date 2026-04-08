@@ -6,7 +6,7 @@ import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import logoZio from '@/assets/logozio.png';
-import heroPizza from '@/assets/hero-pizza.jpg';
+import heroPizza from '@/assets/fondopizza.jpg';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
