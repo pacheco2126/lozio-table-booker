@@ -2,40 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { UtensilsCrossed, Plus, ShoppingCart, Flame } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import pizzaBoscaiola from "@/assets/BOSCAIOLA.png";
-import pizzaMarinara from "@/assets/MARINARA.png";
-import pizzaMargherita from "@/assets/MARGARITA.png";
-import pizzaSiciliana from "@/assets/siciliana.png";
-import pizzaFunghi from "@/assets/FUNGHI.png";
-import pizzaGreca from "@/assets/GRECA.png";
-import pizzaTedesca from "@/assets/tedesca.png";
-import pizzaPiccante from "@/assets/PICANTE.png";
-import pizzaTarragonina from "@/assets/tarragonina.png";
-import pizzaProsiutto from "@/assets/prosciuto.png";
-import pizzaRustica from "@/assets/rustica.png";
-import pizzaCalabrese from "@/assets/CALABRESE.png";
-import pizzaTonnara from "@/assets/tonara.png";
-import pizzaCatalana from "@/assets/CATALANA.png";
-import pizzaVegetariana from "@/assets/vegetariana.png";
-import pizza4Stagioni from "@/assets/4STAGIONI.png";
-import pizzaItaliana from "@/assets/ITALIANA.png";
-import pizzaCiociara from "@/assets/CIOCIARA.png";
-import pizzaFantasia from "@/assets/MARGARITA.png";
-import pizzaMilano from "@/assets/MARGARITA.png";
-import pizzaSpeck from "@/assets/speck.png";
-import pizzaTropea from "@/assets/tropea.png";
-import pizzaHawai from "@/assets/HAWAI.png";
-import pizzaBresaolina from "@/assets/MARGARITA.png";
-import pizza4Formaggi from "@/assets/4FORMAGGI.png";
-import pizzaNorvegia from "@/assets/NORVEGIA.png";
-import pizzaSalentina from "@/assets/salentina.png";
-import pizzaLombarda from "@/assets/LOMBARDA.png";
-import foccaciaCrudo from "@/assets/FCRUDO.png";
-import foccaciaCaprese from "@/assets/FCAPRESE.png";
-import foccaciaZio from "@/assets/FDELLOZIO.png";
-import calzone from "@/assets/BIGCALZONE.png";
-import bigCalzone from "@/assets/BIGCALZONE.png";
-import rusticella from "@/assets/rusticella.png";
+import pizzaPlaceholder from "@/assets/pizza-placeholder.jpg";
 import { useCart } from "@/contexts/CartContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useMedia } from "@/hooks/useMedia";
@@ -51,7 +18,6 @@ interface MenuItemData {
   priceNum: number;
   allergens?: string[];
   category: "pizzas" | "focaccias" | "calzones";
-  image?: string;
 }
 
 const menuItems: MenuItemData[] = [
@@ -63,7 +29,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 9.5,
     allergens: ["gluten"],
     category: "pizzas",
-    image: pizzaMarinara,
   },
   {
     name: "MARGHERITA",
@@ -72,7 +37,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 10,
     allergens: ["gluten", "lacteos"],
     category: "pizzas",
-    image: pizzaMargherita,
   },
   {
     name: "SICILIANA",
@@ -81,7 +45,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "pescado", "sulfitos"],
     category: "pizzas",
-    image: pizzaSiciliana,
   },
   {
     name: "FUNGHI",
@@ -90,7 +53,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos"],
     category: "pizzas",
-    image: pizzaFunghi,
   },
   {
     name: "GRECA",
@@ -99,7 +61,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos"],
     category: "pizzas",
-    image: pizzaGreca,
   },
   {
     name: "TEDESCA",
@@ -108,7 +69,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "soja", "mostaza", "sulfitos"],
     category: "pizzas",
-    image: pizzaTedesca,
   },
   {
     name: "PICCANTE",
@@ -117,7 +77,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
     category: "pizzas",
-    image: pizzaPiccante,
   },
   {
     name: "TARRAGONINA",
@@ -126,7 +85,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "huevo", "sulfitos"],
     category: "pizzas",
-    image: pizzaTarragonina,
   },
   {
     name: "PROSCIUTTO",
@@ -135,7 +93,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
-    image: pizzaProsiutto,
   },
   {
     name: "RÚSTICA",
@@ -144,7 +101,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
-    image: pizzaRustica,
   },
   {
     name: "CALABRESE",
@@ -153,7 +109,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
     category: "pizzas",
-    image: pizzaCalabrese,
   },
   {
     name: "TONNARA",
@@ -162,7 +117,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "pescado", "sulfitos"],
     category: "pizzas",
-    image: pizzaTonnara,
   },
   {
     name: "CATALANA",
@@ -171,7 +125,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "huevo", "sulfitos"],
     category: "pizzas",
-    image: pizzaCatalana,
   },
   {
     name: "VEGETARIANA",
@@ -180,7 +133,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos"],
     category: "pizzas",
-    image: pizzaVegetariana,
   },
   {
     name: "4 STAGIONI",
@@ -189,7 +141,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 12,
     allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
     category: "pizzas",
-    image: pizza4Stagioni,
   },
   {
     name: "ITALIANA",
@@ -198,7 +149,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 14,
     allergens: ["gluten", "lacteos"],
     category: "pizzas",
-    image: pizzaItaliana,
   },
   {
     name: "CIOCIARA",
@@ -207,7 +157,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 15,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
-    image: pizzaCiociara,
   },
   {
     name: "FANTASÍA",
@@ -216,7 +165,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 16,
     allergens: ["gluten", "lacteos"],
     category: "pizzas",
-    image: pizzaFantasia,
   },
   {
     name: "MILANO",
@@ -225,7 +173,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 12,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
-    image: pizzaMilano,
   },
   {
     name: "BOSCAIOLA",
@@ -234,7 +181,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 13.5,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
-    image: pizzaBoscaiola,
   },
   {
     name: "SPECK",
@@ -243,7 +189,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 14,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
-    image: pizzaSpeck,
   },
   {
     name: "TROPEA",
@@ -252,7 +197,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 13,
     allergens: ["gluten", "lacteos"],
     category: "pizzas",
-    image: pizzaTropea,
   },
   {
     name: "HAWAI",
@@ -261,7 +205,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 13,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
-    image: pizzaHawai,
   },
   {
     name: "BRESAOLINA",
@@ -270,7 +213,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 14,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
-    image: pizzaBresaolina,
   },
   {
     name: "4 FORMAGGI",
@@ -279,7 +221,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 13.5,
     allergens: ["gluten", "lacteos"],
     category: "pizzas",
-    image: pizza4Formaggi,
   },
   {
     name: "NORVEGIA",
@@ -288,7 +229,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 18.5,
     allergens: ["gluten", "lacteos", "pescado", "sulfitos"],
     category: "pizzas",
-    image: pizzaNorvegia,
   },
   {
     name: "SALENTINA",
@@ -297,7 +237,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 15.5,
     allergens: ["gluten", "lacteos"],
     category: "pizzas",
-    image: pizzaSalentina,
   },
   {
     name: "LOMBARDA",
@@ -306,7 +245,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 16,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
-    image: pizzaLombarda,
   },
   // Focaccias
   {
@@ -316,7 +254,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11.5,
     allergens: ["gluten", "sulfitos"],
     category: "focaccias",
-    image: foccaciaCrudo,
   },
   {
     name: "FOCACCIA CAPRESE",
@@ -325,7 +262,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11.5,
     allergens: ["gluten", "lacteos"],
     category: "focaccias",
-    image: foccaciaCaprese,
   },
   {
     name: "LA FOCACCIA DELLO ZIO",
@@ -334,7 +270,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 15,
     allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
     category: "focaccias",
-    image: foccaciaZio,
   },
   // Calzones
   {
@@ -344,7 +279,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 11,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "calzones",
-    image: calzone,
   },
   {
     name: "BIG CALZONE",
@@ -353,7 +287,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 14,
     allergens: ["gluten", "lacteos", "huevo", "sulfitos"],
     category: "calzones",
-    image: bigCalzone,
   },
   {
     name: "RUSTICELLA (Calzone)",
@@ -362,7 +295,6 @@ const menuItems: MenuItemData[] = [
     priceNum: 15,
     allergens: ["gluten", "lacteos", "sulfitos"],
     category: "calzones",
-    image: rusticella,
   },
 ];
 
@@ -400,10 +332,12 @@ const MenuCard = ({
   item,
   onAdd,
   showAddButton,
+  imageUrl,
 }: {
   item: MenuItemData;
   onAdd: () => void;
   showAddButton: boolean;
+  imageUrl?: string | null;
 }) => {
   const { t } = useTranslation();
   return (
@@ -411,7 +345,7 @@ const MenuCard = ({
       {/* Image */}
       <div className="relative overflow-hidden" style={{ paddingBottom: "60%" }}>
         <img
-          src={item.image || pizzaBoscaiola}
+          src={imageUrl || pizzaPlaceholder}
           alt={`Pizza artesanal ${item.name} Lo Zio Tarragona`}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
@@ -450,6 +384,7 @@ const MenuSection = () => {
   const { addItem } = useCart();
   const { isAdmin } = useIsAdmin();
   const { t } = useTranslation();
+  const { getImageForItem } = useMedia("menu_item");
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
@@ -570,7 +505,7 @@ const MenuSection = () => {
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
                   {items.map((item) => (
-                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} showAddButton={isAdmin} />
+                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} showAddButton={isAdmin} imageUrl={getImageForItem(item.name)} />
                   ))}
                 </div>
               </div>
