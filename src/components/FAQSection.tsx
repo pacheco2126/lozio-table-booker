@@ -27,7 +27,7 @@ const FAQSection = () => {
             {t("faq.badge")}
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">{t("faq.title")}</h2>
-          <p className="mt-3 text-muted-foreground max-w-xl mx-auto">{t("faq.subtitle")}</p>
+          <p className="mt-3 font-body text-muted-foreground max-w-xl mx-auto">{t("faq.subtitle")}</p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">

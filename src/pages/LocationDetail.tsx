@@ -124,7 +124,7 @@ const LocationDetail = () => {
                   <MapPin className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="font-body font-semibold text-foreground">Dirección</p>
-                    <p className="text-muted-foreground">{location.address}</p>
+                    <p className="font-body text-muted-foreground">{location.address}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -140,7 +140,7 @@ const LocationDetail = () => {
                   <Clock className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="font-body font-semibold text-foreground">Horario</p>
-                    <p className="text-muted-foreground">{location.hours}</p>
+                    <p className="font-body text-muted-foreground">{location.hours}</p>
                   </div>
                 </div>
               </div>

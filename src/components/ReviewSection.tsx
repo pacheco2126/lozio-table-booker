@@ -55,14 +55,14 @@ const ReviewSection = () => {
     <section id="reviews" className="py-16 md:py-24 bg-background">
       <div className="container mx-auto px-4 max-w-xl">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-body font-medium mb-4">
             <MessageSquareHeart className="h-4 w-4" />
             {t("reviews.badge")}
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
             {t("reviews.title")}
           </h2>
-          <p className="mt-3 text-muted-foreground max-w-md mx-auto text-sm leading-relaxed">
+          <p className="mt-3 font-body text-muted-foreground max-w-md mx-auto text-sm leading-relaxed">
             {t("reviews.subtitle")}
           </p>
         </div>
@@ -73,7 +73,7 @@ const ReviewSection = () => {
             <h3 className="font-display text-xl font-bold text-foreground mb-2">
               {t("reviews.thankYou")}
             </h3>
-            <p className="text-muted-foreground text-sm mb-6">
+            <p className="font-body text-muted-foreground text-sm mb-6">
               {t("reviews.thankYouDesc")}
             </p>
             <Button variant="outline" onClick={handleReset}>
@@ -84,7 +84,7 @@ const ReviewSection = () => {
           <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
             {/* Category selector */}
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
+              <label className="font-body text-sm font-medium text-foreground mb-2 block">
                 {t("reviews.categoryLabel")}
               </label>
               <div className="flex gap-2 flex-wrap">
@@ -92,7 +92,7 @@ const ReviewSection = () => {
                   <button
                     key={cat}
                     onClick={() => setCategory(cat)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    className={`px-4 py-2 rounded-full text-sm font-body font-medium transition-all ${
                       category === cat
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -106,7 +106,7 @@ const ReviewSection = () => {
 
             {/* Star rating */}
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
+              <label className="font-body text-sm font-medium text-foreground mb-2 block">
                 {t("reviews.ratingLabel")}
               </label>
               <div className="flex gap-1">
@@ -133,7 +133,7 @@ const ReviewSection = () => {
 
             {/* Message */}
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
+              <label className="font-body text-sm font-medium text-foreground mb-2 block">
                 {t("reviews.messageLabel")}
               </label>
               <Textarea
@@ -143,7 +143,7 @@ const ReviewSection = () => {
                 rows={3}
                 className="resize-none"
               />
-              <p className="text-xs text-muted-foreground mt-1 text-right">
+              <p className="font-body text-xs text-muted-foreground mt-1 text-right">
                 {message.length}/500
               </p>
             </div>
