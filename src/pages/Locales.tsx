@@ -2,42 +2,10 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { MapPin, Clock, Phone } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MapPin, Clock } from "lucide-react";
+import { locationsData } from "@/lib/locations";
 
-const locations = [
-  {
-    slug: "tarragona",
-    name: "Lo Zio Tarragona",
-    type: "Pizzería italiana",
-    address: "Carrer Reding 32 Bajos, Tarragona",
-    phone: "+34 682 239 035",
-    hours: "Miércoles - Lunes 19:00 - 23:30",
-    image: "/placeholder.svg",
-  },
-  {
-    slug: "arrabassada",
-    name: "Lo Zio Arrabassada",
-    type: "Pizzería italiana",
-    address: "Carrer Joan Fuster 28, Tarragona",
-    phone: "+34 682 239 035",
-    hours: "Martes - Domingo 19:00 - 23:30",
-    image: "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA.jpg",
-    images: [
-      "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA.jpg",
-      "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/LOCAL_ARRABASSADA_HORNO.jpg",
-    ],
-  },
-  {
-    slug: "rincon",
-    name: "El Rincón de Lo Zio",
-    type: "Bar de paninis artesanales",
-    address: "Carrer dels Castellers de Tarragona 1",
-    phone: "+34 682 239 035",
-    hours: "Lunes - Sábado 8:00 - 22:00",
-    image: "/placeholder.svg",
-  },
-];
+const locations = Object.values(locationsData);
 
 const Locales = () => {
   const { t } = useTranslation();

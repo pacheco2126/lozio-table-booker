@@ -52,7 +52,8 @@ const HeroSection = () => {
             className="text-primary-foreground/60 font-display italic text-base md:text-lg tracking-wide animate-fade-in-up"
             style={{ animationDelay: "0.2s" }}
           >
-            Pizzería artesanal en Tarragona
+              La vita è un brivido che vola via
+              È tutto un equilibrio sopra la follia
           </p>
         </div>
 

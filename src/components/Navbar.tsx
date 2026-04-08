@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Menu, X, ChevronDown, UserCircle, LogOut, CalendarIcon } from "lucide-react";
-import logo_app_inicio from "@/assets/logozio.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
   DropdownMenu,
@@ -41,7 +40,7 @@ const Navbar = ({ forceSolid = false }: { forceSolid?: boolean }) => {
     >
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
         <a href="/" className="flex items-center">
-          <img src={logo_app_inicio} alt="Lo Zio" className="h-10 w-auto brightness-0 invert" />
+          <img src="/Lozio_favicon-2.png" alt="Lo Zio" className="h-10 w-auto brightness-0 invert" />
         </a>
         <div className="hidden md:flex items-center gap-6">
           <a
