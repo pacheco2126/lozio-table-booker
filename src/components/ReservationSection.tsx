@@ -232,7 +232,7 @@ const ReservationSection = () => {
         const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
         const formattedTime = selectedTime ? selectedTime.substring(0, 5) : "";
         setConfirmationMsg(
-          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${formattedTime}. Recuerda que para hacer modificaciones, o anularla debes ir a Mis reservas o  contactar con el restauratne via teléfono.`,
+          `¡Reserva confirmada! Te esperamos el ${formattedDate} a las ${formattedTime}. Recuerda que para hacer modificaciones, o anularla debes ir a Mis reservas o  contactar con el restaurante via teléfono.`,
         );
         setStep("success");
         toast.success("¡Reserva confirmada!");

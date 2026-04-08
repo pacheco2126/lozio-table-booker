@@ -54,6 +54,8 @@ const Admin = () => {
   const [showToggleDialog, setShowToggleDialog] = useState(false);
   const [pendingToggleValue, setPendingToggleValue] = useState(false);
   const [showCancelledToday, setShowCancelledToday] = useState(false);
+  const [cancelIds, setCancelIds] = useState<string[] | null>(null);
+  const [cancelName, setCancelName] = useState("");
 
   const statusLabels: Record<string, { label: string; className: string }> = {
     pending: { label: t("admin.statusPending"), className: "bg-accent/20 text-accent-foreground" },
@@ -108,8 +110,9 @@ const Admin = () => {
     }
   };
 
-  const updateStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("reservations").update({ status }).eq("id", id);
+  const updateStatus = async (ids: string | string[], status: string) => {
+    const idArray = Array.isArray(ids) ? ids : [ids];
+    const { error } = await supabase.from("reservations").update({ status }).in("id", idArray);
     if (error) { toast.error(t("admin.statusError")); } else { toast.success(t("admin.statusUpdated")); fetchReservations(); }
   };
 
@@ -122,17 +125,58 @@ const Admin = () => {
     return dates;
   }, [reservations]);
 
-  // Filtered reservations for selected date
+  // Group key for multi-table reservations
+  const getGroupKey = (r: Reservation) =>
+    `${r.guest_name}|${r.reservation_date}|${r.reservation_time}|${r.location}|${r.phone}`;
+
+  interface GroupedReservation extends Reservation {
+    tableIds: string[];
+    allIds: string[];
+  }
+
+  // Filtered and grouped reservations for selected date
   const filteredForDate = useMemo(() => {
     const selStr = format(selectedDate, "yyyy-MM-dd");
     const isTodaySelected = selStr === format(new Date(), "yyyy-MM-dd");
-    return reservations.filter((r) => {
+    const filtered = reservations.filter((r) => {
       if (r.reservation_date !== selStr) return false;
       if (filterLocation !== "all" && r.location !== filterLocation) return false;
       if (filterStatus !== "all" && r.status !== filterStatus) return false;
       if (isTodaySelected && !showCancelledToday && r.status === "cancelled") return false;
       return true;
-    }).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
+    });
+
+    // Group by guest+date+time+location+phone, but only if created within 10s of each other (multi-table)
+    const groups = new Map<string, GroupedReservation>();
+    filtered.forEach((r) => {
+      const key = getGroupKey(r);
+      const existing = groups.get(key);
+      if (existing) {
+        // Only group if created_at is within 10 seconds (same multi-table booking)
+        const existingTime = new Date(existing.created_at).getTime();
+        const currentTime = new Date(r.created_at).getTime();
+        if (Math.abs(existingTime - currentTime) <= 10000) {
+          if (r.table_id) existing.tableIds.push(r.table_id);
+          existing.allIds.push(r.id);
+        } else {
+          // Separate reservation, use a unique key
+          const uniqueKey = `${key}|${r.id}`;
+          groups.set(uniqueKey, {
+            ...r,
+            tableIds: r.table_id ? [r.table_id] : [],
+            allIds: [r.id],
+          });
+        }
+      } else {
+        groups.set(key, {
+          ...r,
+          tableIds: r.table_id ? [r.table_id] : [],
+          allIds: [r.id],
+        });
+      }
+    });
+
+    return Array.from(groups.values()).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
   }, [reservations, selectedDate, filterLocation, filterStatus, showCancelledToday]);
 
   const cancelledTodayCount = useMemo(() => {
@@ -170,10 +214,14 @@ const Admin = () => {
     return format(d, "EEEE d 'de' MMMM", { locale: es });
   };
 
-  const renderReservationCard = (r: Reservation) => {
+  const renderReservationCard = (r: GroupedReservation) => {
     const st = statusLabels[r.status] || statusLabels.pending;
+    const tableLabel = r.tableIds
+      .map((id) => tableNames[id])
+      .filter(Boolean)
+      .join(" + ");
     return (
-      <div key={r.id} className="bg-card rounded-lg border border-border p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-muted/30 transition-colors">
+      <div key={r.allIds.join("-")} className="bg-card rounded-lg border border-border p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-muted/30 transition-colors">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="text-center shrink-0 w-14">
             <p className="font-display text-lg font-bold text-foreground leading-none">{r.reservation_time.substring(0, 5)}</p>
@@ -183,7 +231,7 @@ const Admin = () => {
             <p className="font-body font-bold text-foreground truncate">{r.guest_name}</p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-body mt-0.5">
               <span>{r.guests} 👤</span>
-              {r.table_id && tableNames[r.table_id] && <span>🪑 {tableNames[r.table_id]}</span>}
+              {tableLabel && <span>🪑 {tableLabel}</span>}
               <span>{r.phone}</span>
             </div>
           </div>
@@ -191,7 +239,7 @@ const Admin = () => {
         <div className="flex items-center gap-2 shrink-0">
           <span className={`px-2 py-1 rounded-sm text-xs font-bold font-body ${st.className}`}>{st.label}</span>
           {r.status !== "cancelled" && (
-            <button onClick={() => updateStatus(r.id, "cancelled")}
+            <button onClick={() => { setCancelIds(r.allIds); setCancelName(r.guest_name); }}
               className="px-2 py-1 text-xs font-body font-bold bg-destructive/20 text-destructive rounded-sm hover:bg-destructive/30 transition-colors">
               {t("admin.cancel")}
             </button>
@@ -201,7 +249,7 @@ const Admin = () => {
     );
   };
 
-  const renderDateGroup = (dateStr: string, items: Reservation[], isHighlighted = false) => {
+  const renderDateGroup = (dateStr: string, items: GroupedReservation[], isHighlighted = false) => {
     const dateLabel = formatDateHeader(dateStr);
     const isTodayDate = dateStr === format(new Date(), "yyyy-MM-dd");
     return (
@@ -400,6 +448,23 @@ const Admin = () => {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={confirmToggleReservations}>
               Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={!!cancelIds} onOpenChange={(open) => { if (!open) setCancelIds(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Cancelar reserva de {cancelName}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción cancelará la reserva. No se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (cancelIds) updateStatus(cancelIds, "cancelled"); setCancelIds(null); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Cancelar reserva
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
