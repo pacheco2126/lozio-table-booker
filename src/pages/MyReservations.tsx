@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
-import { CalendarIcon, Clock, Users, MapPin, X, Edit2, ChevronLeft } from "lucide-react";
+import { CalendarIcon, Clock, Users, X, Edit2, ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
@@ -15,10 +15,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { getUnavailableSlots, MAX_ONLINE_GUESTS } from "@/lib/availability";
+import { getUnavailableSlots } from "@/lib/availability";
 
 const CLOSED_DAYS: Record<string, number[]> = {
   tarragona: [2],
@@ -38,6 +48,58 @@ interface Reservation {
   notes: string | null;
   guest_name: string;
   table_id: string | null;
+  created_at: string;
+}
+
+interface GroupedReservation {
+  ids: string[];
+  reservation_date: string;
+  reservation_time: string;
+  guests: string;
+  location: string;
+  status: string;
+  notes: string | null;
+  guest_name: string;
+  table_ids: (string | null)[];
+}
+
+function groupReservations(reservations: Reservation[]): GroupedReservation[] {
+  const groups: GroupedReservation[] = [];
+  const used = new Set<string>();
+
+  for (const r of reservations) {
+    if (used.has(r.id)) continue;
+
+    // Find siblings: same user, date, time, location, status, created within 10s
+    const siblings = reservations.filter((s) => {
+      if (used.has(s.id) || s.id === r.id) return false;
+      return (
+        s.reservation_date === r.reservation_date &&
+        s.reservation_time === r.reservation_time &&
+        s.location === r.location &&
+        s.status === r.status &&
+        s.guest_name === r.guest_name &&
+        Math.abs(new Date(s.created_at).getTime() - new Date(r.created_at).getTime()) < 10000
+      );
+    });
+
+    const allIds = [r.id, ...siblings.map((s) => s.id)];
+    allIds.forEach((id) => used.add(id));
+
+    groups.push({
+      ids: allIds,
+      reservation_date: r.reservation_date,
+      reservation_time: r.reservation_time,
+      guests: r.guests,
+      location: r.location,
+      status: r.status,
+      notes: r.notes,
+      guest_name: r.guest_name,
+      table_ids: [r.table_id, ...siblings.map((s) => s.table_id)],
+    });
+  }
+
+  return groups;
 }
 
 const MyReservations = () => {
@@ -48,14 +110,15 @@ const MyReservations = () => {
 
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editDialog, setEditDialog] = useState<Reservation | null>(null);
+  const [editDialog, setEditDialog] = useState<GroupedReservation | null>(null);
   const [editDate, setEditDate] = useState<Date>(new Date());
   const [editTime, setEditTime] = useState<string>("");
   const [editGuests, setEditGuests] = useState<string>("2");
   const [editNotes, setEditNotes] = useState<string>("");
   const [unavailableSlots, setUnavailableSlots] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
-  const [cancelling, setCancelling] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState<string[] | null>(null);
+  const [cancelConfirm, setCancelConfirm] = useState<GroupedReservation | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -69,7 +132,7 @@ const MyReservations = () => {
       .select("*")
       .eq("user_id", user.id)
       .order("reservation_date", { ascending: false });
-    if (!error && data) setReservations(data);
+    if (!error && data) setReservations(data as Reservation[]);
     setLoading(false);
   };
 
@@ -77,49 +140,56 @@ const MyReservations = () => {
     if (user) fetchReservations();
   }, [user]);
 
-  const canModify = (r: Reservation) => {
+  const grouped = groupReservations(reservations);
+
+  const canModify = (r: GroupedReservation) => {
     if (r.status === "cancelled") return false;
     const now = new Date();
     const resDate = new Date(`${r.reservation_date}T${r.reservation_time}`);
     return resDate > now;
   };
 
-  const handleCancel = async (id: string) => {
-    setCancelling(id);
-    const { error } = await supabase
-      .from("reservations")
-      .update({ status: "cancelled" })
-      .eq("id", id)
-      .eq("user_id", user!.id);
-    if (error) {
-      toast.error(t("myReservations.cancelError", "Error al cancelar la reserva"));
-    } else {
-      toast.success(t("myReservations.cancelSuccess", "Reserva cancelada"));
-      fetchReservations();
+  const handleCancel = async (group: GroupedReservation) => {
+    setCancelling(group.ids);
+    // Cancel all reservation rows in the group
+    for (const id of group.ids) {
+      await supabase
+        .from("reservations")
+        .update({ status: "cancelled" })
+        .eq("id", id)
+        .eq("user_id", user!.id);
     }
+    toast.success(t("myReservations.cancelSuccess", "Reserva cancelada"));
+    fetchReservations();
     setCancelling(null);
+    setCancelConfirm(null);
   };
 
-  const openEdit = async (r: Reservation) => {
+  const openEdit = async (r: GroupedReservation) => {
     setEditDialog(r);
     const d = new Date(r.reservation_date + "T00:00:00");
     setEditDate(d);
     setEditTime(r.reservation_time.substring(0, 5));
     setEditGuests(r.guests);
     setEditNotes(r.notes || "");
-    // Load availability for that date/location
-    await loadAvailability(r.location, d, parseInt(r.guests) || 2, r.id);
+    await loadAvailability(r.location, d, parseInt(r.guests) || 2, r.ids);
   };
 
-  const loadAvailability = async (location: string, date: Date, guests: number, excludeId: string) => {
+  const loadAvailability = async (location: string, date: Date, guests: number, excludeIds: string[]) => {
+    const query = supabase
+      .from("reservations")
+      .select("reservation_time, guests, table_id")
+      .eq("location", location)
+      .eq("reservation_date", format(date, "yyyy-MM-dd"))
+      .in("status", ["pending", "confirmed"]);
+
+    // Exclude all IDs from the group
+    for (const id of excludeIds) {
+      query.neq("id", id);
+    }
+
     const [resResult, tablesResult] = await Promise.all([
-      supabase
-        .from("reservations")
-        .select("reservation_time, guests, table_id")
-        .eq("location", location)
-        .eq("reservation_date", format(date, "yyyy-MM-dd"))
-        .in("status", ["pending", "confirmed"])
-        .neq("id", excludeId),
+      query,
       supabase.from("tables").select("id, name, capacity").eq("location", location).eq("is_active", true),
     ]);
     if (!resResult.error) {
@@ -131,19 +201,21 @@ const MyReservations = () => {
   const handleEditDateChange = async (d: Date | undefined) => {
     if (!d || !editDialog) return;
     setEditDate(d);
-    await loadAvailability(editDialog.location, d, parseInt(editGuests) || 2, editDialog.id);
+    await loadAvailability(editDialog.location, d, parseInt(editGuests) || 2, editDialog.ids);
   };
 
   const handleSaveEdit = async () => {
     if (!editDialog || !user) return;
     setSaving(true);
 
-    // Re-check availability via edge function
+    // Get email/phone from the original reservation
+    const original = reservations.find((r) => r.id === editDialog.ids[0]);
+
     const { data, error } = await supabase.functions.invoke("auto-assign-reservation", {
       body: {
         location: editDialog.location,
         guest_name: editDialog.guest_name,
-        phone: "",
+        phone: (original as any)?.phone || "",
         reservation_date: format(editDate, "yyyy-MM-dd"),
         reservation_time: editTime,
         guests: editGuests,
@@ -158,12 +230,14 @@ const MyReservations = () => {
       return;
     }
 
-    // Cancel old reservation
-    await supabase
-      .from("reservations")
-      .update({ status: "cancelled" })
-      .eq("id", editDialog.id)
-      .eq("user_id", user.id);
+    // Cancel all old reservation rows
+    for (const id of editDialog.ids) {
+      await supabase
+        .from("reservations")
+        .update({ status: "cancelled" })
+        .eq("id", id)
+        .eq("user_id", user.id);
+    }
 
     toast.success(t("myReservations.editSuccess", "Reserva modificada correctamente"));
     setEditDialog(null);
@@ -204,15 +278,15 @@ const MyReservations = () => {
 
         {loading ? (
           <p className="text-muted-foreground font-body">{t("myReservations.loading", "Cargando...")}</p>
-        ) : reservations.length === 0 ? (
+        ) : grouped.length === 0 ? (
           <p className="text-muted-foreground font-body">{t("myReservations.empty", "No tienes reservas.")}</p>
         ) : (
           <div className="space-y-4">
-            {reservations.map((r) => {
+            {grouped.map((r) => {
               const st = statusLabel(r.status);
               const modifiable = canModify(r);
               return (
-                <div key={r.id} className="bg-card border border-border rounded-xl p-5 space-y-3">
+                <div key={r.ids.join("-")} className="bg-card border border-border rounded-xl p-5 space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="font-display text-lg font-bold text-foreground">{locationName(r.location)}</h3>
@@ -247,12 +321,12 @@ const MyReservations = () => {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => handleCancel(r.id)}
-                        disabled={cancelling === r.id}
+                        onClick={() => setCancelConfirm(r)}
+                        disabled={cancelling !== null && cancelling.some((id) => r.ids.includes(id))}
                         className="font-body text-xs gap-1.5"
                       >
                         <X className="w-3.5 h-3.5" />
-                        {cancelling === r.id
+                        {cancelling !== null && cancelling.some((id) => r.ids.includes(id))
                           ? t("myReservations.cancelling", "Cancelando...")
                           : t("myReservations.cancel", "Cancelar")}
                       </Button>
@@ -264,6 +338,33 @@ const MyReservations = () => {
           </div>
         )}
       </div>
+
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={!!cancelConfirm} onOpenChange={(o) => !o && setCancelConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display">
+              {t("myReservations.cancelConfirmTitle", "¿Cancelar reserva?")}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="font-body">
+              {cancelConfirm && t("myReservations.cancelConfirmDesc", "¿Estás seguro de que quieres cancelar tu reserva en {{location}} el {{date}} a las {{time}}?", {
+                location: locationName(cancelConfirm.location),
+                date: format(new Date(cancelConfirm.reservation_date + "T00:00:00"), "d MMM yyyy", { locale: dfLocale }),
+                time: cancelConfirm.reservation_time.substring(0, 5),
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="font-body">{t("myReservations.cancelConfirmNo", "No, mantener")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="font-body bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => cancelConfirm && handleCancel(cancelConfirm)}
+            >
+              {t("myReservations.cancelConfirmYes", "Sí, cancelar")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Edit Dialog */}
       <Dialog open={!!editDialog} onOpenChange={(o) => !o && setEditDialog(null)}>
