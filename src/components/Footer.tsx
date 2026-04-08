@@ -46,9 +46,15 @@ const Footer = () => {
             </p>
           </div>
         </div>
-        <div className="border-t border-background/20 pt-8 text-center">
+        <div className="border-t border-background/20 pt-8 text-center space-y-2">
           <p className="text-background/40 font-body text-sm">
             {t("footer.copyright", { year: new Date().getFullYear() })}
+          </p>
+          <p className="text-background/30 font-body text-xs">
+            Developed by{" "}
+            <a href="https://paciotti.dev" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors underline underline-offset-2">
+              Paciotti Dev
+            </a>
           </p>
         </div>
       </div>
