@@ -91,7 +91,7 @@
     "checkingAvailability": "Comprovant disponibilitat...",
     "maxGuestsError": "Ho sentim, no podem acomodar grups de més de {{max}} persones.",
     "largeGroupMessage": "Per a grups de més de {{max}} persones, si us plau truca'ns directament.",
-    "durationWarning": "Disposes d'<strong>1 hora i mitja</strong> per gaudir del teu àpat.",
+    "durationWarning": "Disposes de",
     "person": "persona",
     "persons": "persones",
     "name": "Nom",
@@ -111,7 +111,9 @@
       "hours": "Dim–Diu: 19:00–23:30"
     },
     "loginWarning": "Si vols poder modificar la teva reserva, inicia sessió.",
-    "phoneError": "Introdueix un número de telèfon vàlid"
+    "phoneError": "Introdueix un número de telèfon vàlid",
+    "durationTime": "1 hora i mitja",
+    "durationWarningPost": "per gaudir del teu àpat."
   },
   "myReservations": {
     "title": "Les Meves Reserves",
@@ -436,7 +438,6 @@
     "thankYou": "Moltes gràcies!",
     "thankYouDesc": "La teva opinió anònima ens ajuda a seguir millorant cada dia.",
     "another": "Enviar una altra ressenya",
-    "shareAlso": "Ens deixes una ressenya també a?",
-    "tableLabel": "Taula {{mesa}}"
+    "shareAlso": "Ens deixes una ressenya també a?"
   }
 }

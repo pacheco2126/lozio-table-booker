@@ -91,7 +91,7 @@
     "checkingAvailability": "Verifica disponibilità...",
     "maxGuestsError": "Ci dispiace, non possiamo accogliere gruppi di più di {{max}} persone.",
     "largeGroupMessage": "Per gruppi di più di {{max}} persone, chiamaci direttamente.",
-    "durationWarning": "Hai a disposizione <strong>1 ora e mezza</strong> per goderti il tuo pasto.",
+    "durationWarning": "Hai a disposizione",
     "person": "persona",
     "persons": "persone",
     "name": "Nome",
@@ -111,7 +111,9 @@
       "hours": "Mar–Dom: 19:00–23:30"
     },
     "loginWarning": "Se vuoi poter modificare la tua prenotazione, accedi.",
-    "phoneError": "Inserisci un numero di telefono valido"
+    "phoneError": "Inserisci un numero di telefono valido",
+    "durationTime": "1 ora e mezza",
+    "durationWarningPost": "per goderti il tuo pasto."
   },
   "myReservations": {
     "title": "Le Mie Prenotazioni",
@@ -436,7 +438,6 @@
     "thankYou": "Grazie mille!",
     "thankYouDesc": "La tua opinione anonima ci aiuta a migliorare ogni giorno.",
     "another": "Invia un'altra recensione",
-    "shareAlso": "Ci lasci una recensione anche su?",
-    "tableLabel": "Tavolo {{mesa}}"
+    "shareAlso": "Ci lasci una recensione anche su?"
   }
 }

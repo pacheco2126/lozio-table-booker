@@ -91,7 +91,7 @@
     "checkingAvailability": "Checking availability...",
     "maxGuestsError": "Sorry, we cannot accommodate groups of more than {{max}} guests.",
     "largeGroupMessage": "For groups of more than {{max}} people, please call us directly.",
-    "durationWarning": "You have <strong>1 hour and a half</strong> to enjoy your meal.",
+    "durationWarning": "You have",
     "person": "person",
     "persons": "persons",
     "name": "Name",
@@ -111,7 +111,9 @@
       "hours": "Tue–Sun: 19:00–23:30"
     },
     "loginWarning": "If you want to modify your reservation, please sign in.",
-    "phoneError": "Please enter a valid phone number"
+    "phoneError": "Please enter a valid phone number",
+    "durationTime": "1 hour and a half",
+    "durationWarningPost": "to enjoy your meal."
   },
   "myReservations": {
     "title": "My Reservations",
@@ -436,7 +438,6 @@
     "thankYou": "Thank you so much!",
     "thankYouDesc": "Your anonymous feedback helps us keep improving every day.",
     "another": "Send another review",
-    "shareAlso": "Would you also leave us a review on?",
-    "tableLabel": "Table {{mesa}}"
+    "shareAlso": "Would you also leave us a review on?"
   }
 }

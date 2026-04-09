@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Star, Send, Heart, UtensilsCrossed } from "lucide-react";
@@ -14,8 +14,6 @@ type Category = (typeof categories)[number];
 const ReviewPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [searchParams] = useSearchParams();
-  const mesa = searchParams.get("mesa");
 
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -34,7 +32,6 @@ const ReviewPage = () => {
       category,
       rating,
       message: message.trim() || null,
-      ...(mesa ? { table_number: mesa } : {}),
     } as any);
     setSubmitting(false);
     if (error) {
@@ -73,9 +70,7 @@ const ReviewPage = () => {
           {t("reviews.title")}
         </h1>
         <p className="font-body text-primary-foreground/60 text-sm mt-1">
-          {mesa
-            ? t("reviews.tableLabel", `Mesa ${mesa}`, { mesa })
-            : t("reviews.subtitle")}
+          {t("reviews.subtitle")}
         </p>
 
         {/* Back to menu link */}
