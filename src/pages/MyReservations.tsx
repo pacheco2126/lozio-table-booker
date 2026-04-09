@@ -29,6 +29,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { getUnavailableSlots } from "@/lib/availability";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
 
 const CLOSED_DAYS: Record<string, number[]> = {
   tarragona: [2],
@@ -123,6 +125,10 @@ const MyReservations = () => {
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
   }, [authLoading, user, navigate]);
+
+  const { pullDistance, refreshing, translateY, isAnimating } = usePullToRefresh(async () => {
+    await fetchReservations();
+  });
 
   const fetchReservations = async () => {
     if (!user) return;
@@ -265,7 +271,15 @@ const MyReservations = () => {
   if (authLoading) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative overflow-hidden">
+      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} />
+      <div
+        className="min-h-screen bg-background"
+        style={{
+          transform: `translateY(${translateY}px)`,
+          transition: isAnimating ? "transform 0.3s ease" : "none",
+        }}
+      >
       <Navbar forceSolid />
       <div className="max-w-2xl mx-auto px-4 pt-28 pb-32">
         <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-primary font-body text-sm mb-6 hover:opacity-80">
@@ -463,6 +477,7 @@ const MyReservations = () => {
           )}
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 };
