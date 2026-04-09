@@ -451,6 +451,8 @@
     "error": "Error al enviar la reseña. Inténtalo de nuevo.",
     "thankYou": "¡Muchas gracias!",
     "thankYouDesc": "Tu opinión anónima nos ayuda a seguir mejorando cada día.",
-    "another": "Enviar otra reseña"
+    "another": "Enviar otra reseña",
+    "shareAlso": "¿Nos dejas una reseña también en?",
+    "tableLabel": "Mesa {{mesa}}"
   }
 }

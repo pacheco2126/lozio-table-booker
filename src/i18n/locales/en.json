@@ -432,6 +432,8 @@
     "error": "Error sending review. Please try again.",
     "thankYou": "Thank you so much!",
     "thankYouDesc": "Your anonymous feedback helps us keep improving every day.",
-    "another": "Send another review"
+    "another": "Send another review",
+    "shareAlso": "Would you also leave us a review on?",
+    "tableLabel": "Table {{mesa}}"
   }
 }

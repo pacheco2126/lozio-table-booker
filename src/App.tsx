@@ -23,6 +23,7 @@ import LocationDetail from "./pages/LocationDetail.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import MyReservations from "./pages/MyReservations.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import ReviewPage from "./pages/ReviewPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/pedido" element={<Checkout />} />
               <Route path="/locales" element={<Locales />} />
               <Route path="/locales/:slug" element={<LocationDetail />} />
+              <Route path="/resenas" element={<ReviewPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

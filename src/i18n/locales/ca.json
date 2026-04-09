@@ -432,6 +432,8 @@
     "error": "Error en enviar la ressenya. Torna-ho a provar.",
     "thankYou": "Moltes gràcies!",
     "thankYouDesc": "La teva opinió anònima ens ajuda a seguir millorant cada dia.",
-    "another": "Enviar una altra ressenya"
+    "another": "Enviar una altra ressenya",
+    "shareAlso": "Ens deixes una ressenya també a?",
+    "tableLabel": "Taula {{mesa}}"
   }
 }

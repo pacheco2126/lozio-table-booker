@@ -432,6 +432,8 @@
     "error": "Errore nell'invio della recensione. Riprova.",
     "thankYou": "Grazie mille!",
     "thankYouDesc": "La tua opinione anonima ci aiuta a migliorare ogni giorno.",
-    "another": "Invia un'altra recensione"
+    "another": "Invia un'altra recensione",
+    "shareAlso": "Ci lasci una recensione anche su?",
+    "tableLabel": "Tavolo {{mesa}}"
   }
 }
