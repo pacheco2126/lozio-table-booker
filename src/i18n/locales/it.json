@@ -71,7 +71,10 @@
       "BIG CALZONE": "Pomodoro, mozzarella, prosciutto, uovo e verdure.",
       "RUSTICELLA (Calzone)": "Pomodoro, mozzarella, prosciutto cotto, formaggio e verdure.",
       "NORVEGIA": "Mozzarella, burrata, salmone affumicato e rucola."
-    }
+    },
+    "badgeFire": "Extra piccante",
+    "badgeGold": "Classica",
+    "badgeTeal": "Top vendite"
   },
   "reservation": {
     "sectionTitle": "I nostri locali",

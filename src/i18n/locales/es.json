@@ -71,7 +71,10 @@
       "BIG CALZONE": "Tomate, mozzarella, jamón, huevo y verdura.",
       "RUSTICELLA (Calzone)": "Tomate, mozzarella, jamón dulce, queso y verduras.",
       "NORVEGIA": "Mozzarella, burrata, salmón ahumado y rúcula."
-    }
+    },
+    "badgeFire": "Extra picante",
+    "badgeGold": "Clásica",
+    "badgeTeal": "Top ventas"
   },
   "reservation": {
     "sectionTitle": "Nuestros locales",

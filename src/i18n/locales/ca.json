@@ -71,7 +71,10 @@
       "BIG CALZONE": "Tomàquet, mozzarella, pernil, ou i verdura.",
       "RUSTICELLA (Calzone)": "Tomàquet, mozzarella, pernil dolç, formatge i verdures.",
       "NORVEGIA": "Mozzarella, burrata, salmó fumat i rúcula."
-    }
+    },
+    "badgeFire": "Extra picant",
+    "badgeGold": "Clàssica",
+    "badgeTeal": "Top vendes"
   },
   "reservation": {
     "sectionTitle": "Els nostres locals",

@@ -71,7 +71,10 @@
       "BIG CALZONE": "Tomato, mozzarella, ham, egg and vegetables.",
       "RUSTICELLA (Calzone)": "Tomato, mozzarella, cooked ham, cheese and vegetables.",
       "NORVEGIA": "Mozzarella, burrata, smoked salmon and rocket."
-    }
+    },
+    "badgeFire": "Extra spicy",
+    "badgeGold": "Classic",
+    "badgeTeal": "Top seller"
   },
   "reservation": {
     "sectionTitle": "Our locations",

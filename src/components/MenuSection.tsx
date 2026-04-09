@@ -18,7 +18,7 @@ interface MenuItemData {
   priceNum: number;
   allergens?: string[];
   category: "pizzas" | "focaccias" | "calzones";
-  badge?: { label: string; emoji: string; style: "fire" | "gold" | "teal" };
+  badge?: { key: string; emoji: string; style: "fire" | "gold" | "teal" };
 }
 
 const menuItems: MenuItemData[] = [
@@ -145,7 +145,7 @@ const menuItems: MenuItemData[] = [
   },
   {
     name: "ITALIANA",
-    badge: { label: "Classica", emoji: "🏛️", style: "gold" },
+    badge: { key: "badgeGold", emoji: "🏛️", style: "gold" },
     desc: "Tomate, mozzarella búfala, tomate cherry y albahaca.",
     price: "14,00 €",
     priceNum: 14,
@@ -178,7 +178,7 @@ const menuItems: MenuItemData[] = [
   },
   {
     name: "BOSCAIOLA",
-    badge: { label: "La más pedida", emoji: "⭐", style: "teal" },
+    badge: { key: "badgeTeal", emoji: "⭐", style: "teal" },
     desc: "Tomate, mozzarella, longaniza, champiñones y pimienta negra.",
     price: "13,50 €",
     priceNum: 13.5,
@@ -268,7 +268,7 @@ const menuItems: MenuItemData[] = [
   },
   {
     name: "LA FOCACCIA DELLO ZIO",
-    badge: { label: "Extra picante", emoji: "🌶️", style: "fire" },
+    badge: { key: "badgeFire", emoji: "🌶️", style: "fire" },
     desc: "Bocconcini di mozzarella, salami picante, sobrasada picante, tomate fresco, aceite, orégano y guindilla.",
     price: "15,00 €",
     priceNum: 15,
@@ -365,7 +365,7 @@ const MenuCard = ({
             }`}
           >
             <span>{item.badge.emoji}</span>
-            {item.badge.label}
+            {t(`menu.${item.badge.key}`)}
           </span>
         )}
       </div>
