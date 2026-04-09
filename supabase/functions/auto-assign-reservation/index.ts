@@ -132,9 +132,10 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
-  } catch (error) {
-    console.error("Error in auto-assign-reservation:", error.message);
-    return new Response(JSON.stringify({ success: false, error: "server_error", message: error.message }), {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error in auto-assign-reservation:", msg);
+    return new Response(JSON.stringify({ success: false, error: "server_error", message: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
