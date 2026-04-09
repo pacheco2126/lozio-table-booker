@@ -226,7 +226,13 @@
     "nameRequired": "Name required",
     "emailInvalid": "Invalid email",
     "phoneInvalid": "Invalid phone",
-    "addressRequired": "Address required for delivery"
+    "addressRequired": "Address required for delivery",
+    "estimatedDelivery": "Estimated delivery in ~30 minutes",
+    "estimatedPickup": "Ready to pick up in ~20 minutes",
+    "cardDetails": "Card details",
+    "stripeSecure": "Secure payment managed by Stripe",
+    "stripeNotLoaded": "Payment system unavailable. Please reload the page.",
+    "stripeError": "Payment error. Please check your card details."
   },
   "admin": {
     "title": "Admin Panel",
@@ -439,5 +445,20 @@
     "thankYouDesc": "Your anonymous feedback helps us keep improving every day.",
     "another": "Send another review",
     "shareAlso": "Would you also leave us a review on?"
+  },
+  "confirmation": {
+    "title": "Order received!",
+    "subtitle": "We have received your order and are preparing it.",
+    "estimatedTime": "Estimated time: ~{{minutes}} minutes",
+    "deliveryNote": "We will deliver it to your door",
+    "pickupNote": "You can pick it up at the restaurant",
+    "orderDetails": "Order summary",
+    "orderType": "Order type",
+    "payment": "Payment",
+    "paid": "Paid online ✓",
+    "pendingPayment": "Payment pending",
+    "contactReminder": "We will send a confirmation to {{email}}",
+    "backHome": "Back to home",
+    "notFound": "Order not found"
   }
 }

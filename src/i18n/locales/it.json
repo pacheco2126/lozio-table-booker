@@ -226,7 +226,13 @@
     "nameRequired": "Nome richiesto",
     "emailInvalid": "Email non valida",
     "phoneInvalid": "Telefono non valido",
-    "addressRequired": "Indirizzo richiesto per la consegna"
+    "addressRequired": "Indirizzo richiesto per la consegna",
+    "estimatedDelivery": "Consegna stimata in ~30 minuti",
+    "estimatedPickup": "Pronto da ritirare in ~20 minuti",
+    "cardDetails": "Dati della carta",
+    "stripeSecure": "Pagamento sicuro gestito da Stripe",
+    "stripeNotLoaded": "Sistema di pagamento non disponibile. Ricarica la pagina.",
+    "stripeError": "Errore nel pagamento. Controlla i dati della tua carta."
   },
   "admin": {
     "title": "Pannello di Amministrazione",
@@ -439,5 +445,20 @@
     "thankYouDesc": "La tua opinione anonima ci aiuta a migliorare ogni giorno.",
     "another": "Invia un'altra recensione",
     "shareAlso": "Ci lasci una recensione anche su?"
+  },
+  "confirmation": {
+    "title": "Ordine ricevuto!",
+    "subtitle": "Abbiamo ricevuto il tuo ordine e lo stiamo preparando.",
+    "estimatedTime": "Tempo stimato: ~{{minutes}} minuti",
+    "deliveryNote": "Te lo consegniamo a casa",
+    "pickupNote": "Potrai ritirarlo al locale",
+    "orderDetails": "Riepilogo ordine",
+    "orderType": "Tipo di ordine",
+    "payment": "Pagamento",
+    "paid": "Pagato online ✓",
+    "pendingPayment": "Pagamento in sospeso",
+    "contactReminder": "Ti invieremo una conferma a {{email}}",
+    "backHome": "Torna alla home",
+    "notFound": "Ordine non trovato"
   }
 }
