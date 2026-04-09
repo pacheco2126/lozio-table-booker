@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { UtensilsCrossed, Plus, ShoppingCart, Flame } from "lucide-react";
+import { UtensilsCrossed, Plus, Flame } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import pizzaPlaceholder from "@/assets/pizza-placeholder.jpg";
@@ -18,6 +18,7 @@ interface MenuItemData {
   priceNum: number;
   allergens?: string[];
   category: "pizzas" | "focaccias" | "calzones";
+  badge?: { label: string; emoji: string; style: "fire" | "gold" | "teal" };
 }
 
 const menuItems: MenuItemData[] = [
@@ -144,6 +145,7 @@ const menuItems: MenuItemData[] = [
   },
   {
     name: "ITALIANA",
+    badge: { label: "Classica", emoji: "🏛️", style: "gold" },
     desc: "Tomate, mozzarella búfala, tomate cherry y albahaca.",
     price: "14,00 €",
     priceNum: 14,
@@ -176,6 +178,7 @@ const menuItems: MenuItemData[] = [
   },
   {
     name: "BOSCAIOLA",
+    badge: { label: "La más pedida", emoji: "⭐", style: "teal" },
     desc: "Tomate, mozzarella, longaniza, champiñones y pimienta negra.",
     price: "13,50 €",
     priceNum: 13.5,
@@ -265,6 +268,7 @@ const menuItems: MenuItemData[] = [
   },
   {
     name: "LA FOCACCIA DELLO ZIO",
+    badge: { label: "Extra picante", emoji: "🌶️", style: "fire" },
     desc: "Bocconcini di mozzarella, salami picante, sobrasada picante, tomate fresco, aceite, orégano y guindilla.",
     price: "15,00 €",
     priceNum: 15,
@@ -350,6 +354,20 @@ const MenuCard = ({
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
+        {item.badge && (
+          <span
+            className={`absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-body font-bold shadow-lg tracking-wide backdrop-blur-sm ${
+              item.badge.style === "fire"
+                ? "bg-gradient-to-r from-red-600 to-orange-500 text-white shadow-orange-500/50 shadow-md"
+                : item.badge.style === "gold"
+                ? "bg-amber-400/95 text-amber-900"
+                : "bg-teal-600/90 text-white"
+            }`}
+          >
+            <span>{item.badge.emoji}</span>
+            {item.badge.label}
+          </span>
+        )}
       </div>
       {/* Body */}
       <div className="p-3 md:p-4 flex flex-col flex-1 gap-2">
