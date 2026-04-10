@@ -35,6 +35,7 @@
     "drinks": "Bebidas",
     "dessert": "Postre",
     "addToOrder": "Añadir",
+    "allergenWarning": "La información sobre alérgenos es orientativa. Por favor, consulta los alérgenos directamente con el restaurante.",
     "addedToOrder": "{{name}} añadido al pedido",
     "desc": {
       "MARINARA": "Tomate, ajo y orégano.",
