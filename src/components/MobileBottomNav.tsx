@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UtensilsCrossed, CalendarDays, ShoppingCart, User, Settings, LogOut, CalendarCheck, MapPin } from "lucide-react";
+import { UtensilsCrossed, CalendarDays, ShoppingCart, User, Settings, LogOut, CalendarCheck, MapPin, Globe } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAuth } from "@/hooks/useAuth";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +13,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const MobileBottomNav = () => {
   const { t } = useTranslation();
