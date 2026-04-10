@@ -18,18 +18,31 @@ import {
 import { useNavigate } from "react-router-dom";
 import { extraCategories } from "@/lib/extras";
 
+const SODAS = [
+  { id: "coca-cola", name: "Coca-Cola", emoji: "🥤" },
+  { id: "coca-cola-zero", name: "Coca-Cola Zero", emoji: "⬛" },
+  { id: "fanta-naranja", name: "Fanta naranja", emoji: "🍊" },
+  { id: "fanta-limon", name: "Fanta limón", emoji: "🍋" },
+  { id: "fuze-tea", name: "Fuze Tea limón", emoji: "🫖" },
+  { id: "aquarius", name: "Aquarius limón", emoji: "💛" },
+];
+
 const DRINKS = [
-  { id: "cerveza", name: "Cerveza", emoji: "🍺", price: 3 },
-  { id: "refresco", name: "Refresco", emoji: "🥤", price: 2.5 },
-  { id: "vino", name: "Vino botella", emoji: "🍷", price: 20 },
-  { id: "agua", name: "Agua", emoji: "💧", price: 2.5 },
+  { id: "cerveza", name: "Cerveza", emoji: "🍺", price: 3, expandable: false },
+  { id: "refresco", name: "Refresco", emoji: "🥤", price: 2.5, expandable: true },
+  { id: "vino", name: "Vino botella", emoji: "🍷", price: 20, expandable: false },
+  { id: "agua", name: "Agua", emoji: "💧", price: 2.5, expandable: false },
 ];
 
 const DESSERTS = [
   { id: "tiramisu", name: "Tiramisú", emoji: "🍮", price: 6, desc: "Casero · artesanal" },
 ];
 
-const UPSELL_IDS = [...DRINKS.map((d) => d.id), ...DESSERTS.map((d) => d.id)];
+const UPSELL_IDS = [
+  ...DRINKS.map((d) => d.id),
+  ...SODAS.map((s) => s.id),
+  ...DESSERTS.map((d) => d.id),
+];
 
 // Extras picker with category tabs
 const ExtrasPicker = ({
@@ -99,6 +112,7 @@ const CartDrawer = () => {
 
   const [openNotes, setOpenNotes] = useState<Record<string, boolean>>({});
   const [showExtras, setShowExtras] = useState<Record<string, boolean>>({});
+  const [showSodas, setShowSodas] = useState(false);
 
   const handleCheckout = () => {
     setIsOpen(false);
@@ -292,15 +306,115 @@ const CartDrawer = () => {
               <div className="grid grid-cols-2 gap-2">
                 {DRINKS.map((d) => {
                   const inCart = items.find((i) => i.id === d.id);
+                  if (d.expandable) {
+                    // Refresco — show soda picker on click
+                    const sodasInCart = SODAS.filter((s) => items.find((i) => i.id === s.id));
+                    const totalSodas = sodasInCart.reduce((sum, s) => {
+                      const cartItem = items.find((i) => i.id === s.id);
+                      return sum + (cartItem?.quantity ?? 0);
+                    }, 0);
+                    return (
+                      <div key={d.id} className="col-span-2">
+                        <button
+                          onClick={() => setShowSodas((v) => !v)}
+                          className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border transition-all text-left ${
+                            showSodas || totalSodas > 0
+                              ? "border-menu-teal bg-menu-teal/5"
+                              : "border-border bg-background hover:border-menu-teal hover:bg-menu-teal/5"
+                          }`}
+                        >
+                          <span className="text-xl">{d.emoji}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-display font-bold text-xs text-foreground">
+                              {d.name}
+                            </p>
+                            <p className="text-[10px] text-menu-teal font-body font-semibold">
+                              {d.price.toFixed(2)} €
+                            </p>
+                          </div>
+                          {totalSodas > 0 && (
+                            <span className="text-[10px] font-bold bg-menu-teal text-white rounded-full w-5 h-5 flex items-center justify-center shrink-0">
+                              {totalSodas}
+                            </span>
+                          )}
+                          {showSodas ? (
+                            <ChevronUp className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          ) : (
+                            <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          )}
+                        </button>
+
+                        {/* Soda picker */}
+                        {showSodas && (
+                          <div className="mt-2 rounded-xl border border-menu-teal/20 bg-background overflow-hidden">
+                            <p className="px-3 pt-2.5 pb-1 text-[10px] font-body font-bold text-muted-foreground uppercase tracking-wider">
+                              ¿Cuál prefieres?
+                            </p>
+                            <div className="px-2 pb-2 space-y-1">
+                              {SODAS.map((soda) => {
+                                const sodaInCart = items.find((i) => i.id === soda.id);
+                                return (
+                                  <div
+                                    key={soda.id}
+                                    className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-muted/50 transition-colors"
+                                  >
+                                    <span className="flex items-center gap-2 text-sm font-body text-foreground">
+                                      <span className="text-base">{soda.emoji}</span>
+                                      {soda.name}
+                                    </span>
+                                    <div className="flex items-center gap-1.5">
+                                      {sodaInCart ? (
+                                        <>
+                                          <button
+                                            onClick={() =>
+                                              updateQuantity(soda.id, sodaInCart.quantity - 1)
+                                            }
+                                            className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                                          >
+                                            <Minus className="w-3 h-3" />
+                                          </button>
+                                          <span className="w-5 text-center text-sm font-bold">
+                                            {sodaInCart.quantity}
+                                          </span>
+                                          <button
+                                            onClick={() =>
+                                              updateQuantity(soda.id, sodaInCart.quantity + 1)
+                                            }
+                                            className="w-6 h-6 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
+                                          >
+                                            <Plus className="w-3 h-3" />
+                                          </button>
+                                        </>
+                                      ) : (
+                                        <button
+                                          onClick={() =>
+                                            addItem({ id: soda.id, name: soda.name, price: d.price })
+                                          }
+                                          className="w-6 h-6 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
+                                        >
+                                          <Plus className="w-3 h-3" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+
+                  // Regular drink
                   return (
-                    <button
+                    <div
                       key={d.id}
-                      onClick={() =>
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border transition-all ${
                         inCart
-                          ? updateQuantity(d.id, inCart.quantity + 1)
-                          : addItem({ id: d.id, name: d.name, price: d.price })
-                      }
-                      className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-border bg-background hover:border-menu-teal hover:bg-menu-teal/5 transition-all text-left"
+                          ? "border-menu-teal bg-menu-teal/5"
+                          : "border-border bg-background hover:border-menu-teal hover:bg-menu-teal/5"
+                      }`}
                     >
                       <span className="text-xl">{d.emoji}</span>
                       <div className="flex-1 min-w-0">
@@ -312,13 +426,30 @@ const CartDrawer = () => {
                         </p>
                       </div>
                       {inCart ? (
-                        <span className="text-[10px] font-bold bg-menu-teal text-white rounded-full w-5 h-5 flex items-center justify-center shrink-0">
-                          {inCart.quantity}
-                        </span>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => updateQuantity(d.id, inCart.quantity - 1)}
+                            className="w-5 h-5 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                          >
+                            <Minus className="w-2.5 h-2.5" />
+                          </button>
+                          <span className="w-4 text-center text-xs font-bold">{inCart.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(d.id, inCart.quantity + 1)}
+                            className="w-5 h-5 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
                       ) : (
-                        <Plus className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        <button
+                          onClick={() => addItem({ id: d.id, name: d.name, price: d.price })}
+                          className="w-6 h-6 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors shrink-0"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
                       )}
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -333,33 +464,49 @@ const CartDrawer = () => {
               {DESSERTS.map((d) => {
                 const inCart = items.find((i) => i.id === d.id);
                 return (
-                  <button
+                  <div
                     key={d.id}
-                    onClick={() =>
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
                       inCart
-                        ? updateQuantity(d.id, inCart.quantity + 1)
-                        : addItem({ id: d.id, name: d.name, price: d.price })
-                    }
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-border bg-background hover:border-menu-teal hover:bg-menu-teal/5 transition-all"
+                        ? "border-menu-teal bg-menu-teal/5"
+                        : "border-border bg-background hover:border-menu-teal hover:bg-menu-teal/5"
+                    }`}
                   >
                     <span className="text-2xl">{d.emoji}</span>
-                    <div className="flex-1 text-left">
+                    <div className="flex-1 text-left min-w-0">
                       <p className="font-display font-bold text-sm text-foreground">{d.name}</p>
                       <p className="text-xs text-muted-foreground font-body">{d.desc}</p>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-display font-bold text-menu-teal text-sm">
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="font-display font-bold text-menu-teal text-sm">
                         {d.price.toFixed(2)} €
-                      </p>
+                      </span>
                       {inCart ? (
-                        <span className="text-[10px] text-muted-foreground">
-                          ×{inCart.quantity} añadido
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => updateQuantity(d.id, inCart.quantity - 1)}
+                            className="w-5 h-5 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                          >
+                            <Minus className="w-2.5 h-2.5" />
+                          </button>
+                          <span className="w-4 text-center text-xs font-bold">{inCart.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(d.id, inCart.quantity + 1)}
+                            className="w-5 h-5 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
                       ) : (
-                        <Plus className="w-4 h-4 text-muted-foreground ml-auto" />
+                        <button
+                          onClick={() => addItem({ id: d.id, name: d.name, price: d.price })}
+                          className="w-6 h-6 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
                       )}
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
