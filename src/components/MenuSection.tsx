@@ -28,7 +28,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, ajo y orégano.",
     price: "9,50 €",
     priceNum: 9.5,
-    allergens: ["gluten"],
+    allergens: ["gluten", "lacteos"],
     category: "pizzas",
   },
   {
@@ -44,7 +44,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, mozzarella, anchoas, alcaparras y olivas.",
     price: "11,00 €",
     priceNum: 11,
-    allergens: ["gluten", "lacteos", "pescado", "sulfitos"],
+    allergens: ["gluten", "lacteos", "pescado"],
     category: "pizzas",
   },
   {
@@ -108,7 +108,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, mozzarella y embutido picante de Calabria.",
     price: "11,00 €",
     priceNum: 11,
-    allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
+    allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
   },
   {
@@ -116,7 +116,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, mozzarella y atún.",
     price: "11,00 €",
     priceNum: 11,
-    allergens: ["gluten", "lacteos", "pescado", "sulfitos"],
+    allergens: ["gluten", "lacteos", "pescado"],
     category: "pizzas",
   },
   {
@@ -140,7 +140,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, mozzarella, champiñones, jamón dulce, alcachofas y embutido picante.",
     price: "12,00 €",
     priceNum: 12,
-    allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
+    allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
   },
   {
@@ -272,7 +272,7 @@ const menuItems: MenuItemData[] = [
     desc: "Bocconcini di mozzarella, salami picante, sobrasada picante, tomate fresco, aceite, orégano y guindilla.",
     price: "15,00 €",
     priceNum: 15,
-    allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
+    allergens: ["gluten", "lacteos", "sulfitos"],
     category: "focaccias",
   },
   // Calzones
