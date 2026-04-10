@@ -440,14 +440,19 @@ const MenuSection = () => {
         setIsSticky(rect.top <= 64);
       }
 
-      // Show category nav only when menu section is in viewport
+      // Show category nav only while the actual menu content is in view
       const section = menuSectionRef.current;
-      if (section) {
+      const lastCategoryId = categories[categories.length - 1]?.id;
+      const lastCategorySection = lastCategoryId ? sectionRefs.current[lastCategoryId] : null;
+      if (section && lastCategorySection) {
         const sectionRect = section.getBoundingClientRect();
+        const lastCategoryRect = lastCategorySection.getBoundingClientRect();
         const navbarHeight = 64;
         const sectionTop = sectionRect.top - navbarHeight;
-        const sectionBottom = sectionRect.bottom;
-        setShowCategoryNav(sectionTop < window.innerHeight && sectionBottom > navbarHeight + 60);
+        const lastCategoryBottom = lastCategoryRect.bottom;
+        setShowCategoryNav(sectionTop < window.innerHeight && lastCategoryBottom > navbarHeight + 24);
+      } else {
+        setShowCategoryNav(false);
       }
 
       // Update active category based on scroll
@@ -463,6 +468,7 @@ const MenuSection = () => {
       }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
