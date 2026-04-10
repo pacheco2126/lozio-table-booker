@@ -473,7 +473,15 @@ const MenuSection = () => {
             </p>
           </div>
 
-          {/* Sticky Category Nav */}
+          {/* Allergen Warning */}
+          <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/30 mb-8 max-w-2xl mx-auto">
+            <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            <AlertDescription className="text-amber-800 dark:text-amber-200 font-body text-sm">
+              {t("menu.allergenWarning", "La información sobre alérgenos es orientativa. Por favor, consulta los alérgenos directamente con el restaurante.")}
+            </AlertDescription>
+          </Alert>
+
+
           <div
             ref={navRef}
             className={cn(
