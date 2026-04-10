@@ -498,7 +498,7 @@ const MenuSection = () => {
           <div
             ref={navRef}
             className={cn(
-              "sticky top-[60px] z-30 -mx-4 px-4 py-3 transition-all duration-300 mb-8",
+              "sticky top-[60px] z-30 -mx-4 px-4 py-3 transition-all duration-300 mb-6",
               isSticky ? "bg-muted/95 backdrop-blur-sm shadow-sm" : "",
               !menuInView && isSticky ? "opacity-0 pointer-events-none" : "opacity-100",
             )}
