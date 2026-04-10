@@ -487,8 +487,7 @@ const MenuSection = () => {
           <div
             ref={navRef}
             className={cn(
-              "sticky top-[60px] z-30 -mx-4 px-4 py-3 transition-all duration-300 mb-8",
-              isSticky ? "bg-muted/95 backdrop-blur-sm shadow-sm" : "",
+              "sticky top-[60px] z-30 -mx-4 px-4 py-3 transition-all duration-300 mb-8 bg-muted/95 backdrop-blur-sm shadow-sm",
             )}
           >
             <div className="flex gap-2 overflow-x-auto no-scrollbar justify-center">

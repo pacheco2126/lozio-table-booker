@@ -28,7 +28,10 @@ import MyReservations from "./pages/MyReservations.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ReviewPage from "./pages/ReviewPage.tsx";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? "");
+const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ??
+  "pk_test_51TKagYE97zvFrxLoMt0lKY9AQT2QGLPS3IjhH1xvZigTxwAbF7CurXX9xSmgVKqPalQKvi9wdN2fS1kG8LjtebmP00I4NCgo2w"
+);
 
 const queryClient = new QueryClient();
 
