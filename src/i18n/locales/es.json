@@ -35,6 +35,7 @@
     "drinks": "Bebidas",
     "dessert": "Postre",
     "addToOrder": "Añadir",
+    "allergenWarning": "La información sobre alérgenos es orientativa. Por favor, consulta los alérgenos directamente con el restaurante.",
     "addedToOrder": "{{name}} añadido al pedido",
     "desc": {
       "MARINARA": "Tomate, ajo y orégano.",
@@ -245,7 +246,13 @@
     "nameRequired": "Nombre requerido",
     "emailInvalid": "Email inválido",
     "phoneInvalid": "Teléfono inválido",
-    "addressRequired": "Dirección requerida para reparto"
+    "addressRequired": "Dirección requerida para reparto",
+    "estimatedDelivery": "Entrega estimada en ~30 minutos",
+    "estimatedPickup": "Listo para recoger en ~20 minutos",
+    "cardDetails": "Datos de la tarjeta",
+    "stripeSecure": "Pago seguro gestionado por Stripe",
+    "stripeNotLoaded": "El sistema de pago no está disponible. Recarga la página.",
+    "stripeError": "Error en el pago. Revisa los datos de tu tarjeta."
   },
   "admin": {
     "title": "Panel de Administración",
@@ -458,5 +465,20 @@
     "thankYouDesc": "Tu opinión anónima nos ayuda a seguir mejorando cada día.",
     "another": "Enviar otra reseña",
     "shareAlso": "¿Nos dejas una reseña también en?"
+  },
+  "confirmation": {
+    "title": "¡Pedido recibido!",
+    "subtitle": "Hemos recibido tu pedido y lo estamos preparando.",
+    "estimatedTime": "Tiempo estimado: ~{{minutes}} minutos",
+    "deliveryNote": "Te lo llevamos a casa",
+    "pickupNote": "Podrás recogerlo en el local",
+    "orderDetails": "Resumen del pedido",
+    "orderType": "Tipo de pedido",
+    "payment": "Pago",
+    "paid": "Pagado online ✓",
+    "pendingPayment": "Pago pendiente",
+    "contactReminder": "Te enviaremos una confirmación a {{email}}",
+    "backHome": "Volver al inicio",
+    "notFound": "Pedido no encontrado"
   }
 }

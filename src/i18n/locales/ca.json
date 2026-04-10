@@ -35,6 +35,7 @@
     "drinks": "Begudes",
     "dessert": "Postres",
     "addToOrder": "Afegir",
+    "allergenWarning": "La informació sobre al·lèrgens és orientativa. Si us plau, consulteu els al·lèrgens directament amb el restaurant.",
     "addedToOrder": "{{name}} afegit a la comanda",
     "desc": {
       "MARINARA": "Tomàquet, all i orenga.",
@@ -226,7 +227,13 @@
     "nameRequired": "Nom requerit",
     "emailInvalid": "Email invàlid",
     "phoneInvalid": "Telèfon invàlid",
-    "addressRequired": "Adreça requerida per repartiment"
+    "addressRequired": "Adreça requerida per repartiment",
+    "estimatedDelivery": "Lliurament estimat en ~30 minuts",
+    "estimatedPickup": "Llest per recollir en ~20 minuts",
+    "cardDetails": "Dades de la targeta",
+    "stripeSecure": "Pagament segur gestionat per Stripe",
+    "stripeNotLoaded": "El sistema de pagament no està disponible. Recarrega la pàgina.",
+    "stripeError": "Error en el pagament. Revisa les dades de la teva targeta."
   },
   "admin": {
     "title": "Panell d'Administració",
@@ -439,5 +446,20 @@
     "thankYouDesc": "La teva opinió anònima ens ajuda a seguir millorant cada dia.",
     "another": "Enviar una altra ressenya",
     "shareAlso": "Ens deixes una ressenya també a?"
+  },
+  "confirmation": {
+    "title": "Comanda rebuda!",
+    "subtitle": "Hem rebut la teva comanda i la estem preparant.",
+    "estimatedTime": "Temps estimat: ~{{minutes}} minuts",
+    "deliveryNote": "Te la portem a casa",
+    "pickupNote": "Podràs recollir-la al local",
+    "orderDetails": "Resum de la comanda",
+    "orderType": "Tipus de comanda",
+    "payment": "Pagament",
+    "paid": "Pagat online ✓",
+    "pendingPayment": "Pagament pendent",
+    "contactReminder": "Et enviarem una confirmació a {{email}}",
+    "backHome": "Tornar a l'inici",
+    "notFound": "Comanda no trobada"
   }
 }
