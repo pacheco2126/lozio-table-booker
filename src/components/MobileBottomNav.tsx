@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/popover";
 
 const MobileBottomNav = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { totalItems, setIsOpen } = useCart();
