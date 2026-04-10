@@ -407,7 +407,20 @@ const MenuSection = () => {
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
+  const menuSectionRef = useRef<HTMLElement>(null);
   const [isSticky, setIsSticky] = useState(false);
+  const [menuInView, setMenuInView] = useState(false);
+
+  useEffect(() => {
+    const el = menuSectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setMenuInView(entry.isIntersecting),
+      { threshold: 0, rootMargin: "-60px 0px 0px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleAdd = (item: MenuItemData) => {
     addItem({
@@ -462,7 +475,7 @@ const MenuSection = () => {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <section id="menu" className="py-16 md:py-24 px-4 bg-muted pb-24 md:pb-24">
+      <section id="menu" ref={menuSectionRef} className="py-16 md:py-24 px-4 bg-muted pb-24 md:pb-24">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
@@ -487,6 +500,7 @@ const MenuSection = () => {
             className={cn(
               "sticky top-[60px] z-30 -mx-4 px-4 py-3 transition-all duration-300 mb-8",
               isSticky ? "bg-muted/95 backdrop-blur-sm shadow-sm" : "",
+              !menuInView && isSticky ? "opacity-0 pointer-events-none" : "opacity-100",
             )}
           >
             <div className="flex gap-2 overflow-x-auto no-scrollbar justify-center">
