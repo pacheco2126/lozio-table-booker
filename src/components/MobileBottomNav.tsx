@@ -1,11 +1,21 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UtensilsCrossed, CalendarDays, ShoppingCart, User, Settings, LogOut, CalendarCheck, MapPin, Globe } from "lucide-react";
+import {
+  UtensilsCrossed,
+  CalendarDays,
+  ShoppingCart,
+  User,
+  Settings,
+  LogOut,
+  CalendarCheck,
+  MapPin,
+  Globe,
+} from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAuth } from "@/hooks/useAuth";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,11 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const MobileBottomNav = () => {
   const { t, i18n } = useTranslation();
@@ -66,9 +72,7 @@ const MobileBottomNav = () => {
                   </span>
                 ) : null}
               </div>
-              <span className="text-[10px] font-body font-medium leading-tight">
-                {tab.label}
-              </span>
+              <span className="text-[10px] font-body font-medium leading-tight">{tab.label}</span>
             </>
           );
 
@@ -87,30 +91,13 @@ const MobileBottomNav = () => {
           );
         })}
 
-        {/* Language switcher popover */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <button className={tabClassName(false)}>
-              <Globe className="w-5 h-5" />
-              <span className="text-[10px] font-body font-medium leading-tight">
-                {i18n.language.toUpperCase()}
-              </span>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent side="top" align="center" className="w-auto p-2 mb-2">
-            <LanguageSwitcher />
-          </PopoverContent>
-        </Popover>
-
         {/* Profile dropdown or login link */}
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={tabClassName(isProfileActive)}>
                 <User className="w-5 h-5" />
-                <span className="text-[10px] font-body font-medium leading-tight">
-                  {t("nav.profile")}
-                </span>
+                <span className="text-[10px] font-body font-medium leading-tight">{t("nav.profile")}</span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="end" className="mb-2">
@@ -132,9 +119,7 @@ const MobileBottomNav = () => {
         ) : (
           <a href="/auth" className={tabClassName(location.pathname === "/auth")}>
             <User className="w-5 h-5" />
-            <span className="text-[10px] font-body font-medium leading-tight">
-              {t("nav.login", "Login")}
-            </span>
+            <span className="text-[10px] font-body font-medium leading-tight">{t("nav.login", "Login")}</span>
           </a>
         )}
       </div>
