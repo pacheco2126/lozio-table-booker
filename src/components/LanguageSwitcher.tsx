@@ -11,12 +11,15 @@ const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
   return (
-    <div className="flex items-center gap-0.5 bg-primary-foreground/10 rounded-sm overflow-hidden">
+    <div className="flex items-center gap-1 rounded-md border border-primary-foreground/15 bg-primary-foreground/10 p-1">
       {languages.map((lang) => (
         <button
+          type="button"
           key={lang.code}
           onClick={() => i18n.changeLanguage(lang.code)}
-          className={`px-2.5 py-1.5 md:px-2 md:py-1 text-xs font-body font-bold uppercase tracking-wider transition-colors min-h-[32px] md:min-h-0 ${
+          aria-pressed={i18n.language === lang.code}
+          aria-label={`Cambiar idioma a ${lang.label}`}
+          className={`min-h-[38px] min-w-[38px] rounded-sm px-3 py-2 text-[11px] font-body font-bold uppercase tracking-wider transition-colors ${
             i18n.language === lang.code
               ? "bg-primary text-primary-foreground"
               : "text-primary-foreground/60 hover:text-primary-foreground"
