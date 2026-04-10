@@ -87,6 +87,21 @@ const MobileBottomNav = () => {
           );
         })}
 
+        {/* Language switcher popover */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className={tabClassName(false)}>
+              <Globe className="w-5 h-5" />
+              <span className="text-[10px] font-body font-medium leading-tight">
+                {i18n.language.toUpperCase()}
+              </span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent side="top" align="center" className="w-auto p-2 mb-2">
+            <LanguageSwitcher />
+          </PopoverContent>
+        </Popover>
+
         {/* Profile dropdown or login link */}
         {user ? (
           <DropdownMenu>
