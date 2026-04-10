@@ -409,18 +409,7 @@ const MenuSection = () => {
   const navRef = useRef<HTMLDivElement>(null);
   const menuSectionRef = useRef<HTMLElement>(null);
   const [isSticky, setIsSticky] = useState(false);
-  const [menuInView, setMenuInView] = useState(false);
-
-  useEffect(() => {
-    const el = menuSectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setMenuInView(entry.isIntersecting),
-      { threshold: 0, rootMargin: "-60px 0px 0px 0px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const [showCategoryNav, setShowCategoryNav] = useState(false);
 
   const handleAdd = (item: MenuItemData) => {
     addItem({
@@ -449,6 +438,16 @@ const MenuSection = () => {
       if (nav) {
         const rect = nav.getBoundingClientRect();
         setIsSticky(rect.top <= 64);
+      }
+
+      // Show category nav only when menu section is in viewport
+      const section = menuSectionRef.current;
+      if (section) {
+        const sectionRect = section.getBoundingClientRect();
+        const navbarHeight = 64;
+        const sectionTop = sectionRect.top - navbarHeight;
+        const sectionBottom = sectionRect.bottom;
+        setShowCategoryNav(sectionTop < window.innerHeight && sectionBottom > navbarHeight + 60);
       }
 
       // Update active category based on scroll
@@ -500,7 +499,7 @@ const MenuSection = () => {
             className={cn(
               "sticky top-[60px] z-30 -mx-4 px-4 py-3 transition-all duration-300 mb-6",
               isSticky ? "bg-muted/95 backdrop-blur-sm shadow-sm" : "",
-              !menuInView && isSticky ? "opacity-0 pointer-events-none" : "opacity-100",
+              !showCategoryNav ? "opacity-0 pointer-events-none" : "opacity-100",
             )}
           >
             <div className="flex gap-2 overflow-x-auto no-scrollbar justify-center">
