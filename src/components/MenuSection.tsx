@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect } from "react";
-import { UtensilsCrossed, Plus, Flame, Check } from "lucide-react";
+import { UtensilsCrossed, Plus, Flame, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 import pizzaPlaceholder from "@/assets/pizza-placeholder.jpg";
 import { useCart } from "@/contexts/CartContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useMedia } from "@/hooks/useMedia";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getAllergenById } from "@/lib/allergens";
 import { cn } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface MenuItemData {
   name: string;
@@ -26,7 +29,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, ajo y orégano.",
     price: "9,50 €",
     priceNum: 9.5,
-    allergens: ["gluten"],
+    allergens: ["gluten", "lacteos"],
     category: "pizzas",
   },
   {
@@ -42,7 +45,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, mozzarella, anchoas, alcaparras y olivas.",
     price: "11,00 €",
     priceNum: 11,
-    allergens: ["gluten", "lacteos", "pescado", "sulfitos"],
+    allergens: ["gluten", "lacteos", "pescado"],
     category: "pizzas",
   },
   {
@@ -106,7 +109,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, mozzarella y embutido picante de Calabria.",
     price: "11,00 €",
     priceNum: 11,
-    allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
+    allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
   },
   {
@@ -114,7 +117,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, mozzarella y atún.",
     price: "11,00 €",
     priceNum: 11,
-    allergens: ["gluten", "lacteos", "pescado", "sulfitos"],
+    allergens: ["gluten", "lacteos", "pescado"],
     category: "pizzas",
   },
   {
@@ -138,7 +141,7 @@ const menuItems: MenuItemData[] = [
     desc: "Tomate, mozzarella, champiñones, jamón dulce, alcachofas y embutido picante.",
     price: "12,00 €",
     priceNum: 12,
-    allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
+    allergens: ["gluten", "lacteos", "sulfitos"],
     category: "pizzas",
   },
   {
@@ -270,7 +273,7 @@ const menuItems: MenuItemData[] = [
     desc: "Bocconcini di mozzarella, salami picante, sobrasada picante, tomate fresco, aceite, orégano y guindilla.",
     price: "15,00 €",
     priceNum: 15,
-    allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
+    allergens: ["gluten", "lacteos", "sulfitos"],
     category: "focaccias",
   },
   // Calzones
@@ -333,27 +336,17 @@ const AllergenBadges = ({ allergens }: { allergens?: string[] }) => {
 const MenuCard = ({
   item,
   onAdd,
+  showAddButton,
   imageUrl,
 }: {
   item: MenuItemData;
   onAdd: () => void;
+  showAddButton: boolean;
   imageUrl?: string | null;
 }) => {
   const { t } = useTranslation();
-  const [added, setAdded] = useState(false);
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onAdd();
-    setAdded(true);
-    setTimeout(() => setAdded(false), 900);
-  };
-
   return (
-    <div
-      onClick={handleAdd}
-      className="group bg-card rounded-xl shadow-sm border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col cursor-pointer active:scale-95"
-    >
+    <div className="group bg-card rounded-xl shadow-sm border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col">
       {/* Image */}
       <div className="relative overflow-hidden" style={{ paddingBottom: "60%" }}>
         <img
@@ -376,23 +369,9 @@ const MenuCard = ({
             {t(`menu.${item.badge.key}`)}
           </span>
         )}
-        {/* Add button overlay */}
-        <div
-          className={`absolute bottom-2 right-2 z-10 flex items-center justify-center w-8 h-8 rounded-full shadow-lg transition-all duration-200 ${
-            added
-              ? "bg-green-500 scale-110"
-              : "bg-primary group-hover:scale-110"
-          }`}
-        >
-          {added ? (
-            <Check className="w-4 h-4 text-white" />
-          ) : (
-            <Plus className="w-4 h-4 text-primary-foreground" />
-          )}
-        </div>
       </div>
       {/* Body */}
-      <div className="p-3 md:p-4 flex flex-col flex-1 gap-1.5">
+      <div className="p-3 md:p-4 flex flex-col flex-1 gap-2">
         <h4 className="font-display font-bold text-foreground text-sm md:text-base leading-tight tracking-wide">
           {item.name}
         </h4>
@@ -401,10 +380,20 @@ const MenuCard = ({
             {t(`menu.desc.${item.name}`, item.desc)}
           </p>
         )}
+        <AllergenBadges allergens={item.allergens} />
         <div className="flex items-center justify-between mt-auto pt-1">
           <span className="font-display font-bold text-primary text-base md:text-lg">{item.price}</span>
-          <AllergenBadges allergens={item.allergens} />
         </div>
+        {showAddButton && (
+          <Button
+            onClick={onAdd}
+            className="w-full bg-primary text-primary-foreground font-body font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity mt-1"
+            size="sm"
+          >
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            {t("menu.addToOrder", "Añadir")}
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -412,12 +401,15 @@ const MenuCard = ({
 
 const MenuSection = () => {
   const { addItem } = useCart();
+  const { isAdmin } = useIsAdmin();
   const { t } = useTranslation();
   const { getImageForItem } = useMedia("menu_item");
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
+  const menuSectionRef = useRef<HTMLElement>(null);
   const [isSticky, setIsSticky] = useState(false);
+  const [showCategoryNav, setShowCategoryNav] = useState(false);
 
   const handleAdd = (item: MenuItemData) => {
     addItem({
@@ -448,6 +440,16 @@ const MenuSection = () => {
         setIsSticky(rect.top <= 64);
       }
 
+      // Show category nav only when menu section is in viewport
+      const section = menuSectionRef.current;
+      if (section) {
+        const sectionRect = section.getBoundingClientRect();
+        const navbarHeight = 64;
+        const sectionTop = sectionRect.top - navbarHeight;
+        const sectionBottom = sectionRect.bottom;
+        setShowCategoryNav(sectionTop < window.innerHeight && sectionBottom > navbarHeight + 60);
+      }
+
       // Update active category based on scroll
       for (const cat of [...categories].reverse()) {
         const el = sectionRefs.current[cat.id];
@@ -472,7 +474,7 @@ const MenuSection = () => {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <section id="menu" className="py-16 md:py-24 px-4 bg-muted pb-24 md:pb-24">
+      <section id="menu" ref={menuSectionRef} className="py-16 md:py-24 px-4 bg-muted pb-24 md:pb-24">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
@@ -483,11 +485,21 @@ const MenuSection = () => {
             </p>
           </div>
 
-          {/* Sticky Category Nav */}
+          {/* Allergen Warning */}
+          <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/30 mb-8 max-w-md mx-auto py-2.5 px-3">
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+            <AlertDescription className="text-amber-800 dark:text-amber-200 font-body text-xs leading-snug">
+              {t("menu.allergenWarning", "La información sobre alérgenos es orientativa. Por favor, consulta los alérgenos directamente con el restaurante.")}
+            </AlertDescription>
+          </Alert>
+
+
           <div
             ref={navRef}
             className={cn(
-              "sticky top-[60px] z-30 -mx-4 px-4 py-3 transition-all duration-300 mb-8 bg-muted/95 backdrop-blur-sm shadow-sm",
+              "sticky top-[60px] z-30 -mx-4 px-4 py-3 transition-all duration-300 mb-6",
+              isSticky ? "bg-muted/95 backdrop-blur-sm shadow-sm" : "",
+              !showCategoryNav ? "opacity-0 pointer-events-none" : "opacity-100",
             )}
           >
             <div className="flex gap-2 overflow-x-auto no-scrollbar justify-center">
@@ -533,7 +545,7 @@ const MenuSection = () => {
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
                   {items.map((item) => (
-                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} imageUrl={getImageForItem(item.name)} />
+                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} showAddButton={isAdmin} imageUrl={getImageForItem(item.name)} />
                   ))}
                 </div>
               </div>

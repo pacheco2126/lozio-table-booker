@@ -35,6 +35,7 @@
     "drinks": "Drinks",
     "dessert": "Dessert",
     "addToOrder": "Add",
+    "allergenWarning": "Allergen information is for guidance only. Please check allergens directly with the restaurant.",
     "addedToOrder": "{{name}} added to order",
     "desc": {
       "MARINARA": "Tomato, garlic and oregano.",

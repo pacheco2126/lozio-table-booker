@@ -35,6 +35,7 @@
     "drinks": "Bevande",
     "dessert": "Dolce",
     "addToOrder": "Aggiungi",
+    "allergenWarning": "Le informazioni sugli allergeni sono indicative. Si prega di verificare gli allergeni direttamente con il ristorante.",
     "addedToOrder": "{{name}} aggiunto all'ordine",
     "desc": {
       "MARINARA": "Pomodoro, aglio e origano.",

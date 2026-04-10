@@ -16,7 +16,7 @@ const LanguageSwitcher = () => {
         <button
           key={lang.code}
           onClick={() => i18n.changeLanguage(lang.code)}
-          className={`px-2 py-1 text-xs font-body font-bold uppercase tracking-wider transition-colors ${
+          className={`px-2.5 py-1.5 md:px-2 md:py-1 text-xs font-body font-bold uppercase tracking-wider transition-colors min-h-[32px] md:min-h-0 ${
             i18n.language === lang.code
               ? "bg-primary text-primary-foreground"
               : "text-primary-foreground/60 hover:text-primary-foreground"

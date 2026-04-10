@@ -35,6 +35,7 @@
     "drinks": "Begudes",
     "dessert": "Postres",
     "addToOrder": "Afegir",
+    "allergenWarning": "La informació sobre al·lèrgens és orientativa. Si us plau, consulteu els al·lèrgens directament amb el restaurant.",
     "addedToOrder": "{{name}} afegit a la comanda",
     "desc": {
       "MARINARA": "Tomàquet, all i orenga.",
