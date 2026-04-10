@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { UtensilsCrossed, Plus, Flame } from "lucide-react";
+import { UtensilsCrossed, Plus, Flame, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import pizzaPlaceholder from "@/assets/pizza-placeholder.jpg";
 import { useCart } from "@/contexts/CartContext";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useMedia } from "@/hooks/useMedia";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -335,17 +333,27 @@ const AllergenBadges = ({ allergens }: { allergens?: string[] }) => {
 const MenuCard = ({
   item,
   onAdd,
-  showAddButton,
   imageUrl,
 }: {
   item: MenuItemData;
   onAdd: () => void;
-  showAddButton: boolean;
   imageUrl?: string | null;
 }) => {
   const { t } = useTranslation();
+  const [added, setAdded] = useState(false);
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAdd();
+    setAdded(true);
+    setTimeout(() => setAdded(false), 900);
+  };
+
   return (
-    <div className="group bg-card rounded-xl shadow-sm border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col">
+    <div
+      onClick={handleAdd}
+      className="group bg-card rounded-xl shadow-sm border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col cursor-pointer active:scale-95"
+    >
       {/* Image */}
       <div className="relative overflow-hidden" style={{ paddingBottom: "60%" }}>
         <img
@@ -368,9 +376,23 @@ const MenuCard = ({
             {t(`menu.${item.badge.key}`)}
           </span>
         )}
+        {/* Add button overlay */}
+        <div
+          className={`absolute bottom-2 right-2 z-10 flex items-center justify-center w-8 h-8 rounded-full shadow-lg transition-all duration-200 ${
+            added
+              ? "bg-green-500 scale-110"
+              : "bg-primary group-hover:scale-110"
+          }`}
+        >
+          {added ? (
+            <Check className="w-4 h-4 text-white" />
+          ) : (
+            <Plus className="w-4 h-4 text-primary-foreground" />
+          )}
+        </div>
       </div>
       {/* Body */}
-      <div className="p-3 md:p-4 flex flex-col flex-1 gap-2">
+      <div className="p-3 md:p-4 flex flex-col flex-1 gap-1.5">
         <h4 className="font-display font-bold text-foreground text-sm md:text-base leading-tight tracking-wide">
           {item.name}
         </h4>
@@ -379,20 +401,10 @@ const MenuCard = ({
             {t(`menu.desc.${item.name}`, item.desc)}
           </p>
         )}
-        <AllergenBadges allergens={item.allergens} />
         <div className="flex items-center justify-between mt-auto pt-1">
           <span className="font-display font-bold text-primary text-base md:text-lg">{item.price}</span>
+          <AllergenBadges allergens={item.allergens} />
         </div>
-        {showAddButton && (
-          <Button
-            onClick={onAdd}
-            className="w-full bg-primary text-primary-foreground font-body font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity mt-1"
-            size="sm"
-          >
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            {t("menu.addToOrder", "Añadir")}
-          </Button>
-        )}
       </div>
     </div>
   );
@@ -400,7 +412,6 @@ const MenuCard = ({
 
 const MenuSection = () => {
   const { addItem } = useCart();
-  const { isAdmin } = useIsAdmin();
   const { t } = useTranslation();
   const { getImageForItem } = useMedia("menu_item");
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
@@ -523,7 +534,7 @@ const MenuSection = () => {
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
                   {items.map((item) => (
-                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} showAddButton={isAdmin} imageUrl={getImageForItem(item.name)} />
+                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} imageUrl={getImageForItem(item.name)} />
                   ))}
                 </div>
               </div>
