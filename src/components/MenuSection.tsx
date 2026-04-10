@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { UtensilsCrossed, Plus, Flame } from "lucide-react";
+import { UtensilsCrossed, Plus, Flame, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import pizzaPlaceholder from "@/assets/pizza-placeholder.jpg";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getAllergenById } from "@/lib/allergens";
 import { cn } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface MenuItemData {
   name: string;
