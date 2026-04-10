@@ -110,7 +110,7 @@ const Checkout = () => {
           delivery_city: form.orderType === "delivery" ? form.city : null,
           delivery_postal_code: form.orderType === "delivery" ? form.postalCode : null,
           payment_method: form.paymentMethod,
-          payment_status: form.paymentMethod === "stripe" ? "pending_payment" : "pending",
+          payment_status: "pending",
           notes: form.notes || null,
           total_amount: totalPrice,
         })
@@ -181,7 +181,7 @@ const Checkout = () => {
         if (stripeError) {
           await supabase
             .from("orders")
-            .update({ payment_status: "payment_failed" })
+            .update({ payment_status: "failed" })
             .eq("id", order.id);
           throw new Error(stripeError.message || t("checkout.stripeError"));
         }
