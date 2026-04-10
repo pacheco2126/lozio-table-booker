@@ -427,7 +427,7 @@ const ReservationSection = () => {
                   <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
                   <AlertDescription
                     className="text-yellow-800 dark:text-yellow-200 font-body text-sm"
-                    dangerouslySetInnerHTML={{ __html: t("reservation.durationWarning") }}
+                    dangerouslySetInnerHTML={{ __html: `${t("reservation.durationWarning")} <strong>${t("reservation.durationTime")}</strong> ${t("reservation.durationWarningPost")}` }}
                   />
                 </Alert>
 
