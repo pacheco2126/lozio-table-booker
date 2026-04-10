@@ -44,7 +44,7 @@ const App = () => (
       <CartProvider>
         <TooltipProvider>
           <Toaster />
-          <Sonner />
+          <Sonner position="top-center" />
           <AdminNotificationListener />
           <BrowserRouter>
             <InstallBanner />

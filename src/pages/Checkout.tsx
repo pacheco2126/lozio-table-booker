@@ -119,15 +119,26 @@ const Checkout = () => {
 
       if (orderError) throw orderError;
 
-      // 2. Insert order items
-      const orderItems = items.map((item) => ({
-        order_id: order.id,
-        item_name: item.name,
-        item_description: item.description || null,
-        quantity: item.quantity,
-        unit_price: item.price,
-        total_price: item.price * item.quantity,
-      }));
+      // 2. Insert order items (including extras as part of description)
+      const orderItems = items.map((item) => {
+        const extrasList = (item.extras || [])
+          .map((e) => `${e.emoji} ${e.label} ×${e.quantity}`)
+          .join(", ");
+        const extrasPrice = (item.extras || []).reduce((s, e) => s + e.price * e.quantity, 0);
+        const descParts = [
+          item.description,
+          extrasList ? `Extras: ${extrasList}` : null,
+          item.note ? `📝 ${item.note}` : null,
+        ].filter(Boolean);
+        return {
+          order_id: order.id,
+          item_name: item.name,
+          item_description: descParts.join(" — ") || null,
+          quantity: item.quantity,
+          unit_price: item.price,
+          total_price: item.price * item.quantity + extrasPrice,
+        };
+      });
       const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
       if (itemsError) throw itemsError;
 
