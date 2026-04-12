@@ -461,5 +461,17 @@
     "contactReminder": "We will send a confirmation to {{email}}",
     "backHome": "Back to home",
     "notFound": "Order not found"
+  },
+  "dialog": {
+    "addExtras": "Add an extra",
+    "addNote": "Add a note for the kitchen",
+    "editNote": "Edit note",
+    "notePlaceholder": "E.g: no onion, well done, less tomato...",
+    "addToCart": "Add to cart",
+    "drinksSection": "Don't leave thirsty!",
+    "dessertSection": "Something sweet?",
+    "tiramisuDesc": "Homemade · artisan",
+    "addExtrasCustom": "Choose your ingredients",
+    "freeCounter": "{{count}}/{{max}} included · extra ones are charged"
   }
 }

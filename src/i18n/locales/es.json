@@ -480,5 +480,17 @@
     "contactReminder": "Te enviaremos una confirmación a {{email}}",
     "backHome": "Volver al inicio",
     "notFound": "Pedido no encontrado"
+  },
+  "dialog": {
+    "addExtras": "Añade un extra",
+    "addNote": "Añadir nota para el cocinero",
+    "editNote": "Editar nota",
+    "notePlaceholder": "Ej: sin cebolla, muy hecho, poco tomate...",
+    "addToCart": "Añadir al carrito",
+    "drinksSection": "No te quedes con sed!",
+    "dessertSection": "El toque dulce",
+    "tiramisuDesc": "Casero · artesanal",
+    "addExtrasCustom": "Elige tus ingredientes",
+    "freeCounter": "{{count}}/{{max}} incluidos · los siguientes tienen coste"
   }
 }

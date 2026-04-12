@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import pizzaPlaceholder from "@/assets/pizza-placeholder.jpg";
 import { useCart } from "@/contexts/CartContext";
+import type { CartItemExtra } from "@/contexts/CartContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useMedia } from "@/hooks/useMedia";
 import { toast } from "sonner";
@@ -11,9 +12,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { getAllergenById } from "@/lib/allergens";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import AddToCartDialog from "@/components/AddToCartDialog";
 
 interface MenuItemData {
   name: string;
+  imageKey?: string; // override for image lookup when name changes
+  freeExtras?: number; // first N ingredient extras are free
   desc?: string;
   price: string;
   priceNum: number;
@@ -24,6 +28,16 @@ interface MenuItemData {
 
 const menuItems: MenuItemData[] = [
   // Pizzas
+    {
+    name: "CREA TU PIZZA",
+    imageKey: "FANTASÍA",
+    freeExtras: 4,
+    desc: "Tomate, mozzarella, y 4 ingredientes a escoger.",
+    price: "16,00 €",
+    priceNum: 16,
+    allergens: ["gluten", "lacteos"],
+    category: "pizzas",
+  },
   {
     name: "MARINARA",
     desc: "Tomate, ajo y orégano.",
@@ -159,14 +173,6 @@ const menuItems: MenuItemData[] = [
     price: "15,00 €",
     priceNum: 15,
     allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "FANTASÍA",
-    desc: "Tomate, mozzarella, y 4 ingredientes a escoger.",
-    price: "16,00 €",
-    priceNum: 16,
-    allergens: ["gluten", "lacteos"],
     category: "pizzas",
   },
   {
@@ -400,7 +406,7 @@ const MenuCard = ({
 };
 
 const MenuSection = () => {
-  const { addItem } = useCart();
+  const { addItem, setIsOpen: openCart } = useCart();
   const { isAdmin } = useIsAdmin();
   const { t } = useTranslation();
   const { getImageForItem } = useMedia("menu_item");
@@ -411,14 +417,27 @@ const MenuSection = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [showCategoryNav, setShowCategoryNav] = useState(false);
 
-  const handleAdd = (item: MenuItemData) => {
+  const [dialogItem, setDialogItem] = useState<MenuItemData | null>(null);
+  const [dialogImageUrl, setDialogImageUrl] = useState<string | null>(null);
+
+  const handleAdd = (item: MenuItemData, imageUrl?: string | null) => {
+    setDialogItem(item);
+    setDialogImageUrl(imageUrl ?? null);
+  };
+
+  const handleDialogConfirm = (extras: CartItemExtra[], note: string) => {
+    if (!dialogItem) return;
     addItem({
-      id: item.name.toLowerCase().replace(/\s+/g, "-"),
-      name: item.name,
-      description: item.desc,
-      price: item.priceNum,
+      id: `${dialogItem.name.toLowerCase().replace(/\s+/g, "-")}_${Date.now()}`,
+      name: dialogItem.name,
+      description: dialogItem.desc,
+      price: dialogItem.priceNum,
+      extras: extras.length > 0 ? extras : undefined,
+      note: note || undefined,
     });
-    toast.success(t("menu.addedToOrder", { name: item.name }));
+    setDialogItem(null);
+    openCart(true);
+    toast.success(t("menu.addedToOrder", { name: dialogItem.name }));
   };
 
   const scrollToCategory = (catId: string) => {
@@ -545,7 +564,7 @@ const MenuSection = () => {
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
                   {items.map((item) => (
-                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item)} showAddButton={isAdmin} imageUrl={getImageForItem(item.name)} />
+                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item, getImageForItem(item.imageKey ?? item.name))} showAddButton={true} imageUrl={getImageForItem(item.imageKey ?? item.name)} />
                   ))}
                 </div>
               </div>
@@ -553,6 +572,15 @@ const MenuSection = () => {
           })}
         </div>
       </section>
+
+      <AddToCartDialog
+        item={dialogItem}
+        imageUrl={dialogImageUrl}
+        open={!!dialogItem}
+        freeExtras={dialogItem?.freeExtras}
+        onOpenChange={(open) => { if (!open) setDialogItem(null); }}
+        onConfirm={handleDialogConfirm}
+      />
     </TooltipProvider>
   );
 };

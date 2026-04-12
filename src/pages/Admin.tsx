@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
-import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronUp, UtensilsCrossed, MapPin, Phone, ArrowRight } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import Navbar from "@/components/Navbar";
@@ -24,6 +24,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { locationsData } from "@/lib/locations";
 
 interface Reservation {
   id: string; location: string; guest_name: string; email: string; phone: string;
@@ -291,6 +292,7 @@ const Admin = () => {
             <TabsTrigger value="reviews" className="font-bold">Reseñas</TabsTrigger>
             <TabsTrigger value="customers" className="font-bold">{t("admin.customers")}</TabsTrigger>
             <TabsTrigger value="media" className="font-bold">📷 Media</TabsTrigger>
+            <TabsTrigger value="orders" className="font-bold">🍕 Pedidos</TabsTrigger>
           </TabsList>
 
           <TabsContent value="reservations" className="space-y-6">
@@ -430,6 +432,42 @@ const Admin = () => {
           <TabsContent value="reviews"><AdminReviews /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
           <TabsContent value="media"><AdminMedia /></TabsContent>
+          <TabsContent value="orders">
+            <div className="space-y-4">
+              <p className="text-muted-foreground font-body text-sm">
+                Selecciona un local para ver y gestionar sus pedidos en tiempo real.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {["tarragona", "arrabassada"].map((slug) => {
+                  const loc = locationsData[slug];
+                  return (
+                    <a
+                      key={slug}
+                      href={`/admin/pedidos/${slug}`}
+                      className="block bg-card border border-border rounded-xl p-5 hover:border-menu-teal hover:shadow-md transition-all group"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-display font-bold text-lg text-foreground mb-1 group-hover:text-menu-teal transition-colors">
+                            {loc.name}
+                          </h3>
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
+                            <MapPin className="w-3.5 h-3.5 shrink-0" />
+                            <span>{loc.address}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                            <Phone className="w-3.5 h-3.5 shrink-0" />
+                            <span>{loc.phone}</span>
+                          </div>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-menu-teal transition-colors mt-1 shrink-0" />
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
       <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
