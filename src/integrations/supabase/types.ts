@@ -102,7 +102,10 @@ export type Database = {
           order_type: string
           payment_method: string
           payment_status: string
+          pickup_store: string | null
+          scheduled_for: string | null
           status: string
+          stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           total_amount: number
           user_id: string | null
@@ -120,7 +123,10 @@ export type Database = {
           order_type?: string
           payment_method?: string
           payment_status?: string
+          pickup_store?: string | null
+          scheduled_for?: string | null
           status?: string
+          stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount?: number
           user_id?: string | null
@@ -138,7 +144,10 @@ export type Database = {
           order_type?: string
           payment_method?: string
           payment_status?: string
+          pickup_store?: string | null
+          scheduled_for?: string | null
           status?: string
+          stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount?: number
           user_id?: string | null
