@@ -7,9 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
-import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronUp, Pencil } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
 import FloorPlan from "@/components/FloorPlan";
@@ -24,12 +28,15 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getUnavailableSlots } from "@/lib/availability";
+
+const TIME_SLOTS = ["19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00"];
 
 interface Reservation {
   id: string; location: string; guest_name: string; email: string; phone: string;
   reservation_date: string; reservation_time: string; guests: string;
   notes: string | null; status: string; created_at: string; user_id: string | null;
-  table_id: string | null;
+  table_id: string | null; table_ids: string[] | null;
 }
 
 const locationNames: Record<string, string> = {
@@ -56,6 +63,18 @@ const Admin = () => {
   const [showCancelledToday, setShowCancelledToday] = useState(false);
   const [cancelIds, setCancelIds] = useState<string[] | null>(null);
   const [cancelName, setCancelName] = useState("");
+
+  // Edit reservation state
+  const [editReservation, setEditReservation] = useState<GroupedReservation | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editDate, setEditDate] = useState<Date>(new Date());
+  const [editTime, setEditTime] = useState("");
+  const [editGuests, setEditGuests] = useState("2");
+  const [editNotes, setEditNotes] = useState("");
+  const [editUnavailable, setEditUnavailable] = useState<Set<string>>(new Set());
+  const [editSaving, setEditSaving] = useState(false);
 
   const statusLabels: Record<string, { label: string; className: string }> = {
     pending: { label: t("admin.statusPending"), className: "bg-accent/20 text-accent-foreground" },
@@ -116,6 +135,69 @@ const Admin = () => {
     if (error) { toast.error(t("admin.statusError")); } else { toast.success(t("admin.statusUpdated")); fetchReservations(); }
   };
 
+  const loadEditAvailability = async (location: string, date: Date, guests: number, excludeIds: string[]) => {
+    const { data: resData } = await supabase
+      .from("reservations")
+      .select("reservation_time, guests, table_id, table_ids")
+      .eq("location", location)
+      .eq("reservation_date", format(date, "yyyy-MM-dd"))
+      .in("status", ["pending", "confirmed"])
+      .not("id", "in", `(${excludeIds.join(",")})`);
+    const { data: tablesData } = await supabase
+      .from("tables")
+      .select("id, name, capacity")
+      .eq("location", location)
+      .eq("is_active", true);
+    const unavailable = getUnavailableSlots(resData || [], TIME_SLOTS, guests, tablesData || undefined);
+    setEditUnavailable(unavailable);
+  };
+
+  const openEditDialog = async (r: GroupedReservation) => {
+    setEditReservation(r);
+    setEditName(r.guest_name);
+    setEditPhone(r.phone);
+    setEditEmail(r.email || "");
+    setEditGuests(r.guests);
+    setEditNotes(r.notes || "");
+    const d = new Date(r.reservation_date + "T00:00:00");
+    setEditDate(d);
+    setEditTime(r.reservation_time.substring(0, 5));
+    await loadEditAvailability(r.location, d, parseInt(r.guests) || 2, r.allIds);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editReservation) return;
+    setEditSaving(true);
+
+    const { data, error } = await supabase.functions.invoke("auto-assign-reservation", {
+      body: {
+        location: editReservation.location,
+        guest_name: editName.trim(),
+        phone: editPhone.trim(),
+        email: editEmail.trim() || undefined,
+        reservation_date: format(editDate, "yyyy-MM-dd"),
+        reservation_time: editTime,
+        guests: editGuests,
+        notes: editNotes.trim() || null,
+        user_id: editReservation.user_id || null,
+      },
+    });
+
+    if (error || !data?.success) {
+      toast.error(data?.message || "No hay disponibilidad para esa fecha/hora");
+      setEditSaving(false);
+      return;
+    }
+
+    // Cancel all old reservation rows (admin can cancel any, no user_id check)
+    await supabase.from("reservations").update({ status: "cancelled" }).in("id", editReservation.allIds);
+
+    toast.success("Reserva modificada correctamente");
+    setEditReservation(null);
+    fetchReservations();
+    setEditSaving(false);
+  };
+
   // Dates that have reservations (for calendar dots)
   const reservationDates = useMemo(() => {
     const dates = new Set<string>();
@@ -152,25 +234,25 @@ const Admin = () => {
       const key = getGroupKey(r);
       const existing = groups.get(key);
       if (existing) {
-        // Only group if created_at is within 10 seconds (same multi-table booking)
+        // Legacy: group rows created within 10 seconds (old multi-table 2-row bookings)
         const existingTime = new Date(existing.created_at).getTime();
         const currentTime = new Date(r.created_at).getTime();
         if (Math.abs(existingTime - currentTime) <= 10000) {
           if (r.table_id) existing.tableIds.push(r.table_id);
           existing.allIds.push(r.id);
         } else {
-          // Separate reservation, use a unique key
           const uniqueKey = `${key}|${r.id}`;
           groups.set(uniqueKey, {
             ...r,
-            tableIds: r.table_id ? [r.table_id] : [],
+            // New schema: use table_ids array; fallback to table_id for old rows
+            tableIds: r.table_ids?.length ? r.table_ids : (r.table_id ? [r.table_id] : []),
             allIds: [r.id],
           });
         }
       } else {
         groups.set(key, {
           ...r,
-          tableIds: r.table_id ? [r.table_id] : [],
+          tableIds: r.table_ids?.length ? r.table_ids : (r.table_id ? [r.table_id] : []),
           allIds: [r.id],
         });
       }
@@ -239,10 +321,19 @@ const Admin = () => {
         <div className="flex items-center gap-2 shrink-0">
           <span className={`px-2 py-1 rounded-sm text-xs font-bold font-body ${st.className}`}>{st.label}</span>
           {r.status !== "cancelled" && (
-            <button onClick={() => { setCancelIds(r.allIds); setCancelName(r.guest_name); }}
-              className="px-2 py-1 text-xs font-body font-bold bg-destructive/20 text-destructive rounded-sm hover:bg-destructive/30 transition-colors">
-              {t("admin.cancel")}
-            </button>
+            <>
+              <button
+                onClick={() => openEditDialog(r)}
+                className="px-2 py-1 text-xs font-body font-bold bg-primary/10 text-primary rounded-sm hover:bg-primary/20 transition-colors flex items-center gap-1"
+              >
+                <Pencil className="w-3 h-3" />
+                Editar
+              </button>
+              <button onClick={() => { setCancelIds(r.allIds); setCancelName(r.guest_name); }}
+                className="px-2 py-1 text-xs font-body font-bold bg-destructive/20 text-destructive rounded-sm hover:bg-destructive/30 transition-colors">
+                {t("admin.cancel")}
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -469,6 +560,133 @@ const Admin = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit reservation dialog */}
+      <Dialog open={!!editReservation} onOpenChange={(open) => { if (!open) setEditReservation(null); }}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display font-bold">Editar reserva</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            {/* Name & Phone */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="font-body font-bold text-sm">Nombre</Label>
+                <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="font-body" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="font-body font-bold text-sm">Teléfono</Label>
+                <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} className="font-body" />
+              </div>
+            </div>
+
+            {/* Guests */}
+            <div className="space-y-1.5">
+              <Label className="font-body font-bold text-sm">Personas</Label>
+              <select
+                value={editGuests}
+                onChange={async (e) => {
+                  setEditGuests(e.target.value);
+                  if (editReservation) {
+                    await loadEditAvailability(editReservation.location, editDate, parseInt(e.target.value) || 2, editReservation.allIds);
+                    if (editUnavailable.has(editTime)) setEditTime("");
+                  }
+                }}
+                className="w-full px-3 py-2 rounded-sm bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={String(n)}>{n} {n === 1 ? "persona" : "personas"}</option>
+                ))}
+              </select>
+              {parseInt(editGuests) > 6 && (
+                <p className="text-xs text-muted-foreground font-body">
+                  Se asignarán 2 mesas automáticamente ({editGuests} personas)
+                </p>
+              )}
+              {parseInt(editGuests) <= 6 && editReservation && editReservation.tableIds.length > 1 && (
+                <p className="text-xs text-menu-teal font-body">
+                  Al bajar a {editGuests} personas se liberará 1 mesa
+                </p>
+              )}
+            </div>
+
+            {/* Date */}
+            <div className="space-y-1.5">
+              <Label className="font-body font-bold text-sm">Fecha</Label>
+              <div className="border border-input rounded-sm overflow-hidden">
+                <Calendar
+                  mode="single"
+                  selected={editDate}
+                  onSelect={async (d) => {
+                    if (!d || !editReservation) return;
+                    setEditDate(d);
+                    setEditTime("");
+                    await loadEditAvailability(editReservation.location, d, parseInt(editGuests) || 2, editReservation.allIds);
+                  }}
+                  locale={es}
+                  disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                  className="p-3"
+                />
+              </div>
+            </div>
+
+            {/* Time slots */}
+            <div className="space-y-1.5">
+              <Label className="font-body font-bold text-sm">Hora</Label>
+              <div className="grid grid-cols-4 gap-2">
+                {TIME_SLOTS.map((slot) => {
+                  const unavailable = editUnavailable.has(slot);
+                  const selected = editTime === slot;
+                  return (
+                    <button
+                      key={slot}
+                      type="button"
+                      disabled={unavailable}
+                      onClick={() => setEditTime(slot)}
+                      className={cn(
+                        "py-2 rounded-sm text-sm font-body font-bold border transition-colors",
+                        selected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : unavailable
+                            ? "bg-muted text-muted-foreground border-muted cursor-not-allowed line-through opacity-50"
+                            : "bg-background text-foreground border-input hover:border-primary hover:bg-primary/5"
+                      )}
+                    >
+                      {slot}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-1.5">
+              <Label className="font-body font-bold text-sm">Notas</Label>
+              <Textarea
+                value={editNotes}
+                onChange={(e) => setEditNotes(e.target.value)}
+                rows={2}
+                className="font-body resize-none"
+                placeholder="Alergias, preferencias, ocasión especial…"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setEditReservation(null)} className="font-body">
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={editSaving || !editTime || !editName.trim()}
+              className="font-body font-bold"
+            >
+              {editSaving ? "Guardando…" : "Guardar cambios"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

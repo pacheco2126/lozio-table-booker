@@ -50,6 +50,7 @@ interface Reservation {
   notes: string | null;
   guest_name: string;
   table_id: string | null;
+  table_ids: string[] | null;
   created_at: string;
 }
 
@@ -88,6 +89,11 @@ function groupReservations(reservations: Reservation[]): GroupedReservation[] {
     const allIds = [r.id, ...siblings.map((s) => s.id)];
     allIds.forEach((id) => used.add(id));
 
+    // New schema: single row with table_ids array. Legacy: multiple rows grouped.
+    const resolvedTableIds: (string | null)[] = r.table_ids?.length
+      ? r.table_ids
+      : [r.table_id, ...siblings.map((s) => s.table_id)];
+
     groups.push({
       ids: allIds,
       reservation_date: r.reservation_date,
@@ -97,7 +103,7 @@ function groupReservations(reservations: Reservation[]): GroupedReservation[] {
       status: r.status,
       notes: r.notes,
       guest_name: r.guest_name,
-      table_ids: [r.table_id, ...siblings.map((s) => s.table_id)],
+      table_ids: resolvedTableIds,
     });
   }
 
@@ -184,7 +190,7 @@ const MyReservations = () => {
   const loadAvailability = async (location: string, date: Date, guests: number, excludeIds: string[]) => {
     const query = supabase
       .from("reservations")
-      .select("reservation_time, guests, table_id")
+      .select("reservation_time, guests, table_id, table_ids")
       .eq("location", location)
       .eq("reservation_date", format(date, "yyyy-MM-dd"))
       .in("status", ["pending", "confirmed"]);
