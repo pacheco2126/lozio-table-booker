@@ -58,8 +58,8 @@ serve(async (req) => {
     const { data: tablesData } = await supabase.from("tables").select("id, name").in("id", tableIds);
     const tableNames = tablesData?.map((t) => t.name).join(" + ") || "asignada";
 
-    // Create one reservation per table (linked by same details)
-    const reservationInserts = tableIds.map((tableId: string) => ({
+    // Create a single reservation with all assigned tables
+    const reservationInsert = {
       location,
       guest_name,
       email: "online@reserva.lozio",
@@ -69,13 +69,14 @@ serve(async (req) => {
       guests: String(guestsNum),
       notes: tableIds.length > 1 ? `${notes || ""} [Grupo ${guestsNum}p: ${tableNames}]`.trim() : (notes || null),
       user_id: user_id || null,
-      table_id: tableId,
+      table_id: tableIds[0],
+      table_ids: tableIds,
       status: "confirmed",
-    }));
+    };
 
     const { data: reservations, error: insertError } = await supabase
       .from("reservations")
-      .insert(reservationInserts)
+      .insert([reservationInsert])
       .select();
 
     if (insertError) {
