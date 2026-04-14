@@ -21,7 +21,9 @@ import {
   Trash2,
   Clock,
   Phone,
+  User,
 } from "lucide-react";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { locationsData } from "@/lib/locations";
 import { getNearestStore } from "@/lib/nearestStore";
 import {
@@ -49,6 +51,11 @@ const Checkout = () => {
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [profileAddress, setProfileAddress] = useState<{
+    address: string;
+    city: string;
+    postalCode: string;
+  } | null>(null);
 
   // "asap" = as soon as possible (only when open), "scheduled" = user picks time
   const [scheduleMode, setScheduleMode] = useState<"asap" | "scheduled">(() =>
@@ -76,14 +83,14 @@ const Checkout = () => {
     return d;
   })();
 
-  // Pre-fill contact info from user profile — wait for auth to finish loading
+  // Pre-fill contact info and address from user profile — wait for auth to finish loading
   useEffect(() => {
     if (authLoading || !user) return;
     const loadProfile = async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, phone")
-        .eq("id", user.id)
+        .select("full_name, phone, address, city, postal_code")
+        .eq("user_id", user.id)
         .single();
       setForm((prev) => ({
         ...prev,
@@ -91,6 +98,13 @@ const Checkout = () => {
         phone: data?.phone ?? prev.phone,
         email: user.email ?? prev.email,
       }));
+      if (data?.address) {
+        setProfileAddress({
+          address: data.address ?? "",
+          city: data.city ?? "",
+          postalCode: data.postal_code ?? "",
+        });
+      }
     };
     loadProfile();
   }, [user, authLoading]);
@@ -141,6 +155,9 @@ const Checkout = () => {
     address: "",
     city: "",
     postalCode: "",
+    staircase: "",
+    floor: "",
+    door: "",
     paymentMethod: "cash" as "cash" | "stripe",
     notes: "",
   });
@@ -195,7 +212,14 @@ const Checkout = () => {
           guest_phone: form.phone,
           order_type: form.orderType,
           pickup_store: assignedStore,
-          delivery_address: form.orderType === "delivery" ? form.address : null,
+          delivery_address: form.orderType === "delivery"
+            ? [
+                form.address,
+                form.staircase ? `Esc. ${form.staircase}` : null,
+                form.floor ? `Piso ${form.floor}` : null,
+                form.door ? `Puerta ${form.door}` : null,
+              ].filter(Boolean).join(", ")
+            : null,
           delivery_city: form.orderType === "delivery" ? form.city : null,
           delivery_postal_code: form.orderType === "delivery" ? form.postalCode : null,
           payment_method: form.paymentMethod,
@@ -636,36 +660,105 @@ const Checkout = () => {
                 )}
 
                 {form.orderType === "delivery" && (
-                  <div className="mt-4 grid sm:grid-cols-2 gap-4">
-                    <div className="sm:col-span-2">
-                      <Label htmlFor="address">{t("checkout.address")} *</Label>
-                      <Input
-                        id="address"
-                        value={form.address}
-                        onChange={(e) => updateField("address", e.target.value)}
-                        placeholder={t("checkout.addressPlaceholder")}
-                      />
-                      {errors.address && (
-                        <p className="text-destructive text-xs mt-1">{errors.address}</p>
-                      )}
-                    </div>
-                    <div>
-                      <Label htmlFor="city">{t("checkout.city")}</Label>
-                      <Input
-                        id="city"
-                        value={form.city}
-                        onChange={(e) => updateField("city", e.target.value)}
-                        placeholder={t("checkout.cityPlaceholder")}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="postalCode">{t("checkout.postalCode")}</Label>
-                      <Input
-                        id="postalCode"
-                        value={form.postalCode}
-                        onChange={(e) => updateField("postalCode", e.target.value)}
-                        placeholder={t("checkout.postalCodePlaceholder")}
-                      />
+                  <div className="mt-4 space-y-4">
+                    {/* Copy address from profile */}
+                    {user && profileAddress && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            address: profileAddress.address,
+                            city: profileAddress.city,
+                            postalCode: profileAddress.postalCode,
+                          }));
+                          setErrors((prev) => ({ ...prev, address: "" }));
+                        }}
+                        className="w-full flex items-center gap-2.5 px-4 py-3 rounded-lg border-2 border-dashed border-menu-teal/50 bg-menu-teal/5 hover:bg-menu-teal/10 hover:border-menu-teal transition-all text-left"
+                      >
+                        <User className="w-4 h-4 text-menu-teal shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-display font-bold text-sm text-menu-teal">
+                            Enviarme a mi dirección
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {[profileAddress.address, profileAddress.postalCode, profileAddress.city]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </p>
+                        </div>
+                      </button>
+                    )}
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="sm:col-span-2">
+                        <Label htmlFor="address">{t("checkout.address")} *</Label>
+                        <AddressAutocomplete
+                          value={form.address}
+                          onChange={(v) => updateField("address", v)}
+                          onSelect={({ address, city, postalCode }) => {
+                            setForm((prev) => ({
+                              ...prev,
+                              address,
+                              city: city || prev.city,
+                              postalCode: postalCode || prev.postalCode,
+                            }));
+                            setErrors((prev) => ({ ...prev, address: "" }));
+                          }}
+                          placeholder={t("checkout.addressPlaceholder")}
+                          error={errors.address}
+                        />
+                      </div>
+
+                      {/* Escalera / Piso / Puerta */}
+                      <div className="sm:col-span-2 grid grid-cols-3 gap-3">
+                        <div>
+                          <Label htmlFor="staircase">Escalera</Label>
+                          <Input
+                            id="staircase"
+                            value={form.staircase}
+                            onChange={(e) => updateField("staircase", e.target.value)}
+                            placeholder="A, B…"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="floor">Piso</Label>
+                          <Input
+                            id="floor"
+                            value={form.floor}
+                            onChange={(e) => updateField("floor", e.target.value)}
+                            placeholder="1º, 2º…"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="door">Puerta</Label>
+                          <Input
+                            id="door"
+                            value={form.door}
+                            onChange={(e) => updateField("door", e.target.value)}
+                            placeholder="1, 2ª…"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="city">{t("checkout.city")}</Label>
+                        <Input
+                          id="city"
+                          value={form.city}
+                          onChange={(e) => updateField("city", e.target.value)}
+                          placeholder={t("checkout.cityPlaceholder")}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="postalCode">{t("checkout.postalCode")}</Label>
+                        <Input
+                          id="postalCode"
+                          value={form.postalCode}
+                          onChange={(e) => updateField("postalCode", e.target.value)}
+                          placeholder={t("checkout.postalCodePlaceholder")}
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
