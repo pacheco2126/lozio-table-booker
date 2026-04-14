@@ -183,7 +183,9 @@ const MyReservations = () => {
     setEditDate(d);
     setEditTime(r.reservation_time.substring(0, 5));
     setEditGuests(r.guests);
-    setEditNotes(r.notes || "");
+    // Strip auto-generated group tags like "[Grupo 8p: Mesa 1 + Mesa 2]" from notes
+    const cleanNotes = (r.notes || "").replace(/\[Grupo \d+p:[^\]]*\]/g, "").trim();
+    setEditNotes(cleanNotes);
     await loadAvailability(r.location, d, parseInt(r.guests) || 2, r.ids);
   };
 
@@ -220,36 +222,54 @@ const MyReservations = () => {
     if (!editDialog || !user) return;
     setSaving(true);
 
-    // Get email/phone from the original reservation
-    const original = reservations.find((r) => r.id === editDialog.ids[0]);
+    const primaryId = editDialog.ids[0];
+    const originalStatus = editDialog.status;
+    const newDate = format(editDate, "yyyy-MM-dd");
+    const newGuests = parseInt(editGuests) || 2;
 
-    const { data, error } = await supabase.functions.invoke("auto-assign-reservation", {
-      body: {
-        location: editDialog.location,
-        guest_name: editDialog.guest_name,
-        phone: (original as any)?.phone || "",
-        reservation_date: format(editDate, "yyyy-MM-dd"),
-        reservation_time: editTime,
-        guests: editGuests,
-        notes: editNotes || null,
-        user_id: user.id,
-      },
+    // Temporarily cancel all rows so the RPC doesn't count this
+    // reservation's own tables as occupied when recalculating.
+    for (const id of editDialog.ids) {
+      await supabase.from("reservations").update({ status: "cancelled" }).eq("id", id).eq("user_id", user.id);
+    }
+
+    // Find tables for the new configuration.
+    const { data: tableIds, error: rpcError } = await supabase.rpc("find_available_tables_multi", {
+      _location: editDialog.location,
+      _date: newDate,
+      _time: editTime + ":00",
+      _guests: newGuests,
     });
 
-    if (error || !data?.success) {
-      toast.error(data?.message || t("myReservations.editError", "No hay disponibilidad para esa fecha/hora"));
+    if (rpcError || !tableIds || tableIds.length === 0) {
+      // Revert: restore original status so the reservation is not lost.
+      for (const id of editDialog.ids) {
+        await supabase.from("reservations").update({ status: originalStatus }).eq("id", id).eq("user_id", user.id);
+      }
+      toast.error(t("myReservations.editError", "No hay disponibilidad para esa fecha/hora"));
       setSaving(false);
       return;
     }
 
-    // Cancel all old reservation rows
-    for (const id of editDialog.ids) {
-      await supabase
-        .from("reservations")
-        .update({ status: "cancelled" })
-        .eq("id", id)
-        .eq("user_id", user.id);
-    }
+    // Build notes: re-add group tag only if multi-table, without duplicating.
+    const { data: tablesData } = await supabase.from("tables").select("id, name").in("id", tableIds);
+    const tableNames = tablesData?.map((t: any) => t.name).join(" + ") || "";
+    const notesValue = tableIds.length > 1
+      ? `[Grupo ${newGuests}p: ${tableNames}]${editNotes ? " " + editNotes : ""}`.trim()
+      : editNotes.trim() || null;
+
+    // Update the primary row in-place — no new reservation created.
+    await supabase.from("reservations").update({
+      reservation_date: newDate,
+      reservation_time: editTime + ":00",
+      guests: editGuests,
+      notes: notesValue,
+      table_id: tableIds[0],
+      table_ids: tableIds,
+      status: originalStatus,
+    }).eq("id", primaryId).eq("user_id", user.id);
+
+    // Legacy extra rows (2-row old bookings) remain cancelled — primary row has all info.
 
     toast.success(t("myReservations.editSuccess", "Reserva modificada correctamente"));
     setEditDialog(null);

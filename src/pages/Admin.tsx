@@ -158,7 +158,8 @@ const Admin = () => {
     setEditPhone(r.phone);
     setEditEmail(r.email || "");
     setEditGuests(r.guests);
-    setEditNotes(r.notes || "");
+    const cleanNotes = (r.notes || "").replace(/\[Grupo \d+p:[^\]]*\]/g, "").trim();
+    setEditNotes(cleanNotes);
     const d = new Date(r.reservation_date + "T00:00:00");
     setEditDate(d);
     setEditTime(r.reservation_time.substring(0, 5));
