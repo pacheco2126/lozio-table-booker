@@ -169,28 +169,53 @@ const Admin = () => {
     if (!editReservation) return;
     setEditSaving(true);
 
-    const { data, error } = await supabase.functions.invoke("auto-assign-reservation", {
-      body: {
-        location: editReservation.location,
-        guest_name: editName.trim(),
-        phone: editPhone.trim(),
-        email: editEmail.trim() || undefined,
-        reservation_date: format(editDate, "yyyy-MM-dd"),
-        reservation_time: editTime,
-        guests: editGuests,
-        notes: editNotes.trim() || null,
-        user_id: editReservation.user_id || null,
-      },
+    const primaryId = editReservation.allIds[0];
+    const originalStatus = editReservation.status;
+    const newDate = format(editDate, "yyyy-MM-dd");
+    const newGuests = parseInt(editGuests) || 2;
+
+    // Temporarily cancel all rows so find_available_tables_multi
+    // doesn't count this reservation's own tables as occupied.
+    await supabase.from("reservations").update({ status: "cancelled" }).in("id", editReservation.allIds);
+
+    // Find the right tables for the new configuration.
+    const { data: tableIds, error: rpcError } = await supabase.rpc("find_available_tables_multi", {
+      _location: editReservation.location,
+      _date: newDate,
+      _time: editTime + ":00",
+      _guests: newGuests,
     });
 
-    if (error || !data?.success) {
-      toast.error(data?.message || "No hay disponibilidad para esa fecha/hora");
+    if (rpcError || !tableIds || tableIds.length === 0) {
+      // Revert: restore original status so the reservation is not lost.
+      await supabase.from("reservations").update({ status: originalStatus }).in("id", editReservation.allIds);
+      toast.error("No hay disponibilidad para esa fecha/hora");
       setEditSaving(false);
       return;
     }
 
-    // Cancel all old reservation rows (admin can cancel any, no user_id check)
-    await supabase.from("reservations").update({ status: "cancelled" }).in("id", editReservation.allIds);
+    // Get table names for the notes field.
+    const { data: tablesData } = await supabase.from("tables").select("id, name").in("id", tableIds);
+    const tableNames = tablesData?.map((t: any) => t.name).join(" + ") || "";
+    const notesValue = tableIds.length > 1
+      ? `[Grupo ${newGuests}p: ${tableNames}]${editNotes.trim() ? " " + editNotes.trim() : ""}`.trim()
+      : editNotes.trim() || null;
+
+    // Update the primary row in-place — no new reservation is created.
+    await supabase.from("reservations").update({
+      guest_name: editName.trim(),
+      phone: editPhone.trim(),
+      reservation_date: newDate,
+      reservation_time: editTime + ":00",
+      guests: editGuests,
+      notes: notesValue,
+      table_id: tableIds[0],
+      table_ids: tableIds,
+      status: originalStatus,
+    }).eq("id", primaryId);
+
+    // If this was a legacy 2-row booking, keep the extra rows cancelled.
+    // (they are already cancelled from the temp step above)
 
     toast.success("Reserva modificada correctamente");
     setEditReservation(null);
