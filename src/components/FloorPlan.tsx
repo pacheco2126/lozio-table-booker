@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { cn } from "@/lib/utils";
 
 interface Table { id: string; name: string; capacity: number; position_x: number; position_y: number; shape: string; is_active: boolean; location: string; }
-interface Reservation { id: string; table_id: string | null; guest_name: string; email: string; phone: string; reservation_date: string; reservation_time: string; guests: string; notes: string | null; status: string; location: string; user_id: string | null; }
+interface Reservation { id: string; table_id: string | null; table_ids: string[] | null; guest_name: string; email: string; phone: string; reservation_date: string; reservation_time: string; guests: string; notes: string | null; status: string; location: string; user_id: string | null; }
 interface GuestProfile { allergies: string[] | null; food_preferences: string | null; favorite_table_area: string | null; internal_notes: string | null; visit_count: number | null; }
 
 const ONLINE_TABLE_NAMES = ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5","Mesa 6","Mesa 7","Mesa 8"];
@@ -73,7 +73,7 @@ const FloorPlan = () => {
     const now = parse(selectedTime, "HH:mm", new Date());
     const soon = addMinutes(now, 30);
     for (const res of reservations) {
-      if (res.table_id !== table.id) continue;
+      if (res.table_id !== table.id && !res.table_ids?.includes(table.id)) continue;
       const resTime = parse(res.reservation_time.substring(0, 5), "HH:mm", new Date());
       const resEnd = addMinutes(resTime, RESERVATION_DURATION);
       if (now >= resTime && now < resEnd) return "occupied";
@@ -86,7 +86,7 @@ const FloorPlan = () => {
     const now = parse(selectedTime, "HH:mm", new Date());
     const soon = addMinutes(now, 30);
     for (const res of reservations) {
-      if (res.table_id !== table.id) continue;
+      if (res.table_id !== table.id && !res.table_ids?.includes(table.id)) continue;
       const resTime = parse(res.reservation_time.substring(0, 5), "HH:mm", new Date());
       const resEnd = addMinutes(resTime, RESERVATION_DURATION);
       if ((now >= resTime && now < resEnd) || (resTime > now && resTime <= soon)) return res;
