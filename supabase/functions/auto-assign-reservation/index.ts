@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { location, guest_name, phone, reservation_date, reservation_time, guests, notes, user_id } =
+    const { location, guest_name, phone, reservation_date, reservation_time, guests, notes, user_id, is_admin } =
       await req.json();
 
     if (!location || !guest_name || !phone || !reservation_date || !reservation_time || !guests) {
@@ -21,7 +21,7 @@ serve(async (req) => {
     }
 
     const guestsNum = parseInt(guests) || 2;
-    if (guestsNum < 1 || guestsNum > 10) {
+    if (!is_admin && (guestsNum < 1 || guestsNum > 10)) {
       throw new Error("El número de comensales debe ser entre 1 y 10 para reservas online.");
     }
 
