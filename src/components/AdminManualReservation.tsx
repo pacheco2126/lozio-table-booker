@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
 import { CalendarIcon, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ONLINE_TABLE_NAMES } from "@/lib/availability";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -12,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const timeSlots = ["19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00"];
-const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 
 interface Props { onCreated: () => void; }
@@ -24,6 +24,23 @@ const AdminManualReservation = ({ onCreated }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ location: "arrabassada", guest_name: "", email: "", phone: "", guests: "2", time: "20:00", notes: "", source: "phone" });
   const [date, setDate] = useState<Date>(new Date());
+  const [maxCapacity, setMaxCapacity] = useState(48);
+
+  useEffect(() => {
+    const fetchCapacity = async () => {
+      const { data } = await supabase
+        .from("tables")
+        .select("name, capacity")
+        .eq("location", form.location)
+        .eq("is_active", true);
+      if (data) {
+        const online = data.filter((t) => ONLINE_TABLE_NAMES.includes(t.name));
+        const total = online.reduce((sum, t) => sum + t.capacity, 0);
+        if (total > 0) setMaxCapacity(total);
+      }
+    };
+    fetchCapacity();
+  }, [form.location]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -42,7 +59,7 @@ const AdminManualReservation = ({ onCreated }: Props) => {
       body: {
         location: form.location, guest_name: form.guest_name,
         phone: form.phone, reservation_date: format(date, "yyyy-MM-dd"),
-        reservation_time: form.time + ":00", guests: form.guests, notes: fullNotes, user_id: null,
+        reservation_time: form.time + ":00", guests: form.guests, notes: fullNotes, user_id: null, is_admin: true,
       },
     });
     setSubmitting(false);
@@ -108,11 +125,21 @@ const AdminManualReservation = ({ onCreated }: Props) => {
             </div>
           </div>
           <div>
-            <label className="block font-body text-sm font-bold text-foreground mb-1.5">{t("admin.guestsLabel")} *</label>
-            <select name="guests" value={form.guests} onChange={handleChange}
-              className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-              {guestOptions.map((n) => (<option key={n} value={n}>{n}</option>))}<option value="10+">+10</option>
-            </select>
+            <label className="block font-body text-sm font-bold text-foreground mb-1.5">
+              {t("admin.guestsLabel")} * <span className="text-muted-foreground font-normal text-xs">(máx. {maxCapacity})</span>
+            </label>
+            <input
+              type="number"
+              name="guests"
+              min={1}
+              max={maxCapacity}
+              value={form.guests}
+              onChange={(e) => {
+                const val = Math.max(1, Math.min(maxCapacity, parseInt(e.target.value) || 1));
+                setForm((prev) => ({ ...prev, guests: String(val) }));
+              }}
+              className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
