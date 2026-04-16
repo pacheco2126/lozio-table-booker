@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,13 +14,31 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, orderId, currency = "eur" } = await req.json();
+    const { orderId, currency = "eur" } = await req.json();
 
-    if (!amount || amount <= 0) {
-      throw new Error("Invalid amount");
-    }
     if (!orderId) {
       throw new Error("orderId is required");
+    }
+
+    // Calculate total server-side from order_items — never trust client amount
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    const { data: orderItems, error: itemsError } = await supabase
+      .from("order_items")
+      .select("total_price")
+      .eq("order_id", orderId);
+
+    if (itemsError || !orderItems || orderItems.length === 0) {
+      throw new Error("Order items not found");
+    }
+
+    const amount = orderItems.reduce((sum: number, item: { total_price: number }) => sum + item.total_price, 0);
+
+    if (amount <= 0) {
+      throw new Error("Invalid order amount");
     }
 
     const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");

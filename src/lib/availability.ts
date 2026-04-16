@@ -23,6 +23,7 @@ interface Reservation {
   reservation_time: string;
   guests: string;
   table_id?: string | null;
+  table_ids?: string[] | null;
 }
 
 interface TableInfo {
@@ -68,7 +69,8 @@ export function getUnavailableSlots(
       // Find all free tables during this slot
       const freeTables = onlineTables.filter((table) => {
         const isOccupied = existingReservations.some((res) => {
-          if (res.table_id !== table.id) return false;
+          const usesTable = res.table_id === table.id || res.table_ids?.includes(table.id);
+          if (!usesTable) return false;
           const resStart = timeToMinutes(res.reservation_time);
           const resEnd = resStart + 90;
           return slotStart < resEnd && resStart < slotEnd;

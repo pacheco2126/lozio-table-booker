@@ -50,6 +50,48 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_items: {
+        Row: {
+          allergens: string[] | null
+          badge_emoji: string | null
+          badge_key: string | null
+          badge_style: string | null
+          category: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          price: number
+          sort_order: number | null
+        }
+        Insert: {
+          allergens?: string[] | null
+          badge_emoji?: string | null
+          badge_key?: string | null
+          badge_style?: string | null
+          category: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          price: number
+          sort_order?: number | null
+        }
+        Update: {
+          allergens?: string[] | null
+          badge_emoji?: string | null
+          badge_key?: string | null
+          badge_style?: string | null
+          category?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          price?: number
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
@@ -102,7 +144,10 @@ export type Database = {
           order_type: string
           payment_method: string
           payment_status: string
+          pickup_store: string | null
+          scheduled_for: string | null
           status: string
+          stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           total_amount: number
           user_id: string | null
@@ -120,7 +165,10 @@ export type Database = {
           order_type?: string
           payment_method?: string
           payment_status?: string
+          pickup_store?: string | null
+          scheduled_for?: string | null
           status?: string
+          stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount?: number
           user_id?: string | null
@@ -138,7 +186,10 @@ export type Database = {
           order_type?: string
           payment_method?: string
           payment_status?: string
+          pickup_store?: string | null
+          scheduled_for?: string | null
           status?: string
+          stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           total_amount?: number
           user_id?: string | null
@@ -216,6 +267,7 @@ export type Database = {
           reservation_time: string
           status: string
           table_id: string | null
+          table_ids: string[] | null
           user_id: string | null
         }
         Insert: {
@@ -231,6 +283,7 @@ export type Database = {
           reservation_time: string
           status?: string
           table_id?: string | null
+          table_ids?: string[] | null
           user_id?: string | null
         }
         Update: {
@@ -246,6 +299,7 @@ export type Database = {
           reservation_time?: string
           status?: string
           table_id?: string | null
+          table_ids?: string[] | null
           user_id?: string | null
         }
         Relationships: [
