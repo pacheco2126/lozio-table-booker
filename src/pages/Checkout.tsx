@@ -145,7 +145,7 @@ const Checkout = () => {
         // Get PaymentIntent clientSecret from Edge Function
         const { data: fnData, error: fnError } = await supabase.functions.invoke(
           "create-payment-intent",
-          { body: { amount: totalPrice, orderId: order.id } },
+          { body: { orderId: order.id } },
         );
 
         if (fnError || !fnData?.clientSecret) {
