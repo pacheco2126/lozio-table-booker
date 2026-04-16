@@ -37,26 +37,42 @@ export const usePushSubscription = () => {
 
     const subscribe = async () => {
       try {
+        console.log('[Push] Starting subscription flow for user', user.id);
         const permission = await Notification.requestPermission();
+        console.log('[Push] Permission:', permission);
         if (permission !== 'granted') return;
 
         const registration = await navigator.serviceWorker.ready;
+        console.log('[Push] SW ready, scope:', registration.scope);
 
-        // Reuse existing subscription if the browser already has one
-        const existing = await registration.pushManager.getSubscription();
-        if (existing) {
-          await saveSubscription(existing, user.id);
-          return;
+        let subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          console.log('[Push] Reusing existing subscription:', subscription.endpoint);
+        } else {
+          console.log('[Push] Creating new subscription...');
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
+          });
+          console.log('[Push] New subscription created:', subscription.endpoint);
         }
 
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
-        });
-
-        await saveSubscription(subscription, user.id);
+        const { error } = await supabase.from('push_subscriptions').upsert(
+          {
+            user_id: user.id,
+            endpoint: subscription.endpoint,
+            p256dh: subscription.toJSON().keys?.p256dh ?? '',
+            auth: subscription.toJSON().keys?.auth ?? '',
+          },
+          { onConflict: 'endpoint' },
+        );
+        if (error) {
+          console.error('[Push] Failed to save subscription:', error);
+        } else {
+          console.log('[Push] Subscription saved to DB ✓');
+        }
       } catch (err) {
-        console.error('Push subscription error:', err);
+        console.error('[Push] Subscription error:', err);
       }
     };
 
