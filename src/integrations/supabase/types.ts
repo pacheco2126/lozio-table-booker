@@ -50,6 +50,48 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_items: {
+        Row: {
+          allergens: string[] | null
+          badge_emoji: string | null
+          badge_key: string | null
+          badge_style: string | null
+          category: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          price: number
+          sort_order: number | null
+        }
+        Insert: {
+          allergens?: string[] | null
+          badge_emoji?: string | null
+          badge_key?: string | null
+          badge_style?: string | null
+          category: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          price: number
+          sort_order?: number | null
+        }
+        Update: {
+          allergens?: string[] | null
+          badge_emoji?: string | null
+          badge_key?: string | null
+          badge_style?: string | null
+          category?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          price?: number
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
