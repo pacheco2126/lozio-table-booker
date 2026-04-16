@@ -11,6 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { getAllergenById } from "@/lib/allergens";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MenuItemData {
   name: string;
@@ -22,286 +23,9 @@ interface MenuItemData {
   badge?: { key: string; emoji: string; style: "fire" | "gold" | "teal" };
 }
 
-const menuItems: MenuItemData[] = [
-  // Pizzas
-  {
-    name: "MARINARA",
-    desc: "Tomate, ajo y orégano.",
-    price: "9,50 €",
-    priceNum: 9.5,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "MARGHERITA",
-    desc: "Tomate, mozzarella.",
-    price: "10,00 €",
-    priceNum: 10,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "SICILIANA",
-    desc: "Tomate, mozzarella, anchoas, alcaparras y olivas.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "pescado"],
-    category: "pizzas",
-  },
-  {
-    name: "FUNGHI",
-    desc: "Tomate, mozzarella y champiñones.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "GRECA",
-    desc: "Tomate, mozzarella y olivas negras.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "TEDESCA",
-    desc: "Tomate, mozzarella y frankfurt.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "soja", "mostaza", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "PICCANTE",
-    desc: "Tomate, mozzarella y chorizo picante.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "mostaza", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "TARRAGONINA",
-    desc: "Tomate, mozzarella, jamón y huevo.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "huevo", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "PROSCIUTTO",
-    desc: "Tomate, mozzarella y jamón dulce.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "RÚSTICA",
-    desc: "Tomate, mozzarella, bacon y cebolla.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "CALABRESE",
-    desc: "Tomate, mozzarella y embutido picante de Calabria.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "TONNARA",
-    desc: "Tomate, mozzarella y atún.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "pescado"],
-    category: "pizzas",
-  },
-  {
-    name: "CATALANA",
-    desc: "Base carbonara y bacon.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "huevo", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "VEGETARIANA",
-    desc: "Tomate, mozzarella, pimiento rojo, calabacín y berenjena.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "4 STAGIONI",
-    desc: "Tomate, mozzarella, champiñones, jamón dulce, alcachofas y embutido picante.",
-    price: "12,00 €",
-    priceNum: 12,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "ITALIANA",
-    badge: { key: "badgeGold", emoji: "🏛️", style: "gold" },
-    desc: "Tomate, mozzarella búfala, tomate cherry y albahaca.",
-    price: "14,00 €",
-    priceNum: 14,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "CIOCIARA",
-    desc: "Mozzarella, longaniza Friarielli y tomate cherry.",
-    price: "15,00 €",
-    priceNum: 15,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "FANTASÍA",
-    desc: "Tomate, mozzarella, y 4 ingredientes a escoger.",
-    price: "16,00 €",
-    priceNum: 16,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "MILANO",
-    desc: "Tomate, mozzarella y salami milano.",
-    price: "12,00 €",
-    priceNum: 12,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "BOSCAIOLA",
-    badge: { key: "badgeTeal", emoji: "⭐", style: "teal" },
-    desc: "Tomate, mozzarella, longaniza, champiñones y pimienta negra.",
-    price: "13,50 €",
-    priceNum: 13.5,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "SPECK",
-    desc: "Tomate, mozzarella, jamón ahumado y champiñones.",
-    price: "14,00 €",
-    priceNum: 14,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "TROPEA",
-    desc: "Mozzarella, cebolla roja, tomate natural y albahaca.",
-    price: "13,00 €",
-    priceNum: 13,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "HAWAI",
-    desc: "Tomate, mozzarella, piña, maíz y jamón.",
-    price: "13,00 €",
-    priceNum: 13,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "BRESAOLINA",
-    desc: "Tomate, mozzarella, embutido bresaola, rúcula y queso Grana Padano.",
-    price: "14,00 €",
-    priceNum: 14,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "4 FORMAGGI",
-    desc: "Tomate, mozzarella, gorgonzola, fontina, Emmental y queso de cabra.",
-    price: "13,50 €",
-    priceNum: 13.5,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "NORVEGIA",
-    desc: "Mozzarella, burrata, salmón ahumado y rúcula.",
-    price: "18,50 €",
-    priceNum: 18.5,
-    allergens: ["gluten", "lacteos", "pescado", "sulfitos"],
-    category: "pizzas",
-  },
-  {
-    name: "SALENTINA",
-    desc: "Mozzarella, burrata, tomate seco y rúcula.",
-    price: "15,50 €",
-    priceNum: 15.5,
-    allergens: ["gluten", "lacteos"],
-    category: "pizzas",
-  },
-  {
-    name: "LOMBARDA",
-    desc: "Mozzarella, porchetta, scamorza, tomate cherry.",
-    price: "16,00 €",
-    priceNum: 16,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "pizzas",
-  },
-  // Focaccias
-  {
-    name: "FOCACCIA CRUDO",
-    desc: "Aceite, romero, sal y jamón serrano.",
-    price: "11,50 €",
-    priceNum: 11.5,
-    allergens: ["gluten", "sulfitos"],
-    category: "focaccias",
-  },
-  {
-    name: "FOCACCIA CAPRESE",
-    desc: "Aceite, tomate fresco, mozzarella fresca y albahaca.",
-    price: "11,50 €",
-    priceNum: 11.5,
-    allergens: ["gluten", "lacteos"],
-    category: "focaccias",
-  },
-  {
-    name: "LA FOCACCIA DELLO ZIO",
-    badge: { key: "badgeFire", emoji: "🌶️", style: "fire" },
-    desc: "Bocconcini di mozzarella, salami picante, sobrasada picante, tomate fresco, aceite, orégano y guindilla.",
-    price: "15,00 €",
-    priceNum: 15,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "focaccias",
-  },
-  // Calzones
-  {
-    name: "CALZONE",
-    desc: "Tomate, mozzarella y jamón.",
-    price: "11,00 €",
-    priceNum: 11,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "calzones",
-  },
-  {
-    name: "BIG CALZONE",
-    desc: "Tomate, mozzarella, jamón, huevo y verdura.",
-    price: "14,00 €",
-    priceNum: 14,
-    allergens: ["gluten", "lacteos", "huevo", "sulfitos"],
-    category: "calzones",
-  },
-  {
-    name: "RUSTICELLA (Calzone)",
-    desc: "Tomate, mozzarella, jamón dulce, queso y verduras.",
-    price: "15,00 €",
-    priceNum: 15,
-    allergens: ["gluten", "lacteos", "sulfitos"],
-    category: "calzones",
-  },
-];
+function formatPrice(price: number): string {
+  return price.toFixed(2).replace(".", ",") + " €";
+}
 
 const categories = [
   { id: "pizzas" as const, icon: Flame },
@@ -410,6 +134,33 @@ const MenuSection = () => {
   const menuSectionRef = useRef<HTMLElement>(null);
   const [isSticky, setIsSticky] = useState(false);
   const [showCategoryNav, setShowCategoryNav] = useState(false);
+  const [menuItems, setMenuItems] = useState<MenuItemData[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("menu_items")
+      .select("name, description, price, category, allergens, badge_key, badge_emoji, badge_style")
+      .in("category", ["pizzas", "focaccias", "calzones"])
+      .eq("is_active", true)
+      .order("sort_order")
+      .then(({ data }) => {
+        if (data) {
+          setMenuItems(
+            data.map((item) => ({
+              name: item.name,
+              desc: item.description ?? undefined,
+              price: formatPrice(item.price),
+              priceNum: item.price,
+              allergens: (item.allergens as string[]) ?? undefined,
+              category: item.category as "pizzas" | "focaccias" | "calzones",
+              badge: item.badge_key
+                ? { key: item.badge_key, emoji: item.badge_emoji ?? "", style: item.badge_style as "fire" | "gold" | "teal" }
+                : undefined,
+            })),
+          );
+        }
+      });
+  }, []);
 
   const handleAdd = (item: MenuItemData) => {
     addItem({

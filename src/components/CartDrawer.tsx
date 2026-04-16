@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { Minus, Plus, Trash2, ShoppingBag, Wine, CakeSlice, ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UpsellItem {
   id: string;
@@ -12,23 +13,6 @@ interface UpsellItem {
   price: number;
   priceLabel: string;
 }
-
-const drinkOptions: UpsellItem[] = [
-  { id: "cerveza", name: "Cerveza", price: 3, priceLabel: "3,00 €" },
-  { id: "refresco", name: "Refresco", price: 2.5, priceLabel: "2,50 €" },
-  { id: "vino-botella", name: "Botella de vino", price: 20, priceLabel: "20,00 €" },
-  { id: "agua", name: "Agua", price: 2.5, priceLabel: "2,50 €" },
-];
-
-const extraOptions: UpsellItem[] = [
-  { id: "extra-verdura", name: "Extra: Verdura", price: 2, priceLabel: "+2,00 €" },
-  { id: "extra-embutido-queso", name: "Extra: Embutido / Queso", price: 3, priceLabel: "+3,00 €" },
-  { id: "extra-mozzarella-bufala", name: "Extra: Mozzarella búfala", price: 5, priceLabel: "+5,00 €" },
-];
-
-const dessertOptions: UpsellItem[] = [
-  { id: "tiramisu", name: "Tiramisú", price: 6, priceLabel: "6,00 €" },
-];
 
 const UpsellSection = ({
   icon,
@@ -83,6 +67,30 @@ const CartDrawer = () => {
   const { items, isOpen, setIsOpen, updateQuantity, removeItem, totalPrice, totalItems, addItem } = useCart();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [drinkOptions, setDrinkOptions] = useState<UpsellItem[]>([]);
+  const [extraOptions, setExtraOptions] = useState<UpsellItem[]>([]);
+  const [dessertOptions, setDessertOptions] = useState<UpsellItem[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("menu_items")
+      .select("id, name, price, category")
+      .in("category", ["drinks", "extras", "desserts"])
+      .eq("is_active", true)
+      .order("sort_order")
+      .then(({ data }) => {
+        if (!data) return;
+        const toUpsell = (item: { id: string; name: string; price: number }): UpsellItem => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          priceLabel: item.price.toFixed(2).replace(".", ",") + " €",
+        });
+        setDrinkOptions(data.filter((i) => i.category === "drinks").map(toUpsell));
+        setExtraOptions(data.filter((i) => i.category === "extras").map(toUpsell));
+        setDessertOptions(data.filter((i) => i.category === "desserts").map(toUpsell));
+      });
+  }, []);
 
   const handleCheckout = () => {
     setIsOpen(false);
