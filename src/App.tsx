@@ -13,6 +13,7 @@ import InstallBanner from "@/components/InstallBanner";
 import UpdateBanner from "@/components/UpdateBanner";
 import AdminFAB from "@/components/AdminFAB";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
+import { usePushSubscription } from "@/hooks/usePushSubscription";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import Index from "./pages/Index.tsx";
@@ -34,6 +35,7 @@ const queryClient = new QueryClient();
 
 const AdminNotificationListener = () => {
   useAdminNotifications();
+  usePushSubscription();
   return null;
 };
 
