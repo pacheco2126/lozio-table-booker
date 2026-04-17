@@ -46,7 +46,7 @@ const CLOSED_DAYS: Record<string, number[]> = {
 
 const timeSlots = ["19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00"];
 
-const guestOptions = Array.from({ length: 10 }, (_, i) => i + 1);
+const guestOptions = Array.from({ length: 15 }, (_, i) => i + 1);
 
 const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 
