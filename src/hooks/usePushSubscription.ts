@@ -21,17 +21,18 @@ export type PushStatus =
 
 async function persistSubscription(sub: PushSubscription, userId: string) {
   const json = sub.toJSON();
-  const { error } = await supabase.from('push_subscriptions').insert({
-    user_id: userId,
-    endpoint: sub.endpoint,
-    p256dh: json.keys?.p256dh ?? '',
-    auth: json.keys?.auth ?? '',
-  });
+  const { error } = await supabase.from('push_subscriptions').upsert(
+    {
+      user_id: userId,
+      endpoint: sub.endpoint,
+      p256dh: json.keys?.p256dh ?? '',
+      auth: json.keys?.auth ?? '',
+    },
+    { onConflict: 'endpoint' },
+  );
 
-  if (!error) return true;
-
-  if (error.code === '23505') {
-    console.log('[Push] Subscription already stored in DB');
+  if (!error) {
+    console.log('[Push] Subscription saved/updated in DB ✓');
     return true;
   }
 
