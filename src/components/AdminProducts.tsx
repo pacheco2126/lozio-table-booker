@@ -291,7 +291,7 @@ const AdminProducts = () => {
             <div>
               <Label>Alérgenos</Label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {ALLERGENS.map((a) => {
+                {EU_ALLERGENS.map((a) => {
                   const selected = (form.allergens ?? []).includes(a.id);
                   return (
                     <button
@@ -299,7 +299,7 @@ const AdminProducts = () => {
                       type="button"
                       onClick={() => toggleAllergen(a.id)}
                       className={`px-3 py-1.5 rounded-full text-xs font-body transition-colors ${selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-                    >{a.icon} {a.id}</button>
+                    >{a.emoji} {a.name}</button>
                   );
                 })}
               </div>
