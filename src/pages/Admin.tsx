@@ -66,6 +66,7 @@ const Admin = () => {
   const [showCancelledToday, setShowCancelledToday] = useState(false);
   const [cancelIds, setCancelIds] = useState<string[] | null>(null);
   const [cancelName, setCancelName] = useState("");
+  const [activeTab, setActiveTab] = useState("reservations");
 
   // Edit reservation state
   const [editReservation, setEditReservation] = useState<GroupedReservation | null>(null);
