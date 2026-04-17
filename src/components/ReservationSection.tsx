@@ -383,7 +383,7 @@ const ReservationSection = () => {
                           {n}
                         </option>
                       ))}
-                      <option value="10+">+10</option>
+                      <option value="15+">+15</option>
                     </select>
                   </div>
                   <div>
@@ -429,7 +429,9 @@ const ReservationSection = () => {
                   <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
                   <AlertDescription
                     className="text-yellow-800 dark:text-yellow-200 font-body text-sm"
-                    dangerouslySetInnerHTML={{ __html: `${t("reservation.durationWarning")} <strong>${t("reservation.durationTime")}</strong> ${t("reservation.durationWarningPost")}` }}
+                    dangerouslySetInnerHTML={{
+                      __html: `${t("reservation.durationWarning")} <strong>${t("reservation.durationTime")}</strong> ${t("reservation.durationWarningPost")}`,
+                    }}
                   />
                 </Alert>
 
