@@ -71,8 +71,11 @@ self.addEventListener('push', (event: PushEvent) => {
       // Unique tag so back-to-back reservations don't replace each other
       tag: `res-${Date.now()}`,
       requireInteraction: true,
+      // Vibrate on Android (iOS uses system sound automatically)
+      vibrate: [200, 100, 200, 100, 200],
+      renotify: true,
       data: { url: data.url ?? '/admin' },
-    }),
+    } as NotificationOptions),
   );
 });
 
