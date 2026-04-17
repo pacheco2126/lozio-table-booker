@@ -28,7 +28,7 @@ const PushNotificationToggle = () => {
       });
     } else if (status === 'denied') {
       toast.error('Permiso denegado', {
-        description: 'Activa las notificaciones en los Ajustes del sistema.',
+        description: 'Los permisos de notificaciones están bloqueados en este dispositivo.',
       });
     } else {
       toast.error('No se pudo activar', { description: 'Inténtalo de nuevo.' });
@@ -66,21 +66,6 @@ const PushNotificationToggle = () => {
     }
   };
 
-  if (status === 'denied') {
-    return (
-      <div className="flex items-center gap-3 p-3 rounded-lg bg-destructive/10 border border-destructive/30">
-        <BellOff className="w-5 h-5 text-destructive shrink-0" />
-        <div className="text-sm">
-          <p className="font-semibold text-destructive">Permiso bloqueado</p>
-          <p className="text-muted-foreground text-xs mt-1">
-            Has denegado las notificaciones para esta web. Actívalas desde los Ajustes del sistema
-            (iOS: Ajustes → Notificaciones → Lo Zio · Android: Ajustes de la app → Notificaciones).
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   if (status === 'granted-subscribed') {
     return (
       <div className="flex flex-col gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
@@ -113,16 +98,22 @@ const PushNotificationToggle = () => {
   return (
     <div className="flex items-center justify-between gap-3 p-3 rounded-lg bg-muted/50 border border-border">
       <div className="flex items-center gap-2">
-        <Bell className="w-5 h-5 text-muted-foreground" />
+        {status === 'denied' ? (
+          <BellOff className="w-5 h-5 text-muted-foreground" />
+        ) : (
+          <Bell className="w-5 h-5 text-muted-foreground" />
+        )}
         <div className="text-sm">
-          <p className="font-semibold text-foreground">Activar notificaciones</p>
+          <p className="font-semibold text-foreground">
+            {status === 'denied' ? 'Reactivar notificaciones' : 'Activar notificaciones'}
+          </p>
           <p className="text-xs text-muted-foreground">
             Imprescindible en iOS/Android para recibir reservas con la app cerrada.
           </p>
         </div>
       </div>
       <Button size="sm" onClick={handleEnable} disabled={busy}>
-        {busy ? 'Activando…' : 'Activar'}
+        {busy ? 'Activando…' : status === 'denied' ? 'Reactivar' : 'Activar'}
       </Button>
     </div>
   );
