@@ -44,11 +44,13 @@ export const usePushSubscription = () => {
   const [status, setStatus] = useState<PushStatus>('default');
   const [busy, setBusy] = useState(false);
 
-  const supported =
-    typeof window !== 'undefined' &&
-    'serviceWorker' in navigator &&
-    'PushManager' in window &&
-    'Notification' in window;
+  const [supported] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      'serviceWorker' in navigator &&
+      'PushManager' in window &&
+      'Notification' in window,
+  );
 
   const syncExistingSubscription = useCallback(async () => {
     if (!user || !supported || Notification.permission !== 'granted') return false;
