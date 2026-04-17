@@ -446,7 +446,7 @@ const ReservationSection = () => {
                       </span>
                     )}
                   </div>
-                  {guests === "10+" || guestsNum > MAX_ONLINE_GUESTS ? (
+                  {guests === "15+" || guestsNum > MAX_ONLINE_GUESTS ? (
                     <div className="text-center py-6 space-y-3">
                       <p className="font-body text-sm text-muted-foreground">
                         {t(
