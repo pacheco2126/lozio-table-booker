@@ -12,6 +12,13 @@ self.skipWaiting();
 clientsClaim();
 cleanupOutdatedCaches();
 
+// Allow the page to force activation of a waiting SW (kiosk/TPV auto-update)
+self.addEventListener('message', (event: ExtendableMessageEvent) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Injected by vite-plugin-pwa at build time
 precacheAndRoute(self.__WB_MANIFEST);
 
