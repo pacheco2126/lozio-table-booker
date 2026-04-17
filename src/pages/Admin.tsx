@@ -625,7 +625,7 @@ const Admin = () => {
                 }}
                 className="w-full px-3 py-2 rounded-sm bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                {Array.from({ length: 15 }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={String(n)}>{n} {n === 1 ? "persona" : "personas"}</option>
                 ))}
               </select>
