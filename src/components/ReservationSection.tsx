@@ -151,7 +151,7 @@ const ReservationSection = () => {
       const [resResult, tablesResult] = await Promise.all([
         supabase
           .from("reservations")
-          .select("reservation_time, guests, table_id")
+          .select("reservation_time, guests, table_id, table_ids")
           .eq("location", selectedLocation)
           .eq("reservation_date", format(date, "yyyy-MM-dd"))
           .in("status", ["pending", "confirmed"]),
