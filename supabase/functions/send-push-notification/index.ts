@@ -13,6 +13,8 @@ serve(async (req) => {
   try {
     const body = await req.json();
     // Supabase DB webhook sends { type, table, schema, record, old_record }
+    // Manual test: { test: true, user_id?: string }
+    const isTest = body.test === true;
     const record = body.record ?? body;
 
     const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")!;
@@ -39,15 +41,18 @@ serve(async (req) => {
     }
 
     const adminIds = adminRoles.map((r: { user_id: string }) => r.user_id);
+    const targetIds = isTest && body.user_id ? [body.user_id] : adminIds;
 
     // Get all push subscriptions for those admins
     const { data: subscriptions } = await supabase
       .from("push_subscriptions")
       .select("*")
-      .in("user_id", adminIds);
+      .in("user_id", targetIds);
+
+    console.log(`[push] admins=${adminIds.length} subs=${subscriptions?.length ?? 0} test=${isTest}`);
 
     if (!subscriptions?.length) {
-      return new Response(JSON.stringify({ sent: 0, reason: "no_subscriptions" }), {
+      return new Response(JSON.stringify({ sent: 0, reason: "no_subscriptions", admins: adminIds.length }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -57,13 +62,23 @@ serve(async (req) => {
     const formattedDate = d ? `${d}/${m}/${y}` : "";
     const formattedTime = (record.reservation_time ?? "").substring(0, 5);
 
-    const payload = JSON.stringify({
-      title: "🍕 Nueva reserva en Lo Zio",
-      body: `👤 ${record.guest_name ?? "Cliente"} — 👥 ${record.guests ?? "2"}p\n📅 ${formattedDate} a las ${formattedTime}`,
-      icon: "/pwa-192x192.png",
-      badge: "/pwa-192x192.png",
-      url: "/admin",
-    });
+    const payload = JSON.stringify(
+      isTest
+        ? {
+            title: "🔔 Notificación de prueba",
+            body: "Si ves esto, las notificaciones funcionan correctamente ✅",
+            icon: "/pwa-192x192.png",
+            badge: "/pwa-192x192.png",
+            url: "/admin",
+          }
+        : {
+            title: "🍕 Nueva reserva en Lo Zio",
+            body: `👤 ${record.guest_name ?? "Cliente"} — 👥 ${record.guests ?? "2"}p\n📅 ${formattedDate} a las ${formattedTime}`,
+            icon: "/pwa-192x192.png",
+            badge: "/pwa-192x192.png",
+            url: "/admin",
+          },
+    );
 
     // Send to all subscriptions, clean up expired ones (HTTP 410)
     const results = await Promise.allSettled(
