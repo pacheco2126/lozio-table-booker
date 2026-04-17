@@ -1,10 +1,15 @@
+import { useState } from 'react';
 import { Bell, BellOff, BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePushSubscription } from '@/hooks/usePushSubscription';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 const PushNotificationToggle = () => {
   const { status, busy, supported, enablePush, disablePush } = usePushSubscription();
+  const { user } = useAuth();
+  const [testing, setTesting] = useState(false);
 
   if (!supported) {
     return (
@@ -19,11 +24,11 @@ const PushNotificationToggle = () => {
     const ok = await enablePush();
     if (ok) {
       toast.success('Dispositivo sincronizado', {
-        description: 'Este iPhone/Android ya puede recibir reservas en segundo plano o con la app cerrada.',
+        description: 'Este dispositivo ya recibirá las nuevas reservas.',
       });
     } else if (status === 'denied') {
       toast.error('Permiso denegado', {
-        description: 'Activa las notificaciones en Ajustes del sistema para esta app.',
+        description: 'Activa las notificaciones en los Ajustes del sistema.',
       });
     } else {
       toast.error('No se pudo activar', { description: 'Inténtalo de nuevo.' });
@@ -35,6 +40,32 @@ const PushNotificationToggle = () => {
     if (ok) toast.info('Notificaciones desactivadas');
   };
 
+  const handleTest = async () => {
+    if (!user) return;
+    setTesting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-push-notification', {
+        body: { test: true, user_id: user.id },
+      });
+      if (error) throw error;
+      const sent = (data as { sent?: number })?.sent ?? 0;
+      if (sent > 0) {
+        toast.success(`Prueba enviada (${sent} dispositivo${sent > 1 ? 's' : ''})`, {
+          description: 'Debería llegarte en unos segundos.',
+        });
+      } else {
+        toast.error('No hay suscripciones registradas', {
+          description: 'Pulsa "Reactivar" antes de probar.',
+        });
+      }
+    } catch (err) {
+      console.error('[Push] test error:', err);
+      toast.error('Error enviando la prueba');
+    } finally {
+      setTesting(false);
+    }
+  };
+
   if (status === 'denied') {
     return (
       <div className="flex items-center gap-3 p-3 rounded-lg bg-destructive/10 border border-destructive/30">
@@ -42,7 +73,8 @@ const PushNotificationToggle = () => {
         <div className="text-sm">
           <p className="font-semibold text-destructive">Permiso bloqueado</p>
           <p className="text-muted-foreground text-xs mt-1">
-            Activa las notificaciones desde los Ajustes de tu dispositivo (iOS: Ajustes → Notificaciones → Lo Zio).
+            Has denegado las notificaciones para esta web. Actívalas desde los Ajustes del sistema
+            (iOS: Ajustes → Notificaciones → Lo Zio · Android: Ajustes de la app → Notificaciones).
           </p>
         </div>
       </div>
@@ -51,24 +83,29 @@ const PushNotificationToggle = () => {
 
   if (status === 'granted-subscribed') {
     return (
-      <div className="flex items-center justify-between gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
-        <div className="flex items-center gap-2">
-          <BellRing className="w-5 h-5 text-primary" />
-          <div className="text-sm">
-            <p className="font-semibold text-foreground">Permiso activo en este dispositivo</p>
-            <p className="text-xs text-muted-foreground">
-              Si no te están llegando, pulsa Reactivar para resincronizar este iPhone/Android con el backend.
-            </p>
+      <div className="flex flex-col gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <BellRing className="w-5 h-5 text-primary" />
+            <div className="text-sm">
+              <p className="font-semibold text-foreground">Notificaciones activas</p>
+              <p className="text-xs text-muted-foreground">
+                Recibirás avisos de nuevas reservas en este dispositivo.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button size="sm" variant="outline" onClick={handleEnable} disabled={busy}>
+              {busy ? '…' : 'Reactivar'}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleDisable} disabled={busy}>
+              Desactivar
+            </Button>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Button size="sm" onClick={handleEnable} disabled={busy}>
-            {busy ? 'Reactivando…' : 'Reactivar'}
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDisable} disabled={busy}>
-            Desactivar
-          </Button>
-        </div>
+        <Button size="sm" variant="secondary" onClick={handleTest} disabled={testing}>
+          {testing ? 'Enviando…' : '🔔 Enviar notificación de prueba'}
+        </Button>
       </div>
     );
   }
