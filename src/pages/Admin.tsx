@@ -404,15 +404,56 @@ const Admin = () => {
           <AdminManualReservation onCreated={fetchReservations} />
         </div>
 
-        <Tabs defaultValue="reservations" className="space-y-6">
-          <TabsList className="font-body">
-            <TabsTrigger value="reservations" className="font-bold">{t("admin.reservations")}</TabsTrigger>
-            <TabsTrigger value="floorplan" className="font-bold">{t("admin.floorPlan")}</TabsTrigger>
-            <TabsTrigger value="reports" className="font-bold">{t("admin.reports.title")}</TabsTrigger>
-            <TabsTrigger value="reviews" className="font-bold">Reseñas</TabsTrigger>
-            <TabsTrigger value="customers" className="font-bold">{t("admin.customers")}</TabsTrigger>
-            <TabsTrigger value="media" className="font-bold">📷 Media</TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <TabsList className="font-body">
+              <TabsTrigger value="reservations" className="font-bold">{t("admin.reservations")}</TabsTrigger>
+              <TabsTrigger value="floorplan" className="font-bold">{t("admin.floorPlan")}</TabsTrigger>
+            </TabsList>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="font-body gap-2">
+                  <Settings className="w-4 h-4" />
+                  Configuración
+                  <ChevronDown className="w-4 h-4 opacity-60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-popover">
+                <DropdownMenuLabel>Gestión</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setActiveTab("products")}>
+                  <Package className="w-4 h-4 mr-2" /> Productos
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("media")}>
+                  <ImageIcon className="w-4 h-4 mr-2" /> Media
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("customers")}>
+                  <Users className="w-4 h-4 mr-2" /> Clientes
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Análisis</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setActiveTab("reports")}>
+                  <BarChart3 className="w-4 h-4 mr-2" /> Reportes
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("reviews")}>
+                  <Star className="w-4 h-4 mr-2" /> Reseñas
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {activeTab !== "reservations" && activeTab !== "floorplan" && (
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setActiveTab("reservations")} className="font-body text-xs">
+                ← Volver a reservas
+              </Button>
+              <Badge variant="secondary" className="font-body capitalize">
+                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab}
+              </Badge>
+            </div>
+          )}
 
           <TabsContent value="reservations" className="space-y-6">
             {/* Push notifications toggle (admin device) */}
