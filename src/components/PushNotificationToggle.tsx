@@ -18,8 +18,8 @@ const PushNotificationToggle = () => {
   const handleEnable = async () => {
     const ok = await enablePush();
     if (ok) {
-      toast.success('Notificaciones activadas', {
-        description: 'Recibirás avisos aunque la app esté cerrada.',
+      toast.success('Dispositivo sincronizado', {
+        description: 'Este iPhone/Android ya puede recibir reservas en segundo plano o con la app cerrada.',
       });
     } else if (status === 'denied') {
       toast.error('Permiso denegado', {
@@ -55,13 +55,20 @@ const PushNotificationToggle = () => {
         <div className="flex items-center gap-2">
           <BellRing className="w-5 h-5 text-primary" />
           <div className="text-sm">
-            <p className="font-semibold text-foreground">Notificaciones activas</p>
-            <p className="text-xs text-muted-foreground">Recibirás avisos en este dispositivo.</p>
+            <p className="font-semibold text-foreground">Permiso activo en este dispositivo</p>
+            <p className="text-xs text-muted-foreground">
+              Si no te están llegando, pulsa Reactivar para resincronizar este iPhone/Android con el backend.
+            </p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={handleDisable} disabled={busy}>
-          Desactivar
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button size="sm" onClick={handleEnable} disabled={busy}>
+            {busy ? 'Reactivando…' : 'Reactivar'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleDisable} disabled={busy}>
+            Desactivar
+          </Button>
+        </div>
       </div>
     );
   }
