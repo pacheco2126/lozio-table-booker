@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
+import PushNotificationToggle from "@/components/PushNotificationToggle";
 import FloorPlan from "@/components/FloorPlan";
 import AdminCustomers from "@/components/AdminCustomers";
 import AdminReports from "@/components/AdminReports";
@@ -411,6 +412,9 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="reservations" className="space-y-6">
+            {/* Push notifications toggle (admin device) */}
+            <PushNotificationToggle />
+
             {/* Toggle reservas */}
             <div className="flex items-center justify-between bg-card rounded-lg p-4 border border-border shadow-sm">
               <div>
