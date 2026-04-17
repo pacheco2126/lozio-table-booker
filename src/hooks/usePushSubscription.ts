@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-// Public key — safe to expose in frontend code
 const VAPID_PUBLIC_KEY =
   'BFy3Ru15Qj70TU4JK3polKuevD0-qQp6bdOYjd8DgMQ0nL1gXVnS1m10tqbujXZ1k-RrEidt4ug9ggfXUqQTdBs';
 
@@ -20,6 +19,26 @@ export type PushStatus =
   | 'granted-unsubscribed'
   | 'default';
 
+async function persistSubscription(sub: PushSubscription, userId: string) {
+  const json = sub.toJSON();
+  const { error } = await supabase.from('push_subscriptions').insert({
+    user_id: userId,
+    endpoint: sub.endpoint,
+    p256dh: json.keys?.p256dh ?? '',
+    auth: json.keys?.auth ?? '',
+  });
+
+  if (!error) return true;
+
+  if (error.code === '23505') {
+    console.log('[Push] Subscription already stored in DB');
+    return true;
+  }
+
+  console.error('[Push] Failed to save subscription:', error);
+  return false;
+}
+
 export const usePushSubscription = () => {
   const { user } = useAuth();
   const [status, setStatus] = useState<PushStatus>('default');
@@ -31,38 +50,65 @@ export const usePushSubscription = () => {
     'PushManager' in window &&
     'Notification' in window;
 
+  const syncExistingSubscription = useCallback(async () => {
+    if (!user || !supported || Notification.permission !== 'granted') return false;
+
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (!sub) return false;
+
+      const ok = await persistSubscription(sub, user.id);
+      if (ok) console.log('[Push] Existing subscription synced ✓');
+      return ok;
+    } catch (err) {
+      console.error('[Push] syncExistingSubscription error:', err);
+      return false;
+    }
+  }, [supported, user]);
+
   const refreshStatus = useCallback(async () => {
     if (!supported) {
       setStatus('unsupported');
       return;
     }
+
     if (Notification.permission === 'denied') {
       setStatus('denied');
       return;
     }
+
     if (Notification.permission === 'default') {
       setStatus('default');
       return;
     }
+
     try {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
-      setStatus(sub ? 'granted-subscribed' : 'granted-unsubscribed');
+
+      if (!sub) {
+        setStatus('granted-unsubscribed');
+        return;
+      }
+
+      setStatus('granted-subscribed');
+      void syncExistingSubscription();
     } catch {
       setStatus('granted-unsubscribed');
     }
-  }, [supported]);
+  }, [supported, syncExistingSubscription]);
 
   useEffect(() => {
-    refreshStatus();
+    void refreshStatus();
   }, [refreshStatus, user]);
 
-  // MUST be called from a user gesture (tap/click) — required by iOS Safari PWA
   const enablePush = useCallback(async () => {
     if (!user) {
       console.warn('[Push] No user logged in');
       return false;
     }
+
     if (!supported) {
       console.warn('[Push] Browser does not support push');
       setStatus('unsupported');
@@ -74,6 +120,7 @@ export const usePushSubscription = () => {
       console.log('[Push] Requesting permission...');
       const permission = await Notification.requestPermission();
       console.log('[Push] Permission:', permission);
+
       if (permission !== 'granted') {
         setStatus(permission === 'denied' ? 'denied' : 'default');
         return false;
@@ -90,23 +137,12 @@ export const usePushSubscription = () => {
           applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
         });
       }
+
       console.log('[Push] Subscription endpoint:', subscription.endpoint);
 
-      const json = subscription.toJSON();
-      const { error } = await supabase.from('push_subscriptions').upsert(
-        {
-          user_id: user.id,
-          endpoint: subscription.endpoint,
-          p256dh: json.keys?.p256dh ?? '',
-          auth: json.keys?.auth ?? '',
-        },
-        { onConflict: 'endpoint' },
-      );
-      if (error) {
-        console.error('[Push] Failed to save subscription:', error);
-        return false;
-      }
-      console.log('[Push] Subscription saved ✓');
+      const ok = await persistSubscription(subscription, user.id);
+      if (!ok) return false;
+
       setStatus('granted-subscribed');
       return true;
     } catch (err) {
@@ -115,10 +151,11 @@ export const usePushSubscription = () => {
     } finally {
       setBusy(false);
     }
-  }, [user, supported]);
+  }, [supported, user]);
 
   const disablePush = useCallback(async () => {
     if (!supported) return false;
+
     setBusy(true);
     try {
       const reg = await navigator.serviceWorker.ready;
@@ -137,5 +174,5 @@ export const usePushSubscription = () => {
     }
   }, [supported]);
 
-  return { status, busy, supported, enablePush, disablePush, refreshStatus };
+  return { status, busy, supported, enablePush, disablePush, refreshStatus, syncExistingSubscription };
 };
