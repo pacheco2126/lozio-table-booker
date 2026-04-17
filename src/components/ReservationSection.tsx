@@ -146,33 +146,34 @@ const ReservationSection = () => {
 
   useEffect(() => {
     const fetchAvailability = async () => {
-      setLoadingSlots(true);
-
-      const [resResult, tablesResult] = await Promise.all([
-        supabase
-          .from("reservations")
-          .select("reservation_time, guests, table_id, table_ids")
-          .eq("location", selectedLocation)
-          .eq("reservation_date", format(date, "yyyy-MM-dd"))
-          .in("status", ["pending", "confirmed"]),
-        supabase.from("tables").select("id, name, capacity").eq("location", selectedLocation).eq("is_active", true),
-      ]);
-
-      if (resResult.error) {
-        console.error("Error fetching availability:", resResult.error);
+      if (guests === "15+" || guestsNum > MAX_ONLINE_GUESTS) {
         setUnavailableSlots(new Set());
-      } else {
-        const unavailable = getUnavailableSlots(
-          resResult.data || [],
-          loc.timeSlots,
-          guestsNum,
-          tablesResult.data || undefined,
-        );
-        setUnavailableSlots(unavailable);
+        return;
       }
+      setLoadingSlots(true);
+      const dateStr = format(date, "yyyy-MM-dd");
+      // Use the same RPC the backend uses to create reservations,
+      // so the UI shows EXACTLY the same availability as the booking attempt.
+      const results = await Promise.all(
+        loc.timeSlots.map(async (slot) => {
+          const { data, error } = await supabase.rpc("find_available_tables_multi", {
+            _location: selectedLocation,
+            _date: dateStr,
+            _time: `${slot}:00`,
+            _guests: guestsNum,
+          });
+          if (error) {
+            console.error("Availability RPC error for", slot, error);
+            return { slot, available: true };
+          }
+          return { slot, available: Array.isArray(data) && data.length > 0 };
+        }),
+      );
+      const unavailable = new Set<string>();
+      for (const r of results) if (!r.available) unavailable.add(r.slot);
+      setUnavailableSlots(unavailable);
       setLoadingSlots(false);
     };
-
     fetchAvailability();
   }, [selectedLocation, date, guests, loc.timeSlots, guestsNum]);
 
