@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { Star, MessageSquareHeart, Send } from "lucide-react";
+import { Star, MessageSquareHeart, Send, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -68,15 +68,51 @@ const ReviewSection = () => {
         </div>
 
         {submitted ? (
-          <div className="bg-card border border-border rounded-2xl p-8 text-center shadow-sm">
-            <div className="text-5xl mb-4">🎉</div>
-            <h3 className="font-display text-xl font-bold text-foreground mb-2">
-              {t("reviews.thankYou")}
-            </h3>
-            <p className="font-body text-muted-foreground text-sm mb-6">
-              {t("reviews.thankYouDesc")}
-            </p>
-            <Button variant="outline" onClick={handleReset}>
+          <div className="bg-card border border-border rounded-2xl p-8 text-center shadow-sm flex flex-col items-center gap-5">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+              <Heart className="w-10 h-10 text-primary fill-primary" />
+            </div>
+            <div>
+              <h3 className="font-display text-xl font-bold text-foreground mb-2">
+                {t("reviews.thankYou")}
+              </h3>
+              <p className="font-body text-muted-foreground text-sm leading-relaxed">
+                {t("reviews.thankYouDesc")}
+              </p>
+            </div>
+
+            <div className="w-full space-y-3 pt-2">
+              <p className="font-body text-xs text-muted-foreground uppercase tracking-widest font-bold">
+                {t("reviews.shareAlso")}
+              </p>
+              <a
+                href="https://www.google.com/maps/place/Pizzeria+Lo+Zio/@41.1220121,1.2677832,19.18z/data=!4m8!3m7!1s0x12a3fde71873e23b:0x2d1d5fa3713d83aa!8m2!3d41.1218819!4d1.2680747!9m1!1b1!16s%2Fg%2F11nbh3b1vm?entry=ttu&g_ep=EgoyMDI2MDQwNi4wIKXMDSoASAFQAw%3D%3D"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2.5 w-full py-3 rounded-xl border border-border bg-card font-body font-bold text-sm text-foreground hover:bg-muted transition-colors"
+              >
+                <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Google
+              </a>
+              <a
+                href="https://www.tripadvisor.es/Restaurant_Review-g187503-d25019953-Reviews-Pizzeria_Lo_Zio-Tarragona_Costa_Dorada_Province_of_Tarragona_Catalonia.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2.5 w-full py-3 rounded-xl border border-border bg-card font-body font-bold text-sm text-foreground hover:bg-muted transition-colors"
+              >
+                <svg viewBox="0 0 24 24" className="w-5 h-5" fill="#00AF87">
+                  <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                </svg>
+                TripAdvisor
+              </a>
+            </div>
+
+            <Button variant="ghost" onClick={handleReset} className="font-body text-sm text-muted-foreground">
               {t("reviews.another")}
             </Button>
           </div>
