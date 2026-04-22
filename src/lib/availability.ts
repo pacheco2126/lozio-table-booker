@@ -1,6 +1,6 @@
 // Online reservation tables: Mesa 1-8, capacity 1-6 each
 export const ONLINE_TABLES = 8;
-export const MAX_ONLINE_GUESTS = 10;
+export const MAX_ONLINE_GUESTS = 15;
 export const CALL_PHONE = "+34 682239035";
 export const ONLINE_TABLE_NAMES = ["Mesa 1", "Mesa 2", "Mesa 3", "Mesa 4", "Mesa 5", "Mesa 6", "Mesa 7", "Mesa 8"];
 
@@ -52,9 +52,7 @@ export function getUnavailableSlots(
   const requestedDuration = estimatedDuration(requestedGuests);
 
   // Filter to only online tables
-  const onlineTables = tables
-    ? tables.filter((t) => ONLINE_TABLE_NAMES.includes(t.name))
-    : null;
+  const onlineTables = tables ? tables.filter((t) => ONLINE_TABLE_NAMES.includes(t.name)) : null;
 
   if (onlineTables && onlineTables.length === 0) {
     for (const slot of timeSlots) unavailable.add(slot);

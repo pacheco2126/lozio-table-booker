@@ -31,10 +31,8 @@ import ReviewPage from "./pages/ReviewPage.tsx";
 import AdminOrders from "./pages/AdminOrders.tsx";
 import MyOrders from "./pages/MyOrders.tsx";
 
-const stripePromise = loadStripe(
-  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ??
-  "pk_test_51TKagYE97zvFrxLoMt0lKY9AQT2QGLPS3IjhH1xvZigTxwAbF7CurXX9xSmgVKqPalQKvi9wdN2fS1kG8LjtebmP00I4NCgo2w"
-);
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 const queryClient = new QueryClient();
 
@@ -75,7 +73,7 @@ const App = () => (
               <Route path="/mis-reservas" element={<MyReservations />} />
               <Route path="/perfil" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
-              <Route path="/pedido" element={<Elements stripe={stripePromise}><Checkout /></Elements>} />
+              <Route path="/pedido" element={stripePromise ? <Elements stripe={stripePromise}><Checkout /></Elements> : <Checkout />} />
               <Route path="/pedido-confirmado" element={<OrderConfirmation />} />
               <Route path="/locales" element={<Locales />} />
               <Route path="/locales/:slug" element={<LocationDetail />} />

@@ -62,6 +62,7 @@ export type Database = {
           is_active: boolean | null
           name: string
           price: number
+          slug: string | null
           sort_order: number | null
         }
         Insert: {
@@ -75,6 +76,7 @@ export type Database = {
           is_active?: boolean | null
           name: string
           price: number
+          slug?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -88,6 +90,7 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           price?: number
+          slug?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -250,6 +253,33 @@ export type Database = {
           updated_at?: string
           user_id?: string
           visit_count?: number | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
         }
         Relationships: []
       }

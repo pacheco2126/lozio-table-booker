@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
-import { CalendarIcon, ChevronDown, ChevronUp, UtensilsCrossed, MapPin, Phone, ArrowRight, Pencil } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -16,11 +17,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
+import PushNotificationToggle from "@/components/PushNotificationToggle";
 import FloorPlan from "@/components/FloorPlan";
 import AdminCustomers from "@/components/AdminCustomers";
 import AdminReports from "@/components/AdminReports";
 import AdminReviews from "@/components/AdminReviews";
 import AdminMedia from "@/components/AdminMedia";
+import AdminProducts from "@/components/AdminProducts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -64,6 +67,7 @@ const Admin = () => {
   const [showCancelledToday, setShowCancelledToday] = useState(false);
   const [cancelIds, setCancelIds] = useState<string[] | null>(null);
   const [cancelName, setCancelName] = useState("");
+  const [activeTab, setActiveTab] = useState("reservations");
 
   // Edit reservation state
   const [editReservation, setEditReservation] = useState<GroupedReservation | null>(null);
@@ -401,18 +405,61 @@ const Admin = () => {
           <AdminManualReservation onCreated={fetchReservations} />
         </div>
 
-        <Tabs defaultValue="reservations" className="space-y-6">
-          <TabsList className="font-body">
-            <TabsTrigger value="reservations" className="font-bold">{t("admin.reservations")}</TabsTrigger>
-            <TabsTrigger value="floorplan" className="font-bold">{t("admin.floorPlan")}</TabsTrigger>
-            <TabsTrigger value="reports" className="font-bold">{t("admin.reports.title")}</TabsTrigger>
-            <TabsTrigger value="reviews" className="font-bold">Reseñas</TabsTrigger>
-            <TabsTrigger value="customers" className="font-bold">{t("admin.customers")}</TabsTrigger>
-            <TabsTrigger value="media" className="font-bold">📷 Media</TabsTrigger>
-            <TabsTrigger value="orders" className="font-bold">🍕 Pedidos</TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <TabsList className="font-body">
+              <TabsTrigger value="reservations" className="font-bold">{t("admin.reservations")}</TabsTrigger>
+              <TabsTrigger value="floorplan" className="font-bold">{t("admin.floorPlan")}</TabsTrigger>
+            </TabsList>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="font-body gap-2">
+                  <Settings className="w-4 h-4" />
+                  Configuración
+                  <ChevronDown className="w-4 h-4 opacity-60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-popover">
+                <DropdownMenuLabel>Gestión</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setActiveTab("products")}>
+                  <Package className="w-4 h-4 mr-2" /> Productos
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("media")}>
+                  <ImageIcon className="w-4 h-4 mr-2" /> Media
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("customers")}>
+                  <Users className="w-4 h-4 mr-2" /> Clientes
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Análisis</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setActiveTab("reports")}>
+                  <BarChart3 className="w-4 h-4 mr-2" /> Reportes
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("reviews")}>
+                  <Star className="w-4 h-4 mr-2" /> Reseñas
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {activeTab !== "reservations" && activeTab !== "floorplan" && (
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setActiveTab("reservations")} className="font-body text-xs">
+                ← Volver a reservas
+              </Button>
+              <Badge variant="secondary" className="font-body capitalize">
+                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab}
+              </Badge>
+            </div>
+          )}
 
           <TabsContent value="reservations" className="space-y-6">
+            {/* Push notifications toggle (admin device) */}
+            <PushNotificationToggle />
+
             {/* Toggle reservas */}
             <div className="flex items-center justify-between bg-card rounded-lg p-4 border border-border shadow-sm">
               <div>
@@ -549,42 +596,7 @@ const Admin = () => {
           <TabsContent value="reviews"><AdminReviews /></TabsContent>
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
           <TabsContent value="media"><AdminMedia /></TabsContent>
-          <TabsContent value="orders">
-            <div className="space-y-4">
-              <p className="text-muted-foreground font-body text-sm">
-                Selecciona un local para ver y gestionar sus pedidos en tiempo real.
-              </p>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {["tarragona", "arrabassada"].map((slug) => {
-                  const loc = locationsData[slug];
-                  return (
-                    <a
-                      key={slug}
-                      href={`/admin/pedidos/${slug}`}
-                      className="block bg-card border border-border rounded-xl p-5 hover:border-menu-teal hover:shadow-md transition-all group"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-display font-bold text-lg text-foreground mb-1 group-hover:text-menu-teal transition-colors">
-                            {loc.name}
-                          </h3>
-                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
-                            <MapPin className="w-3.5 h-3.5 shrink-0" />
-                            <span>{loc.address}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                            <Phone className="w-3.5 h-3.5 shrink-0" />
-                            <span>{loc.phone}</span>
-                          </div>
-                        </div>
-                        <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-menu-teal transition-colors mt-1 shrink-0" />
-                      </div>
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-          </TabsContent>
+          <TabsContent value="products"><AdminProducts /></TabsContent>
         </Tabs>
       </div>
       <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
@@ -659,7 +671,7 @@ const Admin = () => {
                 }}
                 className="w-full px-3 py-2 rounded-sm bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                {Array.from({ length: 15 }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={String(n)}>{n} {n === 1 ? "persona" : "personas"}</option>
                 ))}
               </select>

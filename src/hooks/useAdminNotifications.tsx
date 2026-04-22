@@ -3,90 +3,107 @@ import { supabase } from '@/integrations/supabase/client';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { toast } from 'sonner';
 
-const NOTIFICATION_SOUND_URL = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
-
 export const useAdminNotifications = () => {
-  const { isAdmin, loading } = useIsAdmin();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const permissionGranted = useRef(false);
+  const { isAdmin } = useIsAdmin();
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
-  // Request notification permission on mount
+  // Unlock Web Audio context on first user interaction (browser autoplay policy)
   useEffect(() => {
-    if (!isAdmin || loading) return;
+    if (!isAdmin) return;
 
-    // Preload audio
-    audioRef.current = new Audio(NOTIFICATION_SOUND_URL);
-    audioRef.current.volume = 0.7;
+    const unlock = () => {
+      if (audioCtxRef.current) return;
+      try {
+        const AC = window.AudioContext || (window as any).webkitAudioContext;
+        audioCtxRef.current = new AC();
+      } catch { /* ignore */ }
+    };
 
-    // Request browser notification permission
+    document.addEventListener('click', unlock, { once: true });
+    document.addEventListener('touchstart', unlock, { once: true });
+
+    return () => {
+      document.removeEventListener('click', unlock);
+      document.removeEventListener('touchstart', unlock);
+    };
+  }, [isAdmin]);
+
+  // Request browser notification permission once admin is confirmed
+  useEffect(() => {
+    if (!isAdmin) return;
     if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().then((perm) => {
-        permissionGranted.current = perm === 'granted';
-      });
-    } else if ('Notification' in window) {
-      permissionGranted.current = Notification.permission === 'granted';
+      Notification.requestPermission();
     }
-  }, [isAdmin, loading]);
+  }, [isAdmin]);
 
+  // Two-tone ding using Web Audio API — no external file, no CDN dependency
   const playSound = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {
-        // Autoplay blocked — user hasn't interacted yet
-      });
-    }
+    try {
+      const AC = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = audioCtxRef.current ?? new AC();
+      if (!audioCtxRef.current) audioCtxRef.current = ctx;
+      if (ctx.state === 'suspended') ctx.resume();
+
+      const ding = (freq: number, start: number, duration: number, vol: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(vol, start + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+        osc.start(start);
+        osc.stop(start + duration);
+      };
+
+      const t = ctx.currentTime;
+      ding(880, t, 0.5, 0.35);        // A5
+      ding(1108, t + 0.2, 0.5, 0.25); // C#6
+    } catch { /* ignore */ }
   }, []);
 
   const showNotification = useCallback((guestName: string, guests: string, time: string, date: string) => {
-    const dateParts = date.split('-');
-    const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+    const [y, m, d] = date.split('-');
+    const formattedDate = `${d}/${m}/${y}`;
     const formattedTime = time.substring(0, 5);
     const body = `👤 ${guestName} — 👥 ${guests}p\n📅 ${formattedDate} a las ${formattedTime}`;
 
-    // Browser push notification
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification('🍕 Nueva reserva en Lo Zio', {
         body,
-        icon: '/icon-192.png',
-        tag: 'new-reservation',
+        icon: '/pwa-192x192.png',
+        // Unique tag per reservation so multiple notifications don't replace each other
+        tag: `reservation-${Date.now()}`,
       });
     }
 
-    // Also show in-app toast
-    toast.info('🍕 Nueva reserva', {
-      description: body,
-      duration: 8000,
-    });
+    toast.info('🍕 Nueva reserva', { description: body, duration: 8000 });
   }, []);
 
-  // Subscribe to realtime reservation inserts
+  // Subscribe to realtime as soon as isAdmin is true — no loading gate
   useEffect(() => {
-    if (!isAdmin || loading) return;
+    if (!isAdmin) return;
 
     const channel = supabase
       .channel('admin-reservation-notifications')
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'reservations',
-        },
+        { event: 'INSERT', schema: 'public', table: 'reservations' },
         (payload) => {
-          const record = payload.new as any;
+          const r = payload.new as Record<string, string>;
           playSound();
           showNotification(
-            record.guest_name || 'Cliente',
-            record.guests || '2',
-            record.reservation_time || '',
-            record.reservation_date || ''
+            r.guest_name || 'Cliente',
+            r.guests || '2',
+            r.reservation_time || '',
+            r.reservation_date || '',
           );
-        }
+        },
       )
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [isAdmin, loading, playSound, showNotification]);
+    return () => { supabase.removeChannel(channel); };
+  }, [isAdmin, playSound, showNotification]);
 };
