@@ -7,11 +7,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Plus, Minus, MessageSquare, ShoppingBag, Wine, CakeSlice, X } from "lucide-react";
+import { Plus, Minus, MessageSquare, ShoppingBag, Wine, CakeSlice, X, ChevronRight, ChevronLeft } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
 import { extraCategories } from "@/lib/extras";
 import type { CartItemExtra } from "@/contexts/CartContext";
 import pizzaPlaceholder from "@/assets/pizza-placeholder.jpg";
+import cocaColaImg from "@/assets/coca-cola.png";
+import cocaColaZeroImg from "@/assets/coca-cola-zero.png";
+import fantaNaranjaImg from "@/assets/fanta-naranja.png";
+import fantaLimonImg from "@/assets/fanta-limon.png";
+import fuzeTeaImg from "@/assets/fuze-tea-limon.png";
+import aquariusImg from "@/assets/aquarius-limon.png";
+import aguaImg from "@/assets/agua-logo.png";
+import cervezaImg from "@/assets/estrella-damm.png";
+import vinoImg from "@/assets/botella-vino.png";
 
 interface MenuItem {
   name: string;
@@ -29,26 +38,38 @@ interface AddToCartDialogProps {
   onConfirm: (extras: CartItemExtra[], note: string) => void;
 }
 
-// ─── Upsell data ────────────────────────────────────────────────────────────
+// ─── Drink data ──────────────────────────────────────────────────────────────
 
-const SODAS = [
-  { id: "soda_coca-cola",       name: "Coca-Cola",       emoji: "🥤" },
-  { id: "soda_coca-cola-zero",  name: "Coca-Cola Zero",  emoji: "⬛" },
-  { id: "soda_fanta-naranja",   name: "Fanta naranja",   emoji: "🍊" },
-  { id: "soda_fanta-limon",     name: "Fanta limón",     emoji: "🍋" },
-  { id: "soda_fuze-tea",        name: "Fuze Tea limón",  emoji: "🫖" },
-  { id: "soda_aquarius",        name: "Aquarius limón",  emoji: "💛" },
-];
+interface DrinkDef {
+  id: string;
+  name: string;
+  emoji: string;
+  price: number;
+  image?: string;
+  bg?: string;
+}
 
-const DRINKS_SIMPLE = [
-  { id: "drink_agua",     name: "Agua",          emoji: "💧", price: 2.5 },
-  { id: "drink_cerveza",  name: "Cerveza",       emoji: "🍺", price: 3   },
-  { id: "drink_vino",     name: "Vino botella",  emoji: "🍷", price: 20  },
-  
-];
 const SODA_PRICE = 2.5;
 
-const TIRAMISU = { id: "dessert_tiramisu", name: "Tiramisú", emoji: "🍮", price: 6 };
+const ALL_DRINKS: DrinkDef[] = [
+  { id: "soda_coca-cola",       name: "Coca-Cola",       emoji: "🥤", price: SODA_PRICE, image: cocaColaImg },
+  { id: "soda_coca-cola-zero",  name: "Coca-Cola Zero",  emoji: "⬛", price: SODA_PRICE, image: cocaColaZeroImg },
+  { id: "soda_fanta-naranja",   name: "Fanta Naranja",   emoji: "🍊", price: SODA_PRICE, image: fantaNaranjaImg },
+  { id: "soda_fanta-limon",     name: "Fanta Limón",     emoji: "🍋", price: SODA_PRICE, image: fantaLimonImg },
+  { id: "soda_fuze-tea",        name: "Fuze Tea Limón",  emoji: "🫖", price: SODA_PRICE, image: fuzeTeaImg },
+  { id: "soda_aquarius",        name: "Aquarius Limón",  emoji: "💛", price: SODA_PRICE, image: aquariusImg },
+  { id: "drink_agua",           name: "Agua",            emoji: "💧", price: 2.5,        image: aguaImg },
+  { id: "drink_cerveza",        name: "Cerveza",         emoji: "🍺", price: 3,          image: cervezaImg },
+  { id: "drink_vino",           name: "Vino botella",    emoji: "🍷", price: 20,         image: vinoImg },
+];
+
+const TIRAMISU = {
+  id: "dessert_tiramisu",
+  name: "Tiramisú",
+  emoji: "🍮",
+  price: 6,
+  image: "https://lnrnyahzkqqnvlpzrdlv.supabase.co/storage/v1/object/public/media/videos/TIRAMISU.jpg",
+};
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -65,11 +86,10 @@ const ExtrasPicker = ({
 }) => {
   const [activeCategory, setActiveCategory] = useState(extraCategories[0].id);
   const category = extraCategories.find((c) => c.id === activeCategory)!;
-  const selectedCount = extras.reduce((sum, e) => sum + e.quantity, 0); // total units selected
+  const selectedCount = extras.reduce((sum, e) => sum + e.quantity, 0);
 
   return (
     <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
-      {/* Free slot counter */}
       {freeExtras && (
         <div className="flex items-center gap-2 px-3 pt-2.5 pb-1">
           <div className="flex gap-1">
@@ -112,14 +132,13 @@ const ExtrasPicker = ({
       <div className="flex flex-wrap gap-1.5 p-3">
         {category.items.map((item) => {
           const existing = extras.find((e) => e.id === item.id);
-          // Cumulative qty of items before this one in the list
           const qtyBefore = existing
             ? extras.slice(0, extras.findIndex((e) => e.id === item.id)).reduce((s, e) => s + e.quantity, 0)
             : 0;
           const isFree = freeExtras
             ? existing
-              ? qtyBefore < freeExtras // at least first unit of this item falls in free zone
-              : selectedCount < freeExtras // adding it would use a free slot
+              ? qtyBefore < freeExtras
+              : selectedCount < freeExtras
             : false;
           return (
             <button
@@ -141,7 +160,7 @@ const ExtrasPicker = ({
               {item.name}
               <span className={existing ? "text-menu-teal/70" : isFree ? "text-green-600 font-bold" : "text-menu-teal"}>
                 {isFree
-                  ? existing ? "Gratis" : "Gratis"
+                  ? "Gratis"
                   : existing
                   ? `+${(item.price * existing.quantity).toFixed(2)} €`
                   : `+${item.price} €`}
@@ -154,60 +173,75 @@ const ExtrasPicker = ({
   );
 };
 
-/** Generic +/- stepper row used for drinks & tiramisu */
-const UpsellRow = ({
-  id,
-  emoji,
-  name,
-  price,
+/** Image card button for a drink */
+const DrinkCard = ({
+  drink,
   quantity,
   onAdd,
   onChangeQty,
 }: {
-  id: string;
-  emoji: string;
-  name: string;
-  price: number;
+  drink: DrinkDef;
   quantity: number;
   onAdd: () => void;
   onChangeQty: (qty: number) => void;
-}) => (
-  <div className="flex items-center justify-between px-1 py-1.5">
-    <span className="flex items-center gap-2 text-sm font-body text-foreground">
-      <span className="text-lg">{emoji}</span>
-      <span>
-        {name}
-        <span className="ml-1.5 text-[11px] text-menu-teal font-semibold">
-          {price.toFixed(2)} €
-        </span>
-      </span>
-    </span>
-    {quantity > 0 ? (
-      <div className="flex items-center gap-1.5">
-        <button
-          onClick={() => onChangeQty(quantity - 1)}
-          className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
-        >
-          <Minus className="w-3 h-3" />
-        </button>
-        <span className="w-5 text-center text-sm font-bold">{quantity}</span>
-        <button
-          onClick={() => onChangeQty(quantity + 1)}
-          className="w-6 h-6 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
-        >
-          <Plus className="w-3 h-3" />
-        </button>
-      </div>
-    ) : (
+}) => {
+  const isSelected = quantity > 0;
+
+  return (
+    <div
+      className={`relative rounded-xl overflow-hidden border-2 transition-all ${
+        isSelected ? "border-menu-teal shadow-sm" : "border-border"
+      }`}
+    >
+      {/* Image / emoji area */}
       <button
         onClick={onAdd}
-        className="w-6 h-6 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
+        className="w-full block"
+        aria-label={`Añadir ${drink.name}`}
       >
-        <Plus className="w-3 h-3" />
+        <div className={`aspect-square w-full flex items-center justify-center p-3 ${drink.image ? "bg-white" : drink.bg}`}>
+          {drink.image ? (
+            <img
+              src={drink.image}
+              alt={drink.name}
+              className="w-full h-full object-contain"
+              loading="lazy"
+            />
+          ) : (
+            <span className="text-4xl select-none">{drink.emoji}</span>
+          )}
+        </div>
       </button>
-    )}
-  </div>
-);
+
+      {/* Name + price */}
+      <div className="px-1.5 pt-1 pb-1.5 text-center bg-background">
+        <p className="text-[10px] font-body font-bold leading-tight text-foreground truncate">{drink.name}</p>
+        <p className="text-[10px] text-menu-teal font-semibold">{drink.price.toFixed(2)} €</p>
+      </div>
+
+      {/* Quantity controls overlay (shown when selected) */}
+      {isSelected && (
+        <div className="absolute top-1.5 left-0 right-0 flex justify-center">
+          <div className="flex items-center gap-1 bg-black/60 backdrop-blur-sm rounded-full px-1.5 py-0.5">
+            <button
+              onClick={(e) => { e.stopPropagation(); onChangeQty(quantity - 1); }}
+              className="w-5 h-5 flex items-center justify-center text-white hover:text-red-300 transition-colors"
+            >
+              <Minus className="w-3 h-3" />
+            </button>
+            <span className="text-white text-[11px] font-bold w-4 text-center">{quantity}</span>
+            <button
+              onClick={(e) => { e.stopPropagation(); onChangeQty(quantity + 1); }}
+              className="w-5 h-5 flex items-center justify-center text-white hover:text-menu-teal transition-colors"
+            >
+              <Plus className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ─── Main dialog ─────────────────────────────────────────────────────────────
 
@@ -224,37 +258,25 @@ const AddToCartDialog = ({
   const [extras, setExtras] = useState<CartItemExtra[]>([]);
   const [note, setNote] = useState("");
   const [showNote, setShowNote] = useState(false);
-  const [showSodas, setShowSodas] = useState(false);
-  const [showButton, setShowButton] = useState(false);
-  const noteRef = useRef<HTMLDivElement>(null);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) { setShowButton(false); return; }
-    // Wait a tick for the dialog DOM to mount
-    const timer = setTimeout(() => {
-      const el = noteRef.current;
-      const root = scrollRef.current;
-      if (!el || !root) return;
-      const observer = new IntersectionObserver(
-        ([entry]) => setShowButton(entry.isIntersecting),
-        { root, threshold: 0.1 }
-      );
-      observer.observe(el);
-      return () => observer.disconnect();
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [open]);
-
-  const handleOpenChange = (val: boolean) => {
-    if (!val) {
+    if (open) {
       setExtras([]);
       setNote("");
       setShowNote(false);
-      setShowSodas(false);
-      setShowButton(false);
+      setStep(1);
     }
+  }, [open]);
+
+  const handleOpenChange = (val: boolean) => {
     onOpenChange(val);
+  };
+
+  const goToStep = (s: 1 | 2 | 3) => {
+    setStep(s);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
   };
 
   // ── extras helpers ──
@@ -280,33 +302,16 @@ const AddToCartDialog = ({
     else setExtras((prev) => prev.map((e) => e.id === id ? { ...e, quantity: qty } : e));
   };
 
-  // ── upsell helpers (reuse extras state with prefixed ids) ──
   const getQty = (id: string) => extras.find((e) => e.id === id)?.quantity ?? 0;
 
   const addUpsell = (id: string, label: string, emoji: string, price: number) => {
     handleAddExtra({ id, label, emoji, price });
   };
 
-  // ── ingredient extras (no drinks/sodas/desserts) ──
   const ingredientExtras = extras.filter(
     (e) => !e.id.startsWith("drink_") && !e.id.startsWith("soda_") && !e.id.startsWith("dessert_")
   );
 
-  // How much of an ingredient extra is free, given cumulative slots before it.
-  // Returns the effective unit price (0 if all free, original if all paid, or original
-  // for the paid portion — we track this per-unit in the total/confirm).
-  const ingredientSlotsUsed = (upToIndex: number): number =>
-    ingredientExtras.slice(0, upToIndex).reduce((sum, e) => sum + e.quantity, 0);
-
-  const effectiveIngredientPrice = (extra: CartItemExtra, index: number): number => {
-    if (!freeExtras) return extra.price;
-    const slotsBefore = ingredientSlotsUsed(index);
-    if (slotsBefore >= freeExtras) return extra.price;        // fully paid
-    if (slotsBefore + extra.quantity <= freeExtras) return 0; // fully free
-    return extra.price; // partially free — shown as paid in display (see total below)
-  };
-
-  // Per-unit total that respects the free quota correctly
   const ingredientExtrasTotal = (): number => {
     let slotsUsed = 0;
     let total = 0;
@@ -319,17 +324,14 @@ const AddToCartDialog = ({
     return total;
   };
 
-  // Recalculate all extras with correct prices before submitting
   const extrasWithEffectivePrices = (): CartItemExtra[] => {
     let slotsUsed = 0;
     return extras.map((extra) => {
       const isIngredient = !extra.id.startsWith("drink_") && !extra.id.startsWith("soda_") && !extra.id.startsWith("dessert_");
       if (!isIngredient || !freeExtras) return extra;
-      // Calculate per-item effective unit price based on slots used so far
       const freeUnits = Math.max(0, freeExtras - slotsUsed);
       const paidUnits = Math.max(0, extra.quantity - freeUnits);
       slotsUsed += extra.quantity;
-      // Represent as a blended unit price (free units = 0, paid = original)
       const effectiveUnitPrice = paidUnits > 0 && extra.quantity > 0
         ? (paidUnits * extra.price) / extra.quantity
         : 0;
@@ -359,7 +361,6 @@ const AddToCartDialog = ({
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          {/* Custom close button over the image */}
           <DialogClose className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors">
             <X className="w-4 h-4" />
           </DialogClose>
@@ -377,232 +378,231 @@ const AddToCartDialog = ({
           </div>
         </div>
 
-        {/* ── Scrollable body ── */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto min-h-0 px-4 py-4 space-y-5">
-
-          {/* 1. Extras picker */}
-          <div>
-            <p className="font-display font-bold text-sm text-foreground mb-2">
-              {freeExtras ? t("dialog.addExtrasCustom") : t("dialog.addExtras")}
-            </p>
-            <ExtrasPicker
-              extras={ingredientExtras}
-              onAdd={handleAddExtra}
-              onRemove={handleRemoveExtra}
-              freeExtras={freeExtras}
-            />
-          </div>
-
-          {/* Selected ingredient-extras summary */}
-          {ingredientExtras.length > 0 && (
-            <div className="pl-2 border-l-2 border-menu-teal/40 space-y-1.5">
-              {(() => {
-                let slotsUsed = 0;
-                return ingredientExtras.map((extra) => {
-                  const freeUnits = freeExtras ? Math.max(0, freeExtras - slotsUsed) : 0;
-                  const paidUnits = Math.max(0, extra.quantity - freeUnits);
-                  slotsUsed += extra.quantity;
-                  const label =
-                    !freeExtras || paidUnits === 0
-                      ? freeExtras ? "Gratis" : `+${(extra.price * extra.quantity).toFixed(2)} €`
-                      : freeUnits === 0
-                      ? `+${(extra.price * extra.quantity).toFixed(2)} €`
-                      : `${freeUnits} gratis · +${(extra.price * paidUnits).toFixed(2)} €`;
-                  const isAllFree = freeExtras !== undefined && paidUnits === 0;
-                  return (
-                    <div key={extra.id} className="flex items-center justify-between">
-                      <span className="text-xs font-body text-foreground flex items-center gap-1.5">
-                        <span>{extra.emoji}</span>
-                        {extra.label}
-                      </span>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => handleUpdateQty(extra.id, extra.quantity - 1)}
-                          className="w-5 h-5 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
-                        >
-                          <Minus className="w-2.5 h-2.5" />
-                        </button>
-                        <span className="text-xs font-bold w-4 text-center">{extra.quantity}</span>
-                        <button
-                          onClick={() => handleUpdateQty(extra.id, extra.quantity + 1)}
-                          className="w-5 h-5 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
-                        >
-                          <Plus className="w-2.5 h-2.5" />
-                        </button>
-                        <span className={`text-xs font-bold ml-1 w-28 text-right ${isAllFree ? "text-green-600" : "text-menu-teal"}`}>
-                          {label}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                });
-              })()}
-            </div>
-          )}
-
-          <div className="border-t border-border" />
-
-          {/* 2. ¿Algo de beber? */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Wine className="w-4 h-4 text-menu-teal" />
-              <p className="font-display font-bold text-sm text-foreground">
-                {t("dialog.drinksSection")}
-              </p>
-            </div>
-            <div className="space-y-0.5">
-              
-              {/* Refresco expandable */}
-              <div>
-                <button
-                  onClick={() => setShowSodas((v) => !v)}
-                  className="flex items-center w-full px-1 py-1.5 text-sm font-body text-foreground hover:text-menu-teal transition-colors"
-                >
-                  <span className="text-lg mr-2">🥤</span>
-                  <span className="flex-1 text-left">
-                    Refresco
-                    <span className="ml-1.5 text-[11px] text-menu-teal font-semibold">
-                      {SODA_PRICE.toFixed(2)} €
-                    </span>
-                  </span>
-                  <Plus className="w-3.5 h-3.5 text-muted-foreground" />
-                </button>
-                {showSodas && (
-                  <div className="ml-8 mt-1 rounded-xl border border-menu-teal/20 bg-background overflow-hidden">
-                    <p className="px-3 pt-2 pb-1 text-[10px] font-body font-bold text-muted-foreground uppercase tracking-wider">
-                      ¿Cuál prefieres?
-                    </p>
-                    <div className="px-2 pb-2 space-y-0.5">
-                      {SODAS.map((soda) => (
-                        <UpsellRow
-                          key={soda.id}
-                          id={soda.id}
-                          emoji={soda.emoji}
-                          name={soda.name}
-                          price={SODA_PRICE}
-                          quantity={getQty(soda.id)}
-                          onAdd={() => addUpsell(soda.id, soda.name, soda.emoji, SODA_PRICE)}
-                          onChangeQty={(qty) => handleUpdateQty(soda.id, qty)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Simple drinks */}
-              {DRINKS_SIMPLE.map((d) => (
-                <UpsellRow
-                  key={d.id}
-                  id={d.id}
-                  emoji={d.emoji}
-                  name={d.name}
-                  price={d.price}
-                  quantity={getQty(d.id)}
-                  onAdd={() => addUpsell(d.id, d.name, d.emoji, d.price)}
-                  onChangeQty={(qty) => handleUpdateQty(d.id, qty)}
-                />
-              ))}
-
-            </div>
-          </div>
-
-          <div className="border-t border-border" />
-
-          {/* 3. El toque dulce */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <CakeSlice className="w-4 h-4 text-menu-teal" />
-              <p className="font-display font-bold text-sm text-foreground">
-                {t("dialog.dessertSection")}
-              </p>
-            </div>
+        {/* ── Step indicator ── */}
+        <div className="flex justify-center gap-1.5 pt-3 pb-1 shrink-0">
+          {([1, 2, 3] as const).map((s) => (
             <div
-              className={`flex items-center gap-3 px-3 py-3 rounded-xl border transition-all cursor-pointer ${
-                getQty(TIRAMISU.id) > 0
-                  ? "border-menu-teal bg-menu-teal/5"
-                  : "border-border bg-muted/30 hover:border-menu-teal hover:bg-menu-teal/5"
+              key={s}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                s === step ? "w-6 bg-menu-teal" : s < step ? "w-3 bg-menu-teal/40" : "w-3 bg-muted-foreground/20"
               }`}
-            >
-              <span className="text-2xl">{TIRAMISU.emoji}</span>
-              <div className="flex-1 min-w-0">
-                <p className="font-display font-bold text-sm text-foreground">{TIRAMISU.name}</p>
-                <p className="text-xs text-muted-foreground font-body">
-                  {t("dialog.tiramisuDesc")}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="font-display font-bold text-menu-teal text-sm">
-                  {TIRAMISU.price.toFixed(2)} €
-                </span>
-                {getQty(TIRAMISU.id) > 0 ? (
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleUpdateQty(TIRAMISU.id, getQty(TIRAMISU.id) - 1)}
-                      className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <span className="w-5 text-center text-sm font-bold">{getQty(TIRAMISU.id)}</span>
-                    <button
-                      onClick={() => handleUpdateQty(TIRAMISU.id, getQty(TIRAMISU.id) + 1)}
-                      className="w-6 h-6 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => addUpsell(TIRAMISU.id, TIRAMISU.name, TIRAMISU.emoji, TIRAMISU.price)}
-                    className="w-6 h-6 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
-                  >
-                    <Plus className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-border" />
-
-          {/* 4. Note */}
-          <div ref={noteRef}>
-            <button
-              onClick={() => setShowNote((v) => !v)}
-              className="flex items-center gap-1.5 text-xs font-body text-muted-foreground hover:text-menu-teal transition-colors"
-            >
-              <MessageSquare className="w-3.5 h-3.5" />
-              <span>{note ? t("dialog.editNote") : t("dialog.addNote")}</span>
-            </button>
-            {note && !showNote && (
-              <p className="text-[11px] text-muted-foreground italic mt-1 line-clamp-1">"{note}"</p>
-            )}
-            {showNote && (
-              <textarea
-                autoFocus
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder={t("dialog.notePlaceholder")}
-                rows={2}
-                maxLength={120}
-                className="mt-2 w-full text-xs font-body rounded-lg border border-border bg-background px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-menu-teal placeholder:text-muted-foreground/50"
-              />
-            )}
-          </div>
+            />
+          ))}
         </div>
 
-        {/* ── Footer CTA ── */}
-        <div className={`shrink-0 border-t border-border px-4 py-3 bg-background transition-all duration-300 ${showButton ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}>
-          <Button
-            onClick={() => onConfirm(extrasWithEffectivePrices(), note)}
-            className="w-full bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display font-bold text-sm py-5 rounded-xl"
-          >
-            <ShoppingBag className="w-4 h-4 mr-2" />
-            {t("dialog.addToCart")}
-            <span className="ml-auto font-body font-bold">
-              {totalPrice.toFixed(2)} €
-            </span>
-          </Button>
+        {/* ── Scrollable body ── */}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto min-h-0 px-4 py-3 space-y-4">
+
+          {/* Step 1: Extras */}
+          {step === 1 && (
+            <>
+              <p className="font-display font-bold text-sm text-foreground">
+                {freeExtras ? t("dialog.addExtrasCustom") : t("dialog.addExtras")}
+              </p>
+              <ExtrasPicker
+                extras={ingredientExtras}
+                onAdd={handleAddExtra}
+                onRemove={handleRemoveExtra}
+                freeExtras={freeExtras}
+              />
+              {ingredientExtras.length > 0 && (
+                <div className="pl-2 border-l-2 border-menu-teal/40 space-y-1.5">
+                  {(() => {
+                    let slotsUsed = 0;
+                    return ingredientExtras.map((extra) => {
+                      const freeUnits = freeExtras ? Math.max(0, freeExtras - slotsUsed) : 0;
+                      const paidUnits = Math.max(0, extra.quantity - freeUnits);
+                      slotsUsed += extra.quantity;
+                      const label =
+                        !freeExtras || paidUnits === 0
+                          ? freeExtras ? "Gratis" : `+${(extra.price * extra.quantity).toFixed(2)} €`
+                          : freeUnits === 0
+                          ? `+${(extra.price * extra.quantity).toFixed(2)} €`
+                          : `${freeUnits} gratis · +${(extra.price * paidUnits).toFixed(2)} €`;
+                      const isAllFree = freeExtras !== undefined && paidUnits === 0;
+                      return (
+                        <div key={extra.id} className="flex items-center justify-between">
+                          <span className="text-xs font-body text-foreground flex items-center gap-1.5">
+                            <span>{extra.emoji}</span>
+                            {extra.label}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => handleUpdateQty(extra.id, extra.quantity - 1)}
+                              className="w-5 h-5 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                            >
+                              <Minus className="w-2.5 h-2.5" />
+                            </button>
+                            <span className="text-xs font-bold w-4 text-center">{extra.quantity}</span>
+                            <button
+                              onClick={() => handleUpdateQty(extra.id, extra.quantity + 1)}
+                              className="w-5 h-5 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                            >
+                              <Plus className="w-2.5 h-2.5" />
+                            </button>
+                            <span className={`text-xs font-bold ml-1 w-28 text-right ${isAllFree ? "text-green-600" : "text-menu-teal"}`}>
+                              {label}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Step 2: Bebidas */}
+          {step === 2 && (
+            <>
+              <div className="flex items-center gap-2">
+                <Wine className="w-4 h-4 text-menu-teal" />
+                <p className="font-display font-bold text-sm text-foreground">
+                  No te quedes con sed
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {ALL_DRINKS.map((drink) => (
+                  <DrinkCard
+                    key={drink.id}
+                    drink={drink}
+                    quantity={getQty(drink.id)}
+                    onAdd={() => addUpsell(drink.id, drink.name, drink.emoji, drink.price)}
+                    onChangeQty={(qty) => handleUpdateQty(drink.id, qty)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Step 3: Postre + Nota */}
+          {step === 3 && (
+            <>
+              <div className="flex items-center gap-2">
+                <CakeSlice className="w-4 h-4 text-menu-teal" />
+                <p className="font-display font-bold text-sm text-foreground">
+                  El toque dulce que no falte
+                </p>
+              </div>
+
+              {/* Tiramisu card with image */}
+              <div
+                className={`rounded-xl border-2 overflow-hidden transition-all ${
+                  getQty(TIRAMISU.id) > 0 ? "border-menu-teal" : "border-border"
+                }`}
+              >
+                {/* Image */}
+                <div className="relative w-full" style={{ paddingBottom: "50%" }}>
+                  <img
+                    src={TIRAMISU.image}
+                    alt={TIRAMISU.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
+                    <div>
+                      <p className="font-display font-bold text-white text-base leading-tight">{TIRAMISU.name}</p>
+                      <p className="text-white/80 text-[11px] font-body">{t("dialog.tiramisuDesc")}</p>
+                    </div>
+                    <span className="font-display font-bold text-white text-sm shrink-0 ml-2">
+                      {TIRAMISU.price.toFixed(2)} €
+                    </span>
+                  </div>
+                </div>
+
+                {/* Controls */}
+                <div className="flex items-center justify-between px-3 py-2 bg-background">
+                  {getQty(TIRAMISU.id) > 0 ? (
+                    <div className="flex items-center gap-2 mx-auto">
+                      <button
+                        onClick={() => handleUpdateQty(TIRAMISU.id, getQty(TIRAMISU.id) - 1)}
+                        className="w-7 h-7 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="w-6 text-center text-sm font-bold">{getQty(TIRAMISU.id)}</span>
+                      <button
+                        onClick={() => handleUpdateQty(TIRAMISU.id, getQty(TIRAMISU.id) + 1)}
+                        className="w-7 h-7 rounded-full bg-menu-teal text-white flex items-center justify-center hover:bg-menu-teal/90 transition-colors"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => addUpsell(TIRAMISU.id, TIRAMISU.name, TIRAMISU.emoji, TIRAMISU.price)}
+                      className="mx-auto flex items-center gap-2 text-xs font-body font-semibold text-menu-teal hover:text-menu-teal/80 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Añadir tiramisú
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* Note */}
+              <div>
+                <button
+                  onClick={() => setShowNote((v) => !v)}
+                  className="flex items-center gap-1.5 text-xs font-body text-muted-foreground hover:text-menu-teal transition-colors"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>{note ? t("dialog.editNote") : t("dialog.addNote")}</span>
+                </button>
+                {note && !showNote && (
+                  <p className="text-[11px] text-muted-foreground italic mt-1 line-clamp-1">"{note}"</p>
+                )}
+                {showNote && (
+                  <textarea
+                    autoFocus
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder={t("dialog.notePlaceholder")}
+                    rows={2}
+                    maxLength={120}
+                    className="mt-2 w-full text-xs font-body rounded-lg border border-border bg-background px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-menu-teal placeholder:text-muted-foreground/50"
+                  />
+                )}
+              </div>
+            </>
+          )}
+
+        </div>
+
+        {/* ── Footer ── */}
+        <div className="shrink-0 border-t border-border px-4 py-3 bg-background flex gap-2">
+          {step > 1 && (
+            <button
+              onClick={() => goToStep((step - 1) as 1 | 2 | 3)}
+              className="flex items-center justify-center w-11 h-11 rounded-xl border border-border hover:bg-muted transition-colors shrink-0"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          )}
+          {step < 3 ? (
+            <Button
+              onClick={() => goToStep((step + 1) as 1 | 2 | 3)}
+              className="flex-1 bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display font-bold text-sm py-5 rounded-xl"
+            >
+              Siguiente
+              <ChevronRight className="w-4 h-4 ml-auto" />
+            </Button>
+          ) : (
+            <Button
+              onClick={() => onConfirm(extrasWithEffectivePrices(), note)}
+              className="flex-1 bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display font-bold text-sm py-5 rounded-xl"
+            >
+              <ShoppingBag className="w-4 h-4 mr-2" />
+              {t("dialog.addToCart")}
+              <span className="ml-auto font-body font-bold">
+                {totalPrice.toFixed(2)} €
+              </span>
+            </Button>
+          )}
         </div>
 
       </DialogContent>
