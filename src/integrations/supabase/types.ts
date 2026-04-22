@@ -62,6 +62,7 @@ export type Database = {
           is_active: boolean | null
           name: string
           price: number
+          slug: string | null
           sort_order: number | null
         }
         Insert: {
@@ -75,6 +76,7 @@ export type Database = {
           is_active?: boolean | null
           name: string
           price: number
+          slug?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -88,6 +90,7 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           price?: number
+          slug?: string | null
           sort_order?: number | null
         }
         Relationships: []
