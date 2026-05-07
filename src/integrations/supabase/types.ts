@@ -50,6 +50,51 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_items: {
+        Row: {
+          allergens: string[] | null
+          badge_emoji: string | null
+          badge_key: string | null
+          badge_style: string | null
+          category: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          price: number
+          slug: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          allergens?: string[] | null
+          badge_emoji?: string | null
+          badge_key?: string | null
+          badge_style?: string | null
+          category: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          price: number
+          slug?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          allergens?: string[] | null
+          badge_emoji?: string | null
+          badge_key?: string | null
+          badge_style?: string | null
+          category?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          price?: number
+          slug?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
@@ -211,6 +256,33 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reservations: {
         Row: {
           created_at: string
@@ -225,6 +297,7 @@ export type Database = {
           reservation_time: string
           status: string
           table_id: string | null
+          table_ids: string[] | null
           user_id: string | null
         }
         Insert: {
@@ -240,6 +313,7 @@ export type Database = {
           reservation_time: string
           status?: string
           table_id?: string | null
+          table_ids?: string[] | null
           user_id?: string | null
         }
         Update: {
@@ -255,6 +329,7 @@ export type Database = {
           reservation_time?: string
           status?: string
           table_id?: string | null
+          table_ids?: string[] | null
           user_id?: string | null
         }
         Relationships: [
