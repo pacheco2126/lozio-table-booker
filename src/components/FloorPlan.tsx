@@ -69,7 +69,6 @@ const FloorPlan = () => {
   }, [fetchReservations, fetchTables]);
 
   const getTableStatus = (table: Table): "available" | "occupied" | "upcoming" | "manual" => {
-    if (!isOnlineTable(table)) return "manual";
     const now = parse(selectedTime, "HH:mm", new Date());
     const soon = addMinutes(now, 30);
     for (const res of reservations) {
@@ -79,6 +78,7 @@ const FloorPlan = () => {
       if (now >= resTime && now < resEnd) return "occupied";
       if (resTime > now && resTime <= soon) return "upcoming";
     }
+    if (!isOnlineTable(table)) return "manual";
     return "available";
   };
 
