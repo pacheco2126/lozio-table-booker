@@ -32,6 +32,7 @@ import NotFound from "./pages/NotFound.tsx";
 import ReviewPage from "./pages/ReviewPage.tsx";
 import AdminOrders from "./pages/AdminOrders.tsx";
 import MyOrders from "./pages/MyOrders.tsx";
+import Unsubscribe from "./pages/Unsubscribe.tsx";
 
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
@@ -84,6 +85,7 @@ const App = () => (
               <Route path="/admin/pedidos/:store" element={<AdminOrders />} />
               <Route path="/mis-pedidos" element={<MyOrders />} />
               <Route path="/admin/inventario" element={<AdminInventoryPage />} />
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

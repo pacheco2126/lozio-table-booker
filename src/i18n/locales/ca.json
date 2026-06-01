@@ -591,5 +591,17 @@
       "otros": "Altres",
       "verduras": "Verdures"
     }
+  },
+  "unsubscribe": {
+    "checking": "Comprovant l'enllaç...",
+    "title": "Donar-se de baixa",
+    "description": "Vols deixar de rebre emails de Pizzería Lo Zio?",
+    "confirm": "Confirmar la baixa",
+    "successTitle": "Baixa confirmada",
+    "successDescription": "Ja no rebràs més emails. Pots tornar a subscriure't quan vulguis.",
+    "alreadyTitle": "Ja estàs donat de baixa",
+    "alreadyDescription": "Aquesta adreça ja estava donada de baixa.",
+    "errorTitle": "Enllaç no vàlid",
+    "errorDescription": "L'enllaç ha caducat o no és vàlid. Torna a intentar-ho des d'un email recent."
   }
 }

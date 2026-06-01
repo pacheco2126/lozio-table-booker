@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import OrderStatusAnimation from "@/components/OrderStatusAnimation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Navbar from "@/components/Navbar";
@@ -56,20 +57,6 @@ const PROGRESS_STEPS = [
   { key: "delivered", label: "Entregado" },
 ];
 
-const STATUS_GIFS: Partial<Record<string, { src: string; alt: string }>> = {
-  confirmed: {
-    src: "https://media3.giphy.com/media/Jz4ijKk1eoIKvPqNq0/giphy.gif",
-    alt: "Italiano con el pulgar hacia arriba",
-  },
-  preparing: {
-    src: "https://media1.giphy.com/media/oVoDApNKaiHCsXOCPT/giphy.gif",
-    alt: "Abriendo la masa de pizza",
-  },
-  ready: {
-    src: "https://media3.giphy.com/media/3ohjV4TqA25cn3HnK8/giphy.gif",
-    alt: "Pizza en moto de reparto",
-  },
-};
 
 const STATUS_LABELS: Record<string, string> = {
   pending:   "Recibido",
@@ -267,15 +254,13 @@ const MyOrders = () => {
                       </div>
                     </div>
 
-                    {/* Status GIF */}
-                    {!cancelled && STATUS_GIFS[order.status] && (
-                      <div className="mt-4 flex justify-center">
-                        <img
-                          src={STATUS_GIFS[order.status]!.src}
-                          alt={STATUS_GIFS[order.status]!.alt}
-                          className="h-28 rounded-xl object-cover"
-                        />
-                      </div>
+                    {/* Status animation */}
+                    {!cancelled && (
+                      <OrderStatusAnimation
+                        status={order.status}
+                        orderType={order.order_type}
+                        className="mt-4"
+                      />
                     )}
 
                     {/* Progress bar */}

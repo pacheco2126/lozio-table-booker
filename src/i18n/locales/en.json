@@ -591,5 +591,17 @@
       "limpieza": "Cleaning",
       "otros": "Other"
     }
+  },
+  "unsubscribe": {
+    "checking": "Checking link...",
+    "title": "Unsubscribe",
+    "description": "Do you want to stop receiving emails from Pizzería Lo Zio?",
+    "confirm": "Confirm unsubscribe",
+    "successTitle": "You've been unsubscribed",
+    "successDescription": "You won't receive any more emails. You can subscribe again whenever you want.",
+    "alreadyTitle": "Already unsubscribed",
+    "alreadyDescription": "This email address was already unsubscribed.",
+    "errorTitle": "Invalid link",
+    "errorDescription": "This link has expired or is invalid. Please try again from a recent email."
   }
 }

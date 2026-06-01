@@ -610,5 +610,17 @@
       "limpieza": "Limpieza",
       "otros": "Otros"
     }
+  },
+  "unsubscribe": {
+    "checking": "Comprobando enlace...",
+    "title": "Darse de baja",
+    "description": "¿Quieres dejar de recibir emails de Pizzería Lo Zio?",
+    "confirm": "Confirmar baja",
+    "successTitle": "Baja confirmada",
+    "successDescription": "Ya no recibirás más emails. Puedes volver a suscribirte cuando quieras.",
+    "alreadyTitle": "Ya estás dado de baja",
+    "alreadyDescription": "Esta dirección ya estaba dada de baja anteriormente.",
+    "errorTitle": "Enlace no válido",
+    "errorDescription": "El enlace ha expirado o no es válido. Vuelve a intentarlo desde un email reciente."
   }
 }

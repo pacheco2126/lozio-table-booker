@@ -591,5 +591,17 @@
       "limpieza": "Pulizia",
       "otros": "Altro"
     }
+  },
+  "unsubscribe": {
+    "checking": "Verifica del link...",
+    "title": "Annulla iscrizione",
+    "description": "Vuoi smettere di ricevere email da Pizzería Lo Zio?",
+    "confirm": "Conferma annullamento",
+    "successTitle": "Iscrizione annullata",
+    "successDescription": "Non riceverai più email. Puoi iscriverti di nuovo quando vuoi.",
+    "alreadyTitle": "Già annullato",
+    "alreadyDescription": "Questo indirizzo era già stato annullato in precedenza.",
+    "errorTitle": "Link non valido",
+    "errorDescription": "Il link è scaduto o non è valido. Riprova da un'email recente."
   }
 }
