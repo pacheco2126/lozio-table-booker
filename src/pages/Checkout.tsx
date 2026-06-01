@@ -22,7 +22,10 @@ import {
   Clock,
   Phone,
   User,
+  Tag,
+  X,
 } from "lucide-react";
+import { useDiscount, type DiscountReason } from "@/hooks/useDiscount";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { locationsData } from "@/lib/locations";
 import { getNearestStore } from "@/lib/nearestStore";
@@ -44,6 +47,9 @@ import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 const Checkout = () => {
   const { items, totalPrice, updateQuantity, removeItem, clearCart } = useCart();
   const { user, loading: authLoading } = useAuth();
+  const discount = useDiscount({ subtotal: totalPrice, enabled: !!user });
+  const discountAmount = discount.applied?.discount_amount ?? 0;
+  const finalTotal = Math.max(0, totalPrice - discountAmount);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const stripe = useStripe();
@@ -225,7 +231,9 @@ const Checkout = () => {
           payment_method: form.paymentMethod,
           payment_status: "pending",
           notes: form.notes || null,
-          total_amount: totalPrice,
+          total_amount: finalTotal,
+          discount_id: discount.applied?.discount_id ?? null,
+          discount_amount: discountAmount,
           scheduled_for: scheduledFor ? scheduledFor.toISOString() : null,
         })
         .select("id")
@@ -858,6 +866,60 @@ const Checkout = () => {
                 />
               </div>
 
+              {/* Discount / coupon */}
+              <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+                <div className="flex items-center gap-2 font-display font-bold text-sm">
+                  <Tag className="w-4 h-4" /> {t("checkout.discount.title")}
+                </div>
+                {discount.applied ? (
+                  <div className="flex items-center justify-between gap-2 rounded-lg bg-primary/8 border border-primary/20 px-3 py-2">
+                    <div className="text-sm">
+                      <span className="font-bold text-primary">{discount.applied.code}</span>
+                      <span className="text-muted-foreground ml-2">
+                        −{discount.applied.discount_amount.toFixed(2)} €
+                        {" · "}
+                        {discount.applied.manual ? t("checkout.discount.appliedManual") : t("checkout.discount.appliedAuto")}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={discount.clear}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label={t("checkout.discount.remove")}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground font-body">{t("checkout.discount.haveCode")}</p>
+                    <div className="flex gap-2">
+                      <Input
+                        value={discount.code}
+                        onChange={(e) => discount.setCode(e.target.value.toUpperCase())}
+                        placeholder={t("checkout.discount.placeholder")}
+                        className="font-body uppercase"
+                        maxLength={32}
+                      />
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => discount.apply(discount.code)}
+                        disabled={discount.loading || !discount.code.trim()}
+                        className="font-body shrink-0"
+                      >
+                        {discount.loading ? "…" : t("checkout.discount.apply")}
+                      </Button>
+                    </div>
+                    {discount.error && (
+                      <p className="text-xs text-destructive font-body">
+                        {t(`checkout.discount.errors.${discount.error as DiscountReason}`)}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <Button
                 type="submit"
                 disabled={loading || (form.paymentMethod === "stripe" && !stripe)}
@@ -865,7 +927,7 @@ const Checkout = () => {
               >
                 {loading
                   ? t("checkout.processing")
-                  : `${t("checkout.confirmOrder")} · ${totalPrice.toFixed(2)} €`}
+                  : `${t("checkout.confirmOrder")} · ${finalTotal.toFixed(2)} €`}
               </Button>
             </form>
 
@@ -970,11 +1032,23 @@ const Checkout = () => {
                   })}
                 </div>
 
-                <div className="px-5 py-4 border-t border-border bg-muted/30">
+                <div className="px-5 py-4 border-t border-border bg-muted/30 space-y-2">
+                  {discount.applied && (
+                    <>
+                      <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <span>{t("checkout.discount.subtotal")}</span>
+                        <span>{totalPrice.toFixed(2)} €</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm text-primary font-semibold">
+                        <span>{discount.applied.code}</span>
+                        <span>−{discount.applied.discount_amount.toFixed(2)} €</span>
+                      </div>
+                    </>
+                  )}
                   <div className="flex justify-between items-center">
                     <span className="font-display font-bold text-base">{t("cart.total")}</span>
                     <span className="font-display text-2xl font-bold text-menu-teal">
-                      {totalPrice.toFixed(2)} €
+                      {finalTotal.toFixed(2)} €
                     </span>
                   </div>
                 </div>

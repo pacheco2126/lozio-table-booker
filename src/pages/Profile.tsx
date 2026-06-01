@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { EU_ALLERGENS } from "@/lib/allergens";
+import { MyDiscountsSection } from "@/components/MyDiscountsSection";
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -315,6 +316,8 @@ const Profile = () => {
                 </form>
               </div>
             </form>
+
+            <MyDiscountsSection />
           </div>
         </div>
       </div>

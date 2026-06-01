@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
-import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse, Tag } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -19,6 +19,7 @@ import Navbar from "@/components/Navbar";
 import AdminManualReservation from "@/components/AdminManualReservation";
 import PushNotificationToggle from "@/components/PushNotificationToggle";
 import AdminUserRoles from "@/components/AdminUserRoles";
+import AdminDiscounts from "@/components/AdminDiscounts";
 import FloorPlan from "@/components/FloorPlan";
 import AdminCustomers from "@/components/AdminCustomers";
 import AdminReports from "@/components/AdminReports";
@@ -437,6 +438,9 @@ const Admin = () => {
                 <DropdownMenuItem onClick={() => navigate("/admin/inventario")}>
                   <Warehouse className="w-4 h-4 mr-2" /> Inventario
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("discounts")}>
+                  <Tag className="w-4 h-4 mr-2" /> Descuentos
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveTab("roles")}>
                   <Shield className="w-4 h-4 mr-2" /> Roles de usuario
                 </DropdownMenuItem>
@@ -459,7 +463,7 @@ const Admin = () => {
                 ← Volver
               </Button>
               <Badge variant="secondary" className="font-body capitalize">
-                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab}
+                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab === "discounts" ? "Descuentos" : activeTab}
               </Badge>
             </div>
           )}
@@ -647,6 +651,7 @@ const Admin = () => {
           <TabsContent value="customers"><AdminCustomers /></TabsContent>
           <TabsContent value="media"><AdminMedia /></TabsContent>
           <TabsContent value="roles"><AdminUserRoles /></TabsContent>
+          <TabsContent value="discounts"><AdminDiscounts /></TabsContent>
           <TabsContent value="products"><AdminProducts /></TabsContent>
         </Tabs>
       </div>
