@@ -14,6 +14,7 @@ import InstallBanner from "@/components/InstallBanner";
 import UpdateBanner from "@/components/UpdateBanner";
 import AdminFAB from "@/components/AdminFAB";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
+import IncomingOrderManager from "@/components/IncomingOrderManager";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import Index from "./pages/Index.tsx";
@@ -66,6 +67,7 @@ const App = () => (
             <CartFloatingButton />
             <MobileBottomNav />
             <AdminFAB />
+            <IncomingOrderManager />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
