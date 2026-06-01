@@ -4,11 +4,13 @@ import { UtensilsCrossed, Bike } from "lucide-react";
 import heroPizza from "@/assets/fondopizza.jpg";
 import logoZio from "@/assets/logozio.png";
 import { useMedia } from "@/hooks/useMedia";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { getBackgroundVideos, loading } = useMedia("background_video");
+  const { isAdmin } = useIsAdmin();
 
   const backgroundVideos = getBackgroundVideos();
   const videoUrl = backgroundVideos.length > 0 ? backgroundVideos[0] : null;
@@ -77,7 +79,8 @@ const HeroSection = () => {
             <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/40 rounded-xl transition-colors" />
           </button>
 
-          {/* Pedir a Domicilio */}
+          {/* Pedir a Domicilio — solo admin */}
+          {isAdmin && (
           <button
             onClick={() => {
               const el = document.getElementById("menu");
@@ -104,6 +107,7 @@ const HeroSection = () => {
             </div>
             <div className="absolute inset-0 border-2 border-transparent group-hover:border-accent/40 rounded-xl transition-colors" />
           </button>
+          )}
         </div>
       </div>
     </section>
