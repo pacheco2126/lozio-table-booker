@@ -15,6 +15,7 @@ import UpdateBanner from "@/components/UpdateBanner";
 import AdminFAB from "@/components/AdminFAB";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 import IncomingOrderManager from "@/components/IncomingOrderManager";
+import AdminInventoryPage from "./pages/AdminInventoryPage.tsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import Index from "./pages/Index.tsx";
@@ -82,6 +83,7 @@ const App = () => (
               <Route path="/resenas" element={<ReviewPage />} />
               <Route path="/admin/pedidos/:store" element={<AdminOrders />} />
               <Route path="/mis-pedidos" element={<MyOrders />} />
+              <Route path="/admin/inventario" element={<AdminInventoryPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
