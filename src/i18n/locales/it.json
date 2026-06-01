@@ -189,7 +189,9 @@
     "title": "Il Tuo Ordine",
     "empty": "Il tuo carrello è vuoto",
     "total": "Totale",
-    "checkout": "Effettua Ordine"
+    "checkout": "Effettua Ordine",
+    "addMorePizza": "Ti manca un'altra pizza?",
+    "upsellTitle": "Vuoi aggiungere qualcosa in più?"
   },
   "checkout": {
     "emptyTitle": "Il tuo carrello è vuoto",
@@ -236,7 +238,8 @@
     "cardDetails": "Dati della carta",
     "stripeSecure": "Pagamento sicuro gestito da Stripe",
     "stripeNotLoaded": "Sistema di pagamento non disponibile. Ricarica la pagina.",
-    "stripeError": "Errore nel pagamento. Controlla i dati della tua carta."
+    "stripeError": "Errore nel pagamento. Controlla i dati della tua carta.",
+    "addressSuggestionHint": "Suggerimento orientativo — verifica l'indirizzo prima di confermare"
   },
   "admin": {
     "title": "Pannello di Amministrazione",

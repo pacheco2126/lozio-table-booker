@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin, Loader2, AlertTriangle } from "lucide-react";
 
 interface AddressResult {
   address: string;
@@ -49,6 +50,7 @@ function parseNominatim(r: NominatimResult): AddressResult | null {
 }
 
 export default function AddressAutocomplete({ value, onChange, onSelect, placeholder, error }: Props) {
+  const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState<AddressResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -181,8 +183,9 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
               <span className="leading-snug">{s.display}</span>
             </li>
           ))}
-          <li className="px-3 py-1.5 text-[10px] text-muted-foreground border-t border-border bg-muted/30 select-none">
-            Datos de OpenStreetMap
+          <li className="flex items-center gap-1.5 px-3 py-2 text-[11px] text-amber-600 border-t border-border bg-amber-50/60 dark:bg-amber-950/20 dark:text-amber-400 select-none">
+            <AlertTriangle className="w-3 h-3 shrink-0" />
+            {t("checkout.addressSuggestionHint")}
           </li>
         </ul>
       )}

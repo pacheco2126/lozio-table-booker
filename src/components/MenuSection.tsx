@@ -7,12 +7,14 @@ import { useCart } from "@/contexts/CartContext";
 import type { CartItemExtra } from "@/contexts/CartContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useMedia } from "@/hooks/useMedia";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getAllergenById } from "@/lib/allergens";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import AddToCartDialog from "@/components/AddToCartDialog";
+import CartSidebar from "@/components/CartSidebar";
 
 interface MenuItemData {
   name: string;
@@ -406,10 +408,11 @@ const MenuCard = ({
 };
 
 const MenuSection = () => {
-  const { addItem, setIsOpen: openCart } = useCart();
+  const { addItem, setIsOpen: openCart, totalItems } = useCart();
   const { isAdmin } = useIsAdmin();
   const { t } = useTranslation();
   const { getImageForItem } = useMedia("menu_item");
+  const isMobile = useIsMobile();
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
@@ -436,7 +439,7 @@ const MenuSection = () => {
       note: note || undefined,
     });
     setDialogItem(null);
-    openCart(true);
+    if (isMobile) openCart(true);
     toast.success(t("menu.addedToOrder", { name: dialogItem.name }));
   };
 
@@ -513,6 +516,7 @@ const MenuSection = () => {
           </Alert>
 
 
+          {/* Sticky category nav — always full width */}
           <div
             ref={navRef}
             className={cn(
@@ -543,33 +547,47 @@ const MenuSection = () => {
             </div>
           </div>
 
-          {/* Category Sections */}
-          {categories.map((cat) => {
-            const items = menuItems.filter((i) => i.category === cat.id);
-            if (!items.length) return null;
-            return (
-              <div
-                key={cat.id}
-                ref={(el) => {
-                  sectionRefs.current[cat.id] = el;
-                }}
-                className="mb-16 scroll-mt-40"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <cat.icon className="w-6 h-6 text-menu-teal" />
-                  <h3 className="font-display text-2xl md:text-3xl font-bold text-menu-teal">
-                    {categoryLabels[cat.id]}
-                  </h3>
-                  <span className="text-muted-foreground font-body text-sm">({items.length})</span>
-                </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-                  {items.map((item) => (
-                    <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item, getImageForItem(item.imageKey ?? item.name))} showAddButton={true} imageUrl={getImageForItem(item.imageKey ?? item.name)} />
-                  ))}
-                </div>
+          {/* Two-column on desktop when cart has items */}
+          <div className={cn(
+            totalItems > 0 && "lg:grid lg:grid-cols-[1fr_320px] lg:gap-8 lg:items-start"
+          )}>
+            {/* Left: category sections */}
+            <div>
+              {categories.map((cat) => {
+                const items = menuItems.filter((i) => i.category === cat.id);
+                if (!items.length) return null;
+                return (
+                  <div
+                    key={cat.id}
+                    ref={(el) => {
+                      sectionRefs.current[cat.id] = el;
+                    }}
+                    className="mb-16 scroll-mt-40"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <cat.icon className="w-6 h-6 text-menu-teal" />
+                      <h3 className="font-display text-2xl md:text-3xl font-bold text-menu-teal">
+                        {categoryLabels[cat.id]}
+                      </h3>
+                      <span className="text-muted-foreground font-body text-sm">({items.length})</span>
+                    </div>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+                      {items.map((item) => (
+                        <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item, getImageForItem(item.imageKey ?? item.name))} showAddButton={true} imageUrl={getImageForItem(item.imageKey ?? item.name)} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Right: cart sidebar (desktop only, when cart has items) */}
+            {totalItems > 0 && (
+              <div className="hidden lg:block">
+                <CartSidebar />
               </div>
-            );
-          })}
+            )}
+          </div>
         </div>
       </section>
 

@@ -189,7 +189,9 @@
     "title": "La Teva Comanda",
     "empty": "El teu carret està buit",
     "total": "Total",
-    "checkout": "Fer Comanda"
+    "checkout": "Fer Comanda",
+    "addMorePizza": "Et falta alguna pizza?",
+    "upsellTitle": "Vols afegir alguna cosa més?"
   },
   "checkout": {
     "emptyTitle": "El teu carret està buit",
@@ -236,7 +238,8 @@
     "cardDetails": "Dades de la targeta",
     "stripeSecure": "Pagament segur gestionat per Stripe",
     "stripeNotLoaded": "El sistema de pagament no està disponible. Recarrega la pàgina.",
-    "stripeError": "Error en el pagament. Revisa les dades de la teva targeta."
+    "stripeError": "Error en el pagament. Revisa les dades de la teva targeta.",
+    "addressSuggestionHint": "Suggeriment orientatiu — verifica l'adreça abans de confirmar"
   },
   "admin": {
     "title": "Panell d'Administració",

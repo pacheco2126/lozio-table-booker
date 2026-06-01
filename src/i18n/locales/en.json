@@ -189,7 +189,9 @@
     "title": "Your Order",
     "empty": "Your cart is empty",
     "total": "Total",
-    "checkout": "Place Order"
+    "checkout": "Place Order",
+    "addMorePizza": "Want to add another pizza?",
+    "upsellTitle": "Want to add something else?"
   },
   "checkout": {
     "emptyTitle": "Your cart is empty",
@@ -236,7 +238,8 @@
     "cardDetails": "Card details",
     "stripeSecure": "Secure payment managed by Stripe",
     "stripeNotLoaded": "Payment system unavailable. Please reload the page.",
-    "stripeError": "Payment error. Please check your card details."
+    "stripeError": "Payment error. Please check your card details.",
+    "addressSuggestionHint": "Suggested address — please verify before confirming"
   },
   "admin": {
     "title": "Admin Panel",
