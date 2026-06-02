@@ -74,6 +74,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
   tomate_salsas:      "Tomate y salsas",
   embutidos_carnes:   "Embutidos y carnes",
   verduras:           "Verduras",
+  pescado:            "Pescado",
   bebidas:            "Bebidas",
   aceites_condimentos:"Aceites y condimentos",
   packaging:          "Packaging",
