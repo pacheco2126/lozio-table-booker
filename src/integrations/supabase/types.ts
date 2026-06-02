@@ -14,6 +14,267 @@ export type Database = {
   }
   public: {
     Tables: {
+      discount_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          discount_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          discount_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          discount_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_assignments_discount_id_fkey"
+            columns: ["discount_id"]
+            isOneToOne: false
+            referencedRelation: "discounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discount_redemptions: {
+        Row: {
+          cancelled_at: string | null
+          discount_amount: number
+          discount_id: string
+          id: string
+          order_id: string | null
+          redeemed_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          discount_amount: number
+          discount_id: string
+          id?: string
+          order_id?: string | null
+          redeemed_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          discount_amount?: number
+          discount_id?: string
+          id?: string
+          order_id?: string | null
+          redeemed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_redemptions_discount_id_fkey"
+            columns: ["discount_id"]
+            isOneToOne: false
+            referencedRelation: "discounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_redemptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discount_validation_attempts: {
+        Row: {
+          attempt_minute: string
+          attempts: number
+          user_id: string
+        }
+        Insert: {
+          attempt_minute: string
+          attempts?: number
+          user_id: string
+        }
+        Update: {
+          attempt_minute?: string
+          attempts?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      discounts: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string
+          id: string
+          is_active: boolean
+          min_order_amount: number | null
+          name: string
+          updated_at: string
+          usage_limit: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string
+          id?: string
+          is_active?: boolean
+          min_order_amount?: number | null
+          name: string
+          updated_at?: string
+          usage_limit?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          min_order_amount?: number | null
+          name?: string
+          updated_at?: string
+          usage_limit?: number | null
+        }
+        Relationships: []
+      }
+      inventory_items: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          low_stock_threshold: number
+          name: string
+          notes: string | null
+          sort_order: number
+          stores: string[]
+          target_quantity: number | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          low_stock_threshold?: number
+          name: string
+          notes?: string | null
+          sort_order?: number
+          stores?: string[]
+          target_quantity?: number | null
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          low_stock_threshold?: number
+          name?: string
+          notes?: string | null
+          sort_order?: number
+          stores?: string[]
+          target_quantity?: number | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      inventory_movements: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          delta: number
+          id: string
+          item_id: string
+          note: string | null
+          resulting_quantity: number
+          store: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          delta: number
+          id?: string
+          item_id: string
+          note?: string | null
+          resulting_quantity: number
+          store: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          delta?: number
+          id?: string
+          item_id?: string
+          note?: string | null
+          resulting_quantity?: number
+          store?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_stock: {
+        Row: {
+          id: string
+          item_id: string
+          quantity: number
+          store: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          quantity?: number
+          store: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          quantity?: number
+          store?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_stock_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media: {
         Row: {
           alt_text: string | null
@@ -135,10 +396,15 @@ export type Database = {
       }
       orders: {
         Row: {
+          accepted_at: string | null
+          assigned_to: string | null
           created_at: string
           delivery_address: string | null
           delivery_city: string | null
           delivery_postal_code: string | null
+          discount_amount: number
+          discount_id: string | null
+          estimated_time: number | null
           guest_email: string
           guest_name: string
           guest_phone: string
@@ -148,18 +414,26 @@ export type Database = {
           payment_method: string
           payment_status: string
           pickup_store: string | null
+          rejection_reason: string | null
           scheduled_for: string | null
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
+          subtotal_amount: number | null
           total_amount: number
+          transferred_from: string | null
           user_id: string | null
         }
         Insert: {
+          accepted_at?: string | null
+          assigned_to?: string | null
           created_at?: string
           delivery_address?: string | null
           delivery_city?: string | null
           delivery_postal_code?: string | null
+          discount_amount?: number
+          discount_id?: string | null
+          estimated_time?: number | null
           guest_email: string
           guest_name: string
           guest_phone: string
@@ -169,18 +443,26 @@ export type Database = {
           payment_method?: string
           payment_status?: string
           pickup_store?: string | null
+          rejection_reason?: string | null
           scheduled_for?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          subtotal_amount?: number | null
           total_amount?: number
+          transferred_from?: string | null
           user_id?: string | null
         }
         Update: {
+          accepted_at?: string | null
+          assigned_to?: string | null
           created_at?: string
           delivery_address?: string | null
           delivery_city?: string | null
           delivery_postal_code?: string | null
+          discount_amount?: number
+          discount_id?: string | null
+          estimated_time?: number | null
           guest_email?: string
           guest_name?: string
           guest_phone?: string
@@ -190,14 +472,25 @@ export type Database = {
           payment_method?: string
           payment_status?: string
           pickup_store?: string | null
+          rejection_reason?: string | null
           scheduled_for?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          subtotal_amount?: number | null
           total_amount?: number
+          transferred_from?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_discount_id_fkey"
+            columns: ["discount_id"]
+            isOneToOne: false
+            referencedRelation: "discounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -443,6 +736,40 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_inventory_movement: {
+        Args: {
+          p_item_id: string
+          p_note?: string
+          p_store: string
+          p_type: string
+          p_value: number
+        }
+        Returns: {
+          id: string
+          item_id: string
+          quantity: number
+          store: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "inventory_stock"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      can_access_store: {
+        Args: { _store: string; _user_id: string }
+        Returns: boolean
+      }
+      can_manage_inventory_catalog: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
+      compute_discount_amount: {
+        Args: { _subtotal: number; _type: string; _value: number }
+        Returns: number
+      }
       find_available_table: {
         Args: {
           _date: string
@@ -461,6 +788,10 @@ export type Database = {
         }
         Returns: string[]
       }
+      get_best_assigned_discount: {
+        Args: { p_subtotal: number }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -468,9 +799,42 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_my_discounts: {
+        Args: never
+        Returns: {
+          code: string
+          description: string
+          discount_type: string
+          discount_value: number
+          expires_at: string
+          id: string
+          min_order_amount: number
+          name: string
+        }[]
+      }
+      list_users_with_roles: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          roles: Database["public"]["Enums"]["app_role"][]
+          user_id: string
+        }[]
+      }
+      validate_discount_preview: {
+        Args: { p_code: string; p_subtotal: number }
+        Returns: Json
+      }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role:
+        | "admin"
+        | "user"
+        | "pizzeriaRincon"
+        | "god"
+        | "pizzeriaTarragona"
+        | "pizzeriaArrabassada"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -598,7 +962,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: [
+        "admin",
+        "user",
+        "pizzeriaRincon",
+        "god",
+        "pizzeriaTarragona",
+        "pizzeriaArrabassada",
+      ],
     },
   },
 } as const
