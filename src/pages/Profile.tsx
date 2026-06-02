@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { EU_ALLERGENS } from "@/lib/allergens";
+import { MyDiscountsSection } from "@/components/MyDiscountsSection";
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -263,20 +264,6 @@ const Profile = () => {
                 />
               </div>
 
-              <div>
-                <label className="block font-body text-sm font-bold text-foreground mb-1.5">
-                  {t("profile.favoriteArea")}
-                </label>
-                <input
-                  type="text"
-                  name="favorite_table_area"
-                  value={profile.favorite_table_area}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder={t("profile.favoriteAreaPlaceholder")}
-                />
-              </div>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -329,6 +316,8 @@ const Profile = () => {
                 </form>
               </div>
             </form>
+
+            <MyDiscountsSection />
           </div>
         </div>
       </div>

@@ -1,7 +1,10 @@
 project_id = "lnrnyahzkqqnvlpzrdlv"
 
-[functions.notify-reservation]
+[functions.confirm-reservation]
 verify_jwt = false
 
-[functions.confirm-reservation]
+[functions.refund-order]
+verify_jwt = false
+
+[functions.notify-order-status]
 verify_jwt = false
