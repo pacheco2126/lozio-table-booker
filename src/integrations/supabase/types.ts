@@ -873,6 +873,7 @@ export type Database = {
         Args: { _store: string; _user_id: string }
         Returns: boolean
       }
+      can_insert_order_item: { Args: { _order_id: string }; Returns: boolean }
       can_manage_inventory_catalog: {
         Args: { _user_id: string }
         Returns: boolean
