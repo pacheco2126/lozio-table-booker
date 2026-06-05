@@ -476,7 +476,7 @@ const MyReservations = () => {
                   onChange={(e) => setEditGuests(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg bg-background border border-input font-body text-foreground text-sm"
                 >
-                  {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                  {Array.from({ length: 15 }, (_, i) => i + 1).map((n) => (
                     <option key={n} value={n}>{n}</option>
                   ))}
                 </select>

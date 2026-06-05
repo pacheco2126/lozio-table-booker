@@ -12,6 +12,13 @@ self.skipWaiting();
 clientsClaim();
 cleanupOutdatedCaches();
 
+// Allow the page to force activation of a waiting SW (kiosk/TPV auto-update)
+self.addEventListener('message', (event: ExtendableMessageEvent) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Injected by vite-plugin-pwa at build time
 precacheAndRoute(self.__WB_MANIFEST);
 
@@ -64,8 +71,11 @@ self.addEventListener('push', (event: PushEvent) => {
       // Unique tag so back-to-back reservations don't replace each other
       tag: `res-${Date.now()}`,
       requireInteraction: true,
+      // Vibrate on Android (iOS uses system sound automatically)
+      vibrate: [200, 100, 200, 100, 200],
+      renotify: true,
       data: { url: data.url ?? '/admin' },
-    }),
+    } as NotificationOptions),
   );
 });
 

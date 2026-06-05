@@ -357,7 +357,7 @@ const FloorPlan = () => {
                 <label className="block font-body text-sm font-bold text-foreground mb-1">{t("floorPlan.guests")}</label>
                 <select value={newResForm.guests} onChange={(e) => setNewResForm(p => ({ ...p, guests: e.target.value }))}
                   className="w-full px-3 py-2 rounded-md bg-background border border-input font-body text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                  {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
+                  {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
               <div>

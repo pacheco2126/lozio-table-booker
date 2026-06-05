@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,7 +14,8 @@ import InstallBanner from "@/components/InstallBanner";
 import UpdateBanner from "@/components/UpdateBanner";
 import AdminFAB from "@/components/AdminFAB";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
-import { usePushSubscription } from "@/hooks/usePushSubscription";
+import IncomingOrderManager from "@/components/IncomingOrderManager";
+import AdminInventoryPage from "./pages/AdminInventoryPage.tsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import Index from "./pages/Index.tsx";
@@ -28,14 +30,25 @@ import ResetPassword from "./pages/ResetPassword.tsx";
 import MyReservations from "./pages/MyReservations.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ReviewPage from "./pages/ReviewPage.tsx";
+import AdminOrders from "./pages/AdminOrders.tsx";
+import MyOrders from "./pages/MyOrders.tsx";
+import Unsubscribe from "./pages/Unsubscribe.tsx";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? "");
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 const queryClient = new QueryClient();
 
 const AdminNotificationListener = () => {
   useAdminNotifications();
-  usePushSubscription();
+  return null;
+};
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   return null;
 };
 
@@ -46,15 +59,17 @@ const App = () => (
       <CartProvider>
         <TooltipProvider>
           <Toaster />
-          <Sonner />
+          <Sonner position="top-center" />
           <AdminNotificationListener />
           <BrowserRouter>
+            <ScrollToTop />
             <InstallBanner />
             <UpdateBanner />
             <CartDrawer />
             <CartFloatingButton />
             <MobileBottomNav />
             <AdminFAB />
+            <IncomingOrderManager />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -67,6 +82,10 @@ const App = () => (
               <Route path="/locales" element={<Locales />} />
               <Route path="/locales/:slug" element={<LocationDetail />} />
               <Route path="/resenas" element={<ReviewPage />} />
+              <Route path="/admin/pedidos/:store" element={<AdminOrders />} />
+              <Route path="/mis-pedidos" element={<MyOrders />} />
+              <Route path="/admin/inventario" element={<AdminInventoryPage />} />
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

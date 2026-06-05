@@ -46,7 +46,7 @@ const CLOSED_DAYS: Record<string, number[]> = {
 
 const timeSlots = ["19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00"];
 
-const guestOptions = Array.from({ length: 10 }, (_, i) => i + 1);
+const guestOptions = Array.from({ length: 15 }, (_, i) => i + 1);
 
 const dateFnsLocales: Record<string, typeof es> = { es, en: enUS, ca };
 
@@ -146,33 +146,34 @@ const ReservationSection = () => {
 
   useEffect(() => {
     const fetchAvailability = async () => {
-      setLoadingSlots(true);
-
-      const [resResult, tablesResult] = await Promise.all([
-        supabase
-          .from("reservations")
-          .select("reservation_time, guests, table_id")
-          .eq("location", selectedLocation)
-          .eq("reservation_date", format(date, "yyyy-MM-dd"))
-          .in("status", ["pending", "confirmed"]),
-        supabase.from("tables").select("id, name, capacity").eq("location", selectedLocation).eq("is_active", true),
-      ]);
-
-      if (resResult.error) {
-        console.error("Error fetching availability:", resResult.error);
+      if (guests === "15+" || guestsNum > MAX_ONLINE_GUESTS) {
         setUnavailableSlots(new Set());
-      } else {
-        const unavailable = getUnavailableSlots(
-          resResult.data || [],
-          loc.timeSlots,
-          guestsNum,
-          tablesResult.data || undefined,
-        );
-        setUnavailableSlots(unavailable);
+        return;
       }
+      setLoadingSlots(true);
+      const dateStr = format(date, "yyyy-MM-dd");
+      // Use the same RPC the backend uses to create reservations,
+      // so the UI shows EXACTLY the same availability as the booking attempt.
+      const results = await Promise.all(
+        loc.timeSlots.map(async (slot) => {
+          const { data, error } = await supabase.rpc("find_available_tables_multi", {
+            _location: selectedLocation,
+            _date: dateStr,
+            _time: `${slot}:00`,
+            _guests: guestsNum,
+          });
+          if (error) {
+            console.error("Availability RPC error for", slot, error);
+            return { slot, available: true };
+          }
+          return { slot, available: Array.isArray(data) && data.length > 0 };
+        }),
+      );
+      const unavailable = new Set<string>();
+      for (const r of results) if (!r.available) unavailable.add(r.slot);
+      setUnavailableSlots(unavailable);
       setLoadingSlots(false);
     };
-
     fetchAvailability();
   }, [selectedLocation, date, guests, loc.timeSlots, guestsNum]);
 
@@ -383,7 +384,7 @@ const ReservationSection = () => {
                           {n}
                         </option>
                       ))}
-                      <option value="10+">+10</option>
+                      <option value="15+">+15</option>
                     </select>
                   </div>
                   <div>
@@ -429,7 +430,9 @@ const ReservationSection = () => {
                   <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
                   <AlertDescription
                     className="text-yellow-800 dark:text-yellow-200 font-body text-sm"
-                    dangerouslySetInnerHTML={{ __html: `${t("reservation.durationWarning")} <strong>${t("reservation.durationTime")}</strong> ${t("reservation.durationWarningPost")}` }}
+                    dangerouslySetInnerHTML={{
+                      __html: `${t("reservation.durationWarning")} <strong>${t("reservation.durationTime")}</strong> ${t("reservation.durationWarningPost")}`,
+                    }}
                   />
                 </Alert>
 
@@ -444,7 +447,7 @@ const ReservationSection = () => {
                       </span>
                     )}
                   </div>
-                  {guests === "10+" || guestsNum > MAX_ONLINE_GUESTS ? (
+                  {guests === "15+" || guestsNum > MAX_ONLINE_GUESTS ? (
                     <div className="text-center py-6 space-y-3">
                       <p className="font-body text-sm text-muted-foreground">
                         {t(
