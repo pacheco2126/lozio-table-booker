@@ -207,6 +207,9 @@ const Checkout = () => {
       if (form.orderType === "delivery") {
         assignedStore = await getNearestStore(form.address, form.city, form.postalCode, fulfillAt);
       }
+      // Rincon orders fall back to tarragona (no dedicated staff account)
+      const assignedTo: "tarragona" | "arrabassada" =
+        assignedStore === "arrabassada" ? "arrabassada" : "tarragona";
 
       // 1. Create order in Supabase
       const { data: order, error: orderError } = await supabase
@@ -218,6 +221,7 @@ const Checkout = () => {
           guest_phone: form.phone,
           order_type: form.orderType,
           pickup_store: assignedStore,
+          assigned_to: assignedTo,
           delivery_address: form.orderType === "delivery"
             ? [
                 form.address,
