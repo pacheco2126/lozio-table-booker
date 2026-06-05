@@ -82,26 +82,26 @@ const HeroSection = () => {
           {/* Pedir a Domicilio */}
           <button
             onClick={() => {
-              if (!isAdmin) return;
+              if (isAdmin) return;
               const el = document.getElementById("menu");
               if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             className={`group relative flex-1 rounded-xl overflow-hidden border border-primary-foreground/20 backdrop-blur-sm transition-all duration-300 min-h-[140px] md:min-h-[200px] animate-fade-in-up ${
-              isAdmin
+              !isAdmin
                 ? "bg-foreground/40 hover:bg-foreground/50 cursor-pointer"
                 : "bg-foreground/20 cursor-default opacity-70"
             }`}
             style={{ animationDelay: "0.5s" }}
           >
-            {/* Badge JustEat (solo admin) / Próximamente (resto) */}
+            {/* Badge JustEat (usuarios) / Próximamente (admin) */}
             <span
               className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[10px] md:text-xs font-bold shadow-lg animate-fade-in-up"
               style={{ animationDelay: "0.7s" }}
             >
-              {isAdmin ? "🏆 Mejor Restaurante JustEat Catalunya" : t("hero.comingSoon", "Próximamente")}
+              {!isAdmin ? "🏆 Mejor Restaurante JustEat Catalunya" : t("hero.comingSoon", "Próximamente")}
             </span>
             <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
-              <Bike className={`w-10 h-10 md:w-12 md:h-12 mb-3 transition-transform ${isAdmin ? "text-accent group-hover:scale-110" : "text-primary-foreground/40"}`} />
+              <Bike className={`w-10 h-10 md:w-12 md:h-12 mb-3 transition-transform ${!isAdmin ? "text-accent group-hover:scale-110" : "text-primary-foreground/40"}`} />
               <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground mb-1">
                 {t("hero.orderCta", "Pedir a Domicilio")}
               </h2>
@@ -109,7 +109,7 @@ const HeroSection = () => {
                 {t("hero.orderSubtitle", "Ver carta y hacer tu pedido")}
               </p>
             </div>
-            {isAdmin && (
+            {!isAdmin && (
               <div className="absolute inset-0 border-2 border-transparent group-hover:border-accent/40 rounded-xl transition-colors" />
             )}
           </button>
