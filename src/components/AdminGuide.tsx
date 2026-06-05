@@ -137,8 +137,8 @@ const TOPICS: Topic[] = [
       {
         q: "¿Qué información muestra cada pedido?",
         a: [
-          "Nombre, teléfono y email del cliente.",
-          "Tipo: Entrega a domicilio (con dirección) o Recogida en local.",
+          "Nombre y teléfono del cliente.",
+          "Tipo: Entrega a domicilio (Reparto) o Recogida en local.",
           "Método de pago: Efectivo o Tarjeta.",
           "Estado del pago: Sin cobrar / Pagado / Fallido / Reembolsado.",
           "Artículos, cantidades y precios individuales.",
