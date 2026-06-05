@@ -62,14 +62,6 @@ const TOPICS: Topic[] = [
         ],
       },
       {
-        q: "¿Cómo seleccionar y cambiar estado a varias reservas a la vez?",
-        a: [
-          "Marca las casillas a la izquierda de las reservas que quieras modificar.",
-          "Aparecerá una barra de acción con un selector de estado.",
-          "Elige el nuevo estado y confirma. El cambio se aplica a todas las seleccionadas.",
-        ],
-      },
-      {
         q: "¿Cómo activar o desactivar las reservas online para los clientes?",
         a: [
           "En la pestaña «Reservas», localiza el interruptor «Reservas activas / Reservas desactivadas» (arriba de la lista).",
