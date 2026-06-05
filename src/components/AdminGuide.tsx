@@ -84,8 +84,19 @@ const TOPICS: Topic[] = [
         a: [
           "Ve a la pestaña «Reservas» → sub-pestaña «Plano».",
           "Muestra la distribución visual de las mesas del local con su estado en tiempo real.",
-          "Las mesas en verde están libres; las ocupadas muestran el nombre del cliente.",
-          "Haz clic en una mesa para ver los detalles de la reserva asignada.",
+          "Las mesas en gris están libres, las rojas y color bronce que hay una reserva en esa mesa pronto.",
+          "Las azules son mesa comodín, el programa no las asigna automaticamente.",
+          "Haz doble clic en una mesa para ver los detalles de la reserva asignada.",
+        ],
+      },
+      {
+        q: "¿Cómo asignar las mesas comodín (azules en el plano salon)",
+        a: [
+          "Ve a la pestaña «Reservas» → sub-pestaña «Plano».",
+          "Haz doble clic en una mesa azul para ver crear una reserva, OJO!",
+          "Ten en cuenta que la hora que esté seleccionada la vista del plano salon (puedes cambiarlo con las flechas) será la hora en la que se cree la reserva.",
+          "Actualmente te guardará solo esa mesa independientemente de las personas que sean",
+          "Si necesitas mas mesas para tu reserva repite esto dos veces.",
         ],
       },
     ],
