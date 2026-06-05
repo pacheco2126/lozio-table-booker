@@ -1,12 +1,21 @@
 import { useState } from "react";
-import {
-  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
-  CalendarDays, ShoppingBag, Warehouse, Tag, Package, Users, ShieldCheck,
-  Image as ImageIcon, BarChart3, Star, Search, BookOpen, Pizza,
+  CalendarDays,
+  ShoppingBag,
+  Warehouse,
+  Tag,
+  Package,
+  Users,
+  ShieldCheck,
+  Image as ImageIcon,
+  BarChart3,
+  Star,
+  Search,
+  BookOpen,
+  Pizza,
 } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -48,7 +57,7 @@ const TOPICS: Topic[] = [
         a: [
           "En la lista de reservas, haz clic sobre la reserva y usa el icono de lápiz para editar.",
           "Puedes cambiar: fecha, hora, comensales, nombre, teléfono y notas.",
-          "Para cambiar el estado (Pendiente → Confirmada → Cancelada), usa el selector de estado dentro de la ficha o selecciona varias reservas y aplica un cambio masivo.",
+          "Para cambiar el estado (Confirmada → Cancelada), usa el selector de estado dentro de la ficha.",
           "El sistema comprueba disponibilidad en tiempo real: si no hay mesa disponible para la nueva fecha/hora, te avisará y no guardará el cambio.",
         ],
       },
@@ -465,7 +474,7 @@ const AdminGuide = () => {
             f.q.toLowerCase().includes(search.toLowerCase()) ||
             (Array.isArray(f.a)
               ? f.a.some((line) => line.toLowerCase().includes(search.toLowerCase()))
-              : f.a.toLowerCase().includes(search.toLowerCase()))
+              : f.a.toLowerCase().includes(search.toLowerCase())),
         )
       : topic.faqs,
   })).filter((t) => t.faqs.length > 0);
@@ -476,9 +485,7 @@ const AdminGuide = () => {
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="flex items-center gap-2 text-muted-foreground">
           <BookOpen className="w-5 h-5" />
-          <p className="font-body text-sm">
-            Guía de uso del panel de administración · Lo Zio
-          </p>
+          <p className="font-body text-sm">Guía de uso del panel de administración · Lo Zio</p>
         </div>
         <div className="sm:ml-auto flex items-center gap-2 max-w-xs w-full">
           <Search className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -527,9 +534,7 @@ const AdminGuide = () => {
                         ))}
                       </ol>
                     ) : (
-                      <p className="font-body text-sm text-muted-foreground leading-relaxed">
-                        {faq.a}
-                      </p>
+                      <p className="font-body text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
                     )}
                   </AccordionContent>
                 </AccordionItem>
