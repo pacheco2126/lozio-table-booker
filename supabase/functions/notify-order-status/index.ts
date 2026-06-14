@@ -160,4 +160,5 @@ async function handle(req: Request): Promise<Response> {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+}
+
