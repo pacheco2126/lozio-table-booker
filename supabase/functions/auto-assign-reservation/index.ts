@@ -13,21 +13,39 @@ serve(async (req) => {
   }
 
   try {
-    const { location, guest_name, phone, reservation_date, reservation_time, guests, notes, user_id, is_admin } =
+    const { location, guest_name, phone, reservation_date, reservation_time, guests, notes, user_id } =
       await req.json();
 
     if (!location || !guest_name || !phone || !reservation_date || !reservation_time || !guests) {
       throw new Error("Missing required fields");
     }
 
-    const guestsNum = parseInt(guests) || 2;
-    if (!is_admin && (guestsNum < 1 || guestsNum > 10)) {
-      throw new Error("El número de comensales debe ser entre 1 y 10 para reservas online.");
-    }
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    // Server-side admin check (NEVER trust client is_admin flag)
+    let isAdmin = false;
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "");
+      const authClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: claims } = await authClient.auth.getClaims(token);
+      if (claims?.claims?.sub) {
+        const { data: adminFlag } = await supabase.rpc("has_role", {
+          _user_id: claims.claims.sub, _role: "admin",
+        });
+        isAdmin = !!adminFlag;
+      }
+    }
+
+    const guestsNum = parseInt(guests) || 2;
+    if (!isAdmin && (guestsNum < 1 || guestsNum > 10)) {
+      throw new Error("El número de comensales debe ser entre 1 y 10 para reservas online.");
+    }
 
     // Find available tables using the multi-table DB function
     const { data: tableIds, error: rpcError } = await supabase.rpc("find_available_tables_multi", {
