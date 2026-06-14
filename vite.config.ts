@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
       srcDir: 'src',
       filename: 'sw.ts',
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "pwa-192x192.png", "pwa-512x512.png", "apple-touch-icon.png", "logo_lozio_app.jpg"],
+      includeAssets: ["favicon.ico", "logo_app_inicio.png", "logo_lozio_app.jpg"],
       manifest: {
         name: "Lo Zio - Auténtica Pizza Italiana",
         short_name: "Lo Zio",
@@ -33,17 +33,17 @@ export default defineConfig(({ mode }) => ({
         scope: "/",
         icons: [
           {
-            src: "pwa-192x192.png",
+            src: "logo_app_inicio.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "pwa-512x512.png",
+            src: "logo_app_inicio.png",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "pwa-512x512.png",
+            src: "logo_app_inicio.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",
