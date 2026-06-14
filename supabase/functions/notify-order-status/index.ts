@@ -30,6 +30,21 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+  // Require service-role bearer (called by DB trigger only).
+  const authHeader = req.headers.get("Authorization");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!authHeader?.startsWith("Bearer ") || !serviceRoleKey || authHeader.replace("Bearer ", "") !== serviceRoleKey) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  return await handle(req);
+});
+
+async function handle(req: Request): Promise<Response> {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
 
   try {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
