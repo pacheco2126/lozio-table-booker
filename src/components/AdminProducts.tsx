@@ -280,7 +280,40 @@ const AdminProducts = () => {
                   <Button size="icon" variant="ghost" onClick={() => setDeleteId(p.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
               </div>
+
+              {stores.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center gap-2">
+                  <span className="flex items-center gap-1 text-xs font-body text-muted-foreground">
+                    <StoreIcon className="w-3.5 h-3.5" /> Disponibilidad por local:
+                  </span>
+                  {stores.map((s) => {
+                    const row = availability[availKey(p.id, s.slug)];
+                    const available = isAvailableNow(row);
+                    const until = row?.unavailable_until ? new Date(row.unavailable_until) : null;
+                    const reactivatesSoon = !available && until && until > new Date();
+                    return (
+                      <div key={s.slug} className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50">
+                        <span className="text-xs font-body">{s.name}</span>
+                        <Switch
+                          checked={available}
+                          onCheckedChange={(v) => {
+                            if (v) enableAtStore(p, s);
+                            else setDisableTarget({ product: p, store: s });
+                          }}
+                        />
+                        {reactivatesSoon && (
+                          <span className="flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400">
+                            <Clock className="w-3 h-3" />
+                            {until!.toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
+
           ))}
         </div>
       )}
