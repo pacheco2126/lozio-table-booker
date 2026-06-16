@@ -421,6 +421,38 @@ const AdminProducts = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!disableTarget} onOpenChange={(o) => !o && setDisableTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Desactivar producto</DialogTitle>
+            <DialogDescription>
+              {disableTarget && (
+                <>¿Cómo quieres desactivar <strong>{disableTarget.product.name}</strong> en <strong>{disableTarget.store.name}</strong>?</>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <Button
+              variant="outline"
+              className="w-full justify-start font-body"
+              onClick={() => disableTarget && disableAtStore(disableTarget.product, disableTarget.store, nextOpenAt(disableTarget.store))}
+            >
+              <Clock className="w-4 h-4 mr-2" /> Solo hasta mañana (19:00)
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start font-body"
+              onClick={() => disableTarget && disableAtStore(disableTarget.product, disableTarget.store, null)}
+            >
+              <X className="w-4 h-4 mr-2" /> Desactivar indefinidamente
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDisableTarget(null)}>Cancelar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
