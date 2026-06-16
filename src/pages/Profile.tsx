@@ -324,6 +324,11 @@ const Profile = () => {
 
             <MyDiscountsSection />
           </div>
+
+          <div className="mt-6">
+            <UserPushNotificationToggle />
+          </div>
+
         </div>
       </div>
     </div>
