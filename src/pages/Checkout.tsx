@@ -704,24 +704,42 @@ const Checkout = () => {
                     )}
 
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="sm:col-span-2">
-                        <Label htmlFor="address">{t("checkout.address")} *</Label>
-                        <AddressAutocomplete
-                          value={form.address}
-                          onChange={(v) => updateField("address", v)}
-                          onSelect={({ address, city, postalCode }) => {
-                            setForm((prev) => ({
-                              ...prev,
-                              address,
-                              city: city || prev.city,
-                              postalCode: postalCode || prev.postalCode,
-                            }));
-                            setErrors((prev) => ({ ...prev, address: "" }));
-                          }}
-                          placeholder={t("checkout.addressPlaceholder")}
-                          error={errors.address}
-                        />
+                      <div className="sm:col-span-2 grid grid-cols-3 gap-3">
+                        <div className="col-span-2">
+                          <Label htmlFor="address">{t("checkout.address")} *</Label>
+                          <AddressAutocomplete
+                            value={form.address}
+                            onChange={(v) => updateField("address", v)}
+                            onSelect={({ address, city, postalCode }) => {
+                              // Split trailing house number out of address into its own field
+                              const match = address.match(/^(.*?)[,\s]+(\d+[A-Za-z]?(?:\s*-\s*\d+[A-Za-z]?)?)\s*$/);
+                              const street = match ? match[1].trim() : address;
+                              const number = match ? match[2].trim() : "";
+                              setForm((prev) => ({
+                                ...prev,
+                                address: street,
+                                streetNumber: number || prev.streetNumber,
+                                city: city || prev.city,
+                                postalCode: postalCode || prev.postalCode,
+                              }));
+                              setErrors((prev) => ({ ...prev, address: "" }));
+                            }}
+                            placeholder={t("checkout.addressPlaceholder")}
+                            error={errors.address}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="streetNumber">Número *</Label>
+                          <Input
+                            id="streetNumber"
+                            value={form.streetNumber}
+                            onChange={(e) => updateField("streetNumber", e.target.value)}
+                            placeholder="Nº"
+                            inputMode="numeric"
+                          />
+                        </div>
                       </div>
+
 
                       {/* Escalera / Piso / Puerta */}
                       <div className="sm:col-span-2 grid grid-cols-3 gap-3">
