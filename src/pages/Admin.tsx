@@ -446,6 +446,9 @@ const Admin = () => {
                 <DropdownMenuItem onClick={() => setActiveTab("discounts")}>
                   <Tag className="w-4 h-4 mr-2" /> Descuentos
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("delivery-minimums")}>
+                  <Truck className="w-4 h-4 mr-2" /> Pedido mínimo (km)
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveTab("roles")}>
                   <Shield className="w-4 h-4 mr-2" /> Roles de usuario
                 </DropdownMenuItem>
