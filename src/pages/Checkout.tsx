@@ -24,6 +24,7 @@ import {
   User,
   Tag,
   X,
+  Truck,
 } from "lucide-react";
 import { useDiscount, type DiscountReason } from "@/hooks/useDiscount";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
