@@ -49,22 +49,34 @@ interface Order {
   order_items: OrderItem[];
 }
 
-const PROGRESS_STEPS = [
+const PICKUP_STEPS = [
   { key: "pending",   label: "Recibido" },
   { key: "confirmed", label: "Confirmado" },
   { key: "preparing", label: "Preparando" },
   { key: "ready",     label: "Listo" },
-  { key: "delivered", label: "Entregado" },
+  { key: "delivered", label: "Recogido" },
 ];
 
+const DELIVERY_STEPS = [
+  { key: "pending",          label: "Recibido" },
+  { key: "confirmed",        label: "Confirmado" },
+  { key: "preparing",        label: "Preparando" },
+  { key: "out_for_delivery", label: "En camino" },
+  { key: "delivered",        label: "Entregado" },
+];
 
-const STATUS_LABELS: Record<string, string> = {
-  pending:   "Recibido",
-  confirmed: "Confirmado",
-  preparing: "Preparando",
-  ready:     "Listo para recoger",
-  delivered: "Entregado",
-  cancelled: "Cancelado",
+const getSteps = (orderType: string) =>
+  orderType === "delivery" ? DELIVERY_STEPS : PICKUP_STEPS;
+
+const getStatusLabel = (status: string, orderType: string): string => {
+  if (status === "cancelled") return "Cancelado";
+  if (status === "pending") return "Recibido";
+  if (status === "confirmed") return "Confirmado";
+  if (status === "preparing") return "Preparando";
+  if (status === "ready") return orderType === "delivery" ? "Preparando" : "Listo para recoger";
+  if (status === "out_for_delivery") return "En camino";
+  if (status === "delivered") return orderType === "delivery" ? "Entregado" : "Recogido";
+  return status;
 };
 
 const STORE_NAMES: Record<string, string> = {
@@ -139,9 +151,9 @@ const MyOrders = () => {
 
   const shortId = (id: string) => id.slice(0, 8).toUpperCase();
 
-  const activeStep = (status: string) => {
+  const activeStep = (status: string, orderType: string) => {
     if (status === "cancelled") return -1;
-    return PROGRESS_STEPS.findIndex((s) => s.key === status);
+    return getSteps(orderType).findIndex((s) => s.key === status);
   };
 
   if (authLoading || loading) {
@@ -190,7 +202,8 @@ const MyOrders = () => {
         ) : (
           <div className="space-y-4">
             {orders.map((order) => {
-              const step = activeStep(order.status);
+              const steps = getSteps(order.order_type);
+              const step = activeStep(order.status, order.order_type);
               const cancelled = order.status === "cancelled";
               const expanded = expandedIds.has(order.id);
 
@@ -219,7 +232,7 @@ const MyOrders = () => {
                                 : "bg-orange-100 text-orange-800 border-orange-200"
                             }`}
                           >
-                            {STATUS_LABELS[order.status] ?? order.status}
+                            {getStatusLabel(order.status, order.order_type)}
                           </Badge>
                           <Badge
                             className={`text-[10px] border ${PAYMENT_STATUS_STYLES[order.payment_status]}`}
@@ -267,9 +280,9 @@ const MyOrders = () => {
                     {!cancelled && (
                       <div className="mt-4">
                         <div className="flex items-center gap-0">
-                          {PROGRESS_STEPS.map((s, i) => {
+                          {steps.map((s, i) => {
                             const done = i <= step;
-                            const isLast = i === PROGRESS_STEPS.length - 1;
+                            const isLast = i === steps.length - 1;
                             return (
                               <div key={s.key} className="flex items-center flex-1 last:flex-none">
                                 <div className="flex flex-col items-center gap-1">

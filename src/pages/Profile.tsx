@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { EU_ALLERGENS } from "@/lib/allergens";
 import { MyDiscountsSection } from "@/components/MyDiscountsSection";
+import UserPushNotificationToggle from "@/components/UserPushNotificationToggle";
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -148,6 +149,9 @@ const Profile = () => {
               </p>
             </div>
           </div>
+
+          <UserPushNotificationToggle />
+
 
           <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
             <form onSubmit={handleSubmit} className="space-y-5">
