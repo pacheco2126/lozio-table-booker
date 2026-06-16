@@ -128,6 +128,7 @@ const Checkout = () => {
       orderType: z.enum(["pickup", "delivery"]),
       pickupStore: z.string().optional(),
       address: z.string().optional(),
+      streetNumber: z.string().optional(),
       city: z.string().optional(),
       postalCode: z.string().optional(),
       paymentMethod: z.enum(["cash", "stripe"]),
