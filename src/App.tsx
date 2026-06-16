@@ -60,6 +60,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
+        <OrderFlowProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner position="top-center" />
