@@ -21,6 +21,7 @@ import { useOrderFlow } from "@/contexts/OrderFlowContext";
 import { Badge } from "@/components/ui/badge";
 
 interface MenuItemData {
+  id: string;
   name: string;
   imageKey?: string; // override for image lookup when name changes
   freeExtras?: number; // first N ingredient extras are free
@@ -30,6 +31,8 @@ interface MenuItemData {
   allergens?: string[];
   category: "pizzas" | "focaccias" | "calzones";
   badge?: { key: string; emoji: string; style: "fire" | "gold" | "teal" };
+  isAvailable?: boolean;
+  unavailableUntil?: string | null;
 }
 
 type MenuCategory = "pizzas" | "focaccias" | "calzones";
