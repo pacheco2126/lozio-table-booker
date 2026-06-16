@@ -128,6 +128,7 @@ const Checkout = () => {
       orderType: z.enum(["pickup", "delivery"]),
       pickupStore: z.string().optional(),
       address: z.string().optional(),
+      streetNumber: z.string().optional(),
       city: z.string().optional(),
       postalCode: z.string().optional(),
       paymentMethod: z.enum(["cash", "stripe"]),
@@ -150,6 +151,15 @@ const Checkout = () => {
         return true;
       },
       { message: t("checkout.addressRequired"), path: ["address"] },
+    )
+    .refine(
+      (data) => {
+        if (data.orderType === "delivery") {
+          return data.streetNumber && data.streetNumber.trim().length > 0;
+        }
+        return true;
+      },
+      { message: "El número es obligatorio", path: ["streetNumber"] },
     );
 
   const [form, setForm] = useState({
@@ -159,6 +169,7 @@ const Checkout = () => {
     orderType: "pickup" as "pickup" | "delivery",
     pickupStore: "",
     address: "",
+    streetNumber: "",
     city: "",
     postalCode: "",
     staircase: "",
@@ -224,7 +235,7 @@ const Checkout = () => {
           assigned_to: assignedTo,
           delivery_address: form.orderType === "delivery"
             ? [
-                form.address,
+                [form.address, form.streetNumber].filter(Boolean).join(", "),
                 form.staircase ? `Esc. ${form.staircase}` : null,
                 form.floor ? `Piso ${form.floor}` : null,
                 form.door ? `Puerta ${form.door}` : null,
@@ -678,13 +689,17 @@ const Checkout = () => {
                       <button
                         type="button"
                         onClick={() => {
+                          const match = profileAddress.address.match(/^(.*?)[,\s]+(\d+[A-Za-z]?(?:\s*-\s*\d+[A-Za-z]?)?)\s*$/);
+                          const street = match ? match[1].trim() : profileAddress.address;
+                          const number = match ? match[2].trim() : "";
                           setForm((prev) => ({
                             ...prev,
-                            address: profileAddress.address,
+                            address: street,
+                            streetNumber: number || prev.streetNumber,
                             city: profileAddress.city,
                             postalCode: profileAddress.postalCode,
                           }));
-                          setErrors((prev) => ({ ...prev, address: "" }));
+                          setErrors((prev) => ({ ...prev, address: "", streetNumber: "" }));
                         }}
                         className="w-full flex items-center gap-2.5 px-4 py-3 rounded-lg border-2 border-dashed border-menu-teal/50 bg-menu-teal/5 hover:bg-menu-teal/10 hover:border-menu-teal transition-all text-left"
                       >
@@ -703,24 +718,42 @@ const Checkout = () => {
                     )}
 
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="sm:col-span-2">
-                        <Label htmlFor="address">{t("checkout.address")} *</Label>
-                        <AddressAutocomplete
-                          value={form.address}
-                          onChange={(v) => updateField("address", v)}
-                          onSelect={({ address, city, postalCode }) => {
-                            setForm((prev) => ({
-                              ...prev,
-                              address,
-                              city: city || prev.city,
-                              postalCode: postalCode || prev.postalCode,
-                            }));
-                            setErrors((prev) => ({ ...prev, address: "" }));
-                          }}
-                          placeholder={t("checkout.addressPlaceholder")}
-                          error={errors.address}
-                        />
+                      <div className="sm:col-span-2 grid grid-cols-3 gap-3">
+                        <div className="col-span-2">
+                          <Label htmlFor="address">{t("checkout.address")} *</Label>
+                          <AddressAutocomplete
+                            value={form.address}
+                            onChange={(v) => updateField("address", v)}
+                            onSelect={({ address, city, postalCode }) => {
+                              // Split trailing house number out of address into its own field
+                              const match = address.match(/^(.*?)[,\s]+(\d+[A-Za-z]?(?:\s*-\s*\d+[A-Za-z]?)?)\s*$/);
+                              const street = match ? match[1].trim() : address;
+                              const number = match ? match[2].trim() : "";
+                              setForm((prev) => ({
+                                ...prev,
+                                address: street,
+                                streetNumber: number || prev.streetNumber,
+                                city: city || prev.city,
+                                postalCode: postalCode || prev.postalCode,
+                              }));
+                              setErrors((prev) => ({ ...prev, address: "" }));
+                            }}
+                            placeholder={t("checkout.addressPlaceholder")}
+                            error={errors.address}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="streetNumber">Número *</Label>
+                          <Input
+                            id="streetNumber"
+                            value={form.streetNumber}
+                            onChange={(e) => updateField("streetNumber", e.target.value)}
+                            placeholder="Nº"
+                            inputMode="numeric"
+                          />
+                        </div>
                       </div>
+
 
                       {/* Escalera / Piso / Puerta */}
                       <div className="sm:col-span-2 grid grid-cols-3 gap-3">
