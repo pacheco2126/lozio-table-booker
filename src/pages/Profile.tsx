@@ -8,6 +8,17 @@ import Navbar from "@/components/Navbar";
 import { EU_ALLERGENS } from "@/lib/allergens";
 import { MyDiscountsSection } from "@/components/MyDiscountsSection";
 import UserPushNotificationToggle from "@/components/UserPushNotificationToggle";
+import { Settings, Lock, Bell } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
