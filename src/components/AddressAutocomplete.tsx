@@ -21,7 +21,10 @@ interface NominatimResult {
     village?: string;
     municipality?: string;
     postcode?: string;
+    county?: string;
+    province?: string;
     state?: string;
+    state_district?: string;
     country_code?: string;
   };
 }
@@ -34,8 +37,20 @@ interface Props {
   error?: string;
 }
 
+function isInTarragonaProvince(a: NominatimResult["address"]): boolean {
+  // Tarragona province postcodes start with "43"
+  if (a.postcode && /^43\d{3}$/.test(a.postcode)) return true;
+  const provinceFields = [a.province, a.county, a.state_district]
+    .filter(Boolean)
+    .map((s) => s!.toLowerCase());
+  return provinceFields.some((f) => f.includes("tarragona"));
+}
+
 function parseNominatim(r: NominatimResult): AddressResult | null {
   const a = r.address;
+  if (a.country_code && a.country_code !== "es") return null;
+  if (!isInTarragonaProvince(a)) return null;
+
   const street = a.road || a.pedestrian || "";
   if (!street) return null;
 
@@ -70,11 +85,11 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
         q: query,
         format: "json",
         addressdetails: "1",
-        limit: "6",
+        limit: "10",
         countrycodes: "es",
-        // Bias results towards Tarragona area
-        viewbox: "-0.5,40.5,3.5,42.5",
-        bounded: "0",
+        // Restrict strictly to Tarragona province bounding box
+        viewbox: "0.0,41.6,1.55,40.45",
+        bounded: "1",
       });
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?${params}`,
@@ -85,7 +100,8 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
 
       const results = data
         .map(parseNominatim)
-        .filter((r): r is AddressResult => r !== null);
+        .filter((r): r is AddressResult => r !== null)
+        .slice(0, 6);
 
       setSuggestions(results);
       setOpen(results.length > 0);
