@@ -46,8 +46,22 @@ const emptyProduct: Omit<Product, "id"> = {
   sort_order: 0,
 };
 
+interface StoreRow { slug: string; name: string; accepts_delivery: boolean; accepts_pickup: boolean; }
+interface AvailabilityRow { menu_item_id: string; store_slug: string; is_available: boolean; unavailable_until: string | null; }
+
+type AvailabilityMap = Record<string, AvailabilityRow>; // key = `${menu_item_id}__${store_slug}`
+const availKey = (itemId: string, slug: string) => `${itemId}__${slug}`;
+
+function isAvailableNow(row?: AvailabilityRow): boolean {
+  if (!row) return true; // default available
+  if (row.unavailable_until && new Date(row.unavailable_until) <= new Date()) return true;
+  return row.is_available;
+}
+
 const AdminProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [stores, setStores] = useState<StoreRow[]>([]);
+  const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [editing, setEditing] = useState<Product | null>(null);
@@ -56,20 +70,30 @@ const AdminProducts = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [inlinePriceId, setInlinePriceId] = useState<string | null>(null);
   const [inlinePriceValue, setInlinePriceValue] = useState("");
+  const [disableTarget, setDisableTarget] = useState<{ product: Product; store: StoreRow } | null>(null);
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => { fetchAll(); }, []);
 
-  const fetchProducts = async () => {
+  const fetchAll = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("menu_items")
-      .select("*")
-      .order("category")
-      .order("sort_order");
-    if (error) toast.error("Error al cargar productos");
-    setProducts((data as Product[]) || []);
+    const [productsRes, storesRes, availRes] = await Promise.all([
+      supabase.from("menu_items").select("*").order("category").order("sort_order"),
+      supabase.from("stores").select("slug,name,accepts_delivery,accepts_pickup").eq("is_active", true).order("sort_order"),
+      supabase.from("menu_item_store_availability").select("menu_item_id,store_slug,is_available,unavailable_until"),
+    ]);
+    if (productsRes.error) toast.error("Error al cargar productos");
+    if (storesRes.error) toast.error("Error al cargar locales");
+    setProducts((productsRes.data as Product[]) || []);
+    const orderingStores = ((storesRes.data as StoreRow[]) || []).filter(s => s.accepts_delivery || s.accepts_pickup);
+    setStores(orderingStores);
+    const map: AvailabilityMap = {};
+    ((availRes.data as AvailabilityRow[]) || []).forEach(r => { map[availKey(r.menu_item_id, r.store_slug)] = r; });
+    setAvailability(map);
     setLoading(false);
   };
+
+  const fetchProducts = fetchAll;
+
 
   const openEdit = (p: Product) => {
     setEditing(p);
