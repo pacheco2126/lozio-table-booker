@@ -486,8 +486,7 @@ const Admin = () => {
               </TabsList>
 
               <TabsContent value="lista" className="space-y-6 mt-4">
-                {/* Push notifications toggle (admin device) */}
-                <PushNotificationToggle />
+
 
                 {/* Toggle reservas */}
                 <div className="flex items-center justify-between bg-card rounded-lg p-4 border border-border shadow-sm">
