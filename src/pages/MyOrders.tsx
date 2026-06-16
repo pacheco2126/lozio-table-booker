@@ -49,22 +49,34 @@ interface Order {
   order_items: OrderItem[];
 }
 
-const PROGRESS_STEPS = [
+const PICKUP_STEPS = [
   { key: "pending",   label: "Recibido" },
   { key: "confirmed", label: "Confirmado" },
   { key: "preparing", label: "Preparando" },
   { key: "ready",     label: "Listo" },
-  { key: "delivered", label: "Entregado" },
+  { key: "delivered", label: "Recogido" },
 ];
 
+const DELIVERY_STEPS = [
+  { key: "pending",          label: "Recibido" },
+  { key: "confirmed",        label: "Confirmado" },
+  { key: "preparing",        label: "Preparando" },
+  { key: "out_for_delivery", label: "En camino" },
+  { key: "delivered",        label: "Entregado" },
+];
 
-const STATUS_LABELS: Record<string, string> = {
-  pending:   "Recibido",
-  confirmed: "Confirmado",
-  preparing: "Preparando",
-  ready:     "Listo para recoger",
-  delivered: "Entregado",
-  cancelled: "Cancelado",
+const getSteps = (orderType: string) =>
+  orderType === "delivery" ? DELIVERY_STEPS : PICKUP_STEPS;
+
+const getStatusLabel = (status: string, orderType: string): string => {
+  if (status === "cancelled") return "Cancelado";
+  if (status === "pending") return "Recibido";
+  if (status === "confirmed") return "Confirmado";
+  if (status === "preparing") return "Preparando";
+  if (status === "ready") return orderType === "delivery" ? "Preparando" : "Listo para recoger";
+  if (status === "out_for_delivery") return "En camino";
+  if (status === "delivered") return orderType === "delivery" ? "Entregado" : "Recogido";
+  return status;
 };
 
 const STORE_NAMES: Record<string, string> = {
