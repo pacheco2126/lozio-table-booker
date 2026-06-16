@@ -65,6 +65,7 @@ const App = () => (
           <BrowserRouter>
             <ScrollToTop />
             <InstallBanner />
+            <SamsungBrowserBanner />
             <UpdateBanner />
             <CartDrawer />
             <CartFloatingButton />
