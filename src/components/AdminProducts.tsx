@@ -181,6 +181,9 @@ const AdminProducts = () => {
     d.setDate(d.getDate() + 1);
     d.setHours(19, 0, 0, 0);
     return d;
+  };
+
+
 
 
   const saveInlinePrice = async (id: string) => {
