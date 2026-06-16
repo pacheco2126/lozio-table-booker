@@ -202,7 +202,8 @@ const MyOrders = () => {
         ) : (
           <div className="space-y-4">
             {orders.map((order) => {
-              const step = activeStep(order.status);
+              const steps = getSteps(order.order_type);
+              const step = activeStep(order.status, order.order_type);
               const cancelled = order.status === "cancelled";
               const expanded = expandedIds.has(order.id);
 
