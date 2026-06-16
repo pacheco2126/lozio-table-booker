@@ -28,8 +28,10 @@ const Profile = () => {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [settingsPanel, setSettingsPanel] = useState<null | "password" | "notifications">(null);
   const [profile, setProfile] = useState({
     full_name: "",
+
     phone: "",
     address: "",
     city: "",
