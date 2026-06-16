@@ -915,9 +915,62 @@ const Checkout = () => {
                         />
                       </div>
                     </div>
+
+                    {/* Delivery minimum banner */}
+                    {deliveryMinLoading && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
+                        <MapPin className="w-3 h-3 animate-pulse" />
+                        Calculando distancia y pedido mínimo…
+                      </p>
+                    )}
+                    {!deliveryMinLoading && deliveryMin && deliveryMin.geocoded && (
+                      <>
+                        {deliveryOutOfRange && (
+                          <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm">
+                            <p className="font-display font-bold text-destructive flex items-center gap-1.5">
+                              <AlertTriangle className="w-4 h-4" />
+                              Fuera de zona de reparto
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Tu dirección está a {deliveryMin.distanceKm.toFixed(1)} km de
+                              nuestra pizzería más cercana. Solo entregamos hasta{" "}
+                              {deliveryMin.maxKmConfigured.toFixed(1)} km.
+                            </p>
+                          </div>
+                        )}
+                        {!deliveryOutOfRange && deliveryMin.minOrderAmount != null && (
+                          <div
+                            className={`rounded-lg border p-3 text-sm ${
+                              deliveryBelowMin
+                                ? "border-amber-400/50 bg-amber-50 dark:bg-amber-950/20"
+                                : "border-menu-teal/30 bg-menu-teal/5"
+                            }`}
+                          >
+                            <p className="font-display font-bold text-foreground flex items-center gap-1.5">
+                              <Truck className="w-4 h-4 text-menu-teal" />
+                              Pedido mínimo: {deliveryMin.minOrderAmount.toFixed(2)} €
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              A {deliveryMin.distanceKm.toFixed(1)} km de nuestra pizzería.
+                              {deliveryBelowMin && (
+                                <>
+                                  {" "}
+                                  Te faltan{" "}
+                                  <span className="font-bold text-amber-700 dark:text-amber-400">
+                                    {(deliveryMin.minOrderAmount - totalPrice).toFixed(2)} €
+                                  </span>{" "}
+                                  para llegar al mínimo.
+                                </>
+                              )}
+                            </p>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 )}
               </div>
+
 
               {/* Payment */}
               <div className="bg-card rounded-xl p-6 border border-border">
