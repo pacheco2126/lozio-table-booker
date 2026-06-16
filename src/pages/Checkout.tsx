@@ -60,6 +60,7 @@ const Checkout = () => {
   const { t } = useTranslation();
   const stripe = useStripe();
   const elements = useElements();
+  const orderFlow = useOrderFlow();
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
