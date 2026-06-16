@@ -30,6 +30,10 @@ import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { locationsData } from "@/lib/locations";
 import { getNearestStore } from "@/lib/nearestStore";
 import {
+  computeDeliveryMinimumForAddress,
+  type DeliveryMinimumResult,
+} from "@/lib/deliveryMinimum";
+import {
   isStoreOpen,
   getScheduleStatus,
   getAvailableDays,
