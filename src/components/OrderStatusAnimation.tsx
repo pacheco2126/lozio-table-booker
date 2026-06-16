@@ -191,6 +191,7 @@ const OrderStatusAnimation = ({ status, orderType, className }: OrderStatusAnima
   const scene: OrderAnimationStatus | null =
     status === "confirmed" ? "confirmed"
     : status === "preparing" ? "preparing"
+    : status === "out_for_delivery" ? "driving"
     : status === "ready"
       ? orderType === "delivery" ? "driving" : "ready"
     : null;
