@@ -294,7 +294,7 @@ const AdminOrders = () => {
           {[
             { label: "Hoy", value: orders.filter((o) => isToday(new Date(o.created_at))).length },
             { label: "Pendientes", value: orders.filter((o) => ["pending", "confirmed", "preparing"].includes(o.status)).length },
-            { label: "Listos", value: orders.filter((o) => o.status === "ready").length },
+            { label: "Listos / En camino", value: orders.filter((o) => o.status === "ready" || o.status === "out_for_delivery").length },
           ].map((s) => (
             <div key={s.label} className="bg-card border border-border rounded-xl p-4 text-center">
               <p className="font-display text-2xl font-bold text-menu-teal">{s.value}</p>
