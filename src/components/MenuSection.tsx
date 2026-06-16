@@ -182,6 +182,24 @@ const MenuSection = () => {
   const [dialogItem, setDialogItem] = useState<MenuItemData | null>(null);
   const [dialogImageUrl, setDialogImageUrl] = useState<string | null>(null);
 
+  const { data: menuItems = [], isLoading } = useQuery({
+    queryKey: ["menu_items", "public"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("menu_items")
+        .select("id,name,description,price,category,allergens,badge_key,badge_emoji,badge_style,sort_order,image_key,free_extras")
+        .in("category", ["pizzas", "focaccias", "calzones"])
+        .eq("is_active", true)
+        .order("category", { ascending: true })
+        .order("sort_order", { ascending: true, nullsFirst: false })
+        .order("name", { ascending: true });
+      if (error) throw error;
+      return (data as MenuItemRow[]).map(mapRow);
+    },
+    staleTime: 60_000,
+  });
+
+
   const handleAdd = (item: MenuItemData, imageUrl?: string | null) => {
     setDialogItem(item);
     setDialogImageUrl(imageUrl ?? null);
