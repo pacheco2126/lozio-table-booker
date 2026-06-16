@@ -205,6 +205,23 @@ const Checkout = () => {
         fieldErrors[err.path[0] as string] = err.message;
       });
       setErrors(fieldErrors);
+
+      // Scroll to first error field
+      const firstField = result.error.errors[0]?.path[0] as string | undefined;
+      if (firstField) {
+        setTimeout(() => {
+          const el =
+            document.getElementById(firstField) ||
+            document.querySelector(`[data-field="${firstField}"]`);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (el instanceof HTMLElement && typeof (el as HTMLInputElement).focus === "function") {
+              (el as HTMLInputElement).focus({ preventScroll: true });
+            }
+          }
+        }, 50);
+      }
+      toast.error(t("checkout.formIncomplete", { defaultValue: "Faltan datos por completar" }));
       return;
     }
 
