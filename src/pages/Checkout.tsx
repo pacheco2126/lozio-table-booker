@@ -842,23 +842,28 @@ const Checkout = () => {
                   className="grid sm:grid-cols-2 gap-3"
                 >
                   <label
-                    className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      form.paymentMethod === "cash"
-                        ? "border-menu-teal bg-menu-teal/5"
-                        : "border-border hover:border-menu-teal/30"
+                    className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                      form.orderType === "delivery"
+                        ? "border-border opacity-50 cursor-not-allowed bg-muted/30"
+                        : form.paymentMethod === "cash"
+                          ? "border-menu-teal bg-menu-teal/5 cursor-pointer"
+                          : "border-border hover:border-menu-teal/30 cursor-pointer"
                     }`}
                   >
-                    <RadioGroupItem value="cash" />
+                    <RadioGroupItem value="cash" disabled={form.orderType === "delivery"} />
                     <Banknote className="w-5 h-5 text-menu-teal" />
                     <div>
                       <p className="font-display font-bold text-sm">
                         {t("checkout.cashPayment")}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {t("checkout.cashPaymentDesc")}
+                        {form.orderType === "delivery"
+                          ? "No disponible para entregas a domicilio"
+                          : t("checkout.cashPaymentDesc")}
                       </p>
                     </div>
                   </label>
+
                   <label
                     className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                       form.paymentMethod === "stripe"
