@@ -330,32 +330,38 @@ const MenuSection = () => {
           )}>
             {/* Left: category sections */}
             <div>
-              {categories.map((cat) => {
-                const items = menuItems.filter((i) => i.category === cat.id);
-                if (!items.length) return null;
-                return (
-                  <div
-                    key={cat.id}
-                    ref={(el) => {
-                      sectionRefs.current[cat.id] = el;
-                    }}
-                    className="mb-16 scroll-mt-40"
-                  >
-                    <div className="flex items-center gap-3 mb-6">
-                      <cat.icon className="w-6 h-6 text-menu-teal" />
-                      <h3 className="font-display text-2xl md:text-3xl font-bold text-menu-teal">
-                        {categoryLabels[cat.id]}
-                      </h3>
-                      <span className="text-muted-foreground font-body text-sm">({items.length})</span>
+              {isLoading ? (
+                <div className="flex justify-center py-16">
+                  <Loader2 className="w-8 h-8 animate-spin text-menu-teal" />
+                </div>
+              ) : (
+                categories.map((cat) => {
+                  const items = menuItems.filter((i) => i.category === cat.id);
+                  if (!items.length) return null;
+                  return (
+                    <div
+                      key={cat.id}
+                      ref={(el) => {
+                        sectionRefs.current[cat.id] = el;
+                      }}
+                      className="mb-16 scroll-mt-40"
+                    >
+                      <div className="flex items-center gap-3 mb-6">
+                        <cat.icon className="w-6 h-6 text-menu-teal" />
+                        <h3 className="font-display text-2xl md:text-3xl font-bold text-menu-teal">
+                          {categoryLabels[cat.id]}
+                        </h3>
+                        <span className="text-muted-foreground font-body text-sm">({items.length})</span>
+                      </div>
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+                        {items.map((item) => (
+                          <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item, getImageForItem(item.imageKey ?? item.name))} showAddButton={isAdmin} imageUrl={getImageForItem(item.imageKey ?? item.name)} />
+                        ))}
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-                      {items.map((item) => (
-                        <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item, getImageForItem(item.imageKey ?? item.name))} showAddButton={isAdmin} imageUrl={getImageForItem(item.imageKey ?? item.name)} />
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
 
             {/* Right: cart sidebar (desktop only, when cart has items) */}
@@ -367,6 +373,7 @@ const MenuSection = () => {
           </div>
         </div>
       </section>
+
 
       <AddToCartDialog
         item={dialogItem}
