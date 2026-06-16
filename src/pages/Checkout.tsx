@@ -1128,12 +1128,21 @@ const Checkout = () => {
 
               <Button
                 type="submit"
-                disabled={loading || (form.paymentMethod === "stripe" && !stripe)}
+                disabled={
+                  loading ||
+                  (form.paymentMethod === "stripe" && !stripe) ||
+                  deliveryOutOfRange ||
+                  deliveryBelowMin
+                }
                 className="w-full bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display text-lg py-7 min-h-[56px]"
               >
                 {loading
                   ? t("checkout.processing")
-                  : `${t("checkout.confirmOrder")} · ${finalTotal.toFixed(2)} €`}
+                  : deliveryOutOfRange
+                    ? "Fuera de zona de reparto"
+                    : deliveryBelowMin && deliveryMin?.minOrderAmount != null
+                      ? `Pedido mínimo ${deliveryMin.minOrderAmount.toFixed(2)} €`
+                      : `${t("checkout.confirmOrder")} · ${finalTotal.toFixed(2)} €`}
               </Button>
             </form>
 
