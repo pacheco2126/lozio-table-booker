@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      delivery_min_order_tiers: {
+        Row: {
+          created_at: string
+          id: string
+          max_km: number
+          min_order_amount: number
+          sort_order: number
+          store: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          max_km: number
+          min_order_amount: number
+          sort_order?: number
+          store: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          max_km?: number
+          min_order_amount?: number
+          sort_order?: number
+          store?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discount_assignments: {
         Row: {
           assigned_at: string
