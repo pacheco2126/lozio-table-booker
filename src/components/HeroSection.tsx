@@ -1,16 +1,16 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { UtensilsCrossed, Bike, Clock } from "lucide-react";
+import { UtensilsCrossed, Bike } from "lucide-react";
 import heroPizza from "@/assets/fondopizza.jpg";
 import logoZio from "@/assets/logozio.png";
 import { useMedia } from "@/hooks/useMedia";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useOrderFlow } from "@/contexts/OrderFlowContext";
 
 const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { getBackgroundVideos, loading } = useMedia("background_video");
-  const { isAdmin } = useIsAdmin();
+  const { getBackgroundVideos } = useMedia("background_video");
+  const { openDialog } = useOrderFlow();
 
   const backgroundVideos = getBackgroundVideos();
   const videoUrl = backgroundVideos.length > 0 ? backgroundVideos[0] : null;
@@ -19,6 +19,7 @@ const HeroSection = () => {
     const el = document.getElementById("reservar");
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
 
   return (
     <section className="relative min-h-[100dvh] flex flex-col overflow-hidden hero-section">
