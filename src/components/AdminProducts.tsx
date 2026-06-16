@@ -151,6 +151,38 @@ const AdminProducts = () => {
     else { toast.success(p.is_active ? "Producto oculto" : "Producto visible"); fetchProducts(); }
   };
 
+  const enableAtStore = async (product: Product, store: StoreRow) => {
+    const { error } = await supabase
+      .from("menu_item_store_availability")
+      .upsert({ menu_item_id: product.id, store_slug: store.slug, is_available: true, unavailable_until: null }, { onConflict: "menu_item_id,store_slug" });
+    if (error) { toast.error("Error: " + error.message); return; }
+    toast.success(`Disponible en ${store.name}`);
+    fetchAll();
+  };
+
+  const disableAtStore = async (product: Product, store: StoreRow, until: Date | null) => {
+    const { error } = await supabase
+      .from("menu_item_store_availability")
+      .upsert({
+        menu_item_id: product.id,
+        store_slug: store.slug,
+        is_available: false,
+        unavailable_until: until ? until.toISOString() : null,
+      }, { onConflict: "menu_item_id,store_slug" });
+    if (error) { toast.error("Error: " + error.message); return; }
+    toast.success(until ? `Oculto en ${store.name} hasta mañana` : `Desactivado en ${store.name}`);
+    setDisableTarget(null);
+    fetchAll();
+  };
+
+  const nextOpenAt = (_store: StoreRow): Date => {
+    // 19:00 next day; storeHours handles closed days but for "hasta mañana" we use literal mañana 19:00
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    d.setHours(19, 0, 0, 0);
+    return d;
+
+
   const saveInlinePrice = async (id: string) => {
     const v = parseFloat(inlinePriceValue);
     if (isNaN(v) || v < 0) { toast.error("Precio inválido"); return; }
