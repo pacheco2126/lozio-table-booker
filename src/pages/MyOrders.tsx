@@ -151,9 +151,9 @@ const MyOrders = () => {
 
   const shortId = (id: string) => id.slice(0, 8).toUpperCase();
 
-  const activeStep = (status: string) => {
+  const activeStep = (status: string, orderType: string) => {
     if (status === "cancelled") return -1;
-    return PROGRESS_STEPS.findIndex((s) => s.key === status);
+    return getSteps(orderType).findIndex((s) => s.key === status);
   };
 
   if (authLoading || loading) {
