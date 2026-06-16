@@ -82,16 +82,8 @@ const HeroSection = () => {
 
           {/* Pedir a Domicilio */}
           <button
-            onClick={() => {
-              if (!isAdmin) return;
-              const el = document.getElementById("menu");
-              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
-            className={`group relative flex-1 rounded-xl overflow-hidden border border-primary-foreground/20 backdrop-blur-sm transition-all duration-300 min-h-[140px] md:min-h-[200px] animate-fade-in-up ${
-              isAdmin
-                ? "bg-foreground/40 hover:bg-foreground/50 cursor-pointer"
-                : "bg-foreground/20 cursor-default opacity-70"
-            }`}
+            onClick={openDialog}
+            className="group relative flex-1 rounded-xl overflow-hidden border border-primary-foreground/20 backdrop-blur-sm transition-all duration-300 min-h-[140px] md:min-h-[200px] animate-fade-in-up bg-foreground/40 hover:bg-foreground/50 cursor-pointer"
             style={{ animationDelay: "0.5s" }}
           >
             {/* Badge JustEat (siempre visible) */}
@@ -102,26 +94,17 @@ const HeroSection = () => {
               🏆 Mejor Restaurante JustEat Catalunya
             </span>
             <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
-              <Bike className={`w-10 h-10 md:w-12 md:h-12 mb-3 transition-transform ${isAdmin ? "text-accent group-hover:scale-110" : "text-primary-foreground/40"}`} />
+              <Bike className="w-10 h-10 md:w-12 md:h-12 mb-3 transition-transform text-accent group-hover:scale-110" />
               <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground mb-1">
                 {t("hero.orderCta", "Hacer un pedido")}
               </h2>
-              {!isAdmin && (
-                <div className="inline-flex items-center gap-2 px-4 py-2 my-2 rounded-lg border border-dashed border-primary-foreground/30 text-primary-foreground/70 text-xs md:text-sm font-bold tracking-wider uppercase">
-                  <Clock className="w-4 h-4" />
-                  {t("hero.comingSoon", "Próximamente")}
-                </div>
-              )}
               <p className="text-primary-foreground/60 text-sm font-body italic">
-                {!isAdmin
-                  ? t("hero.orderSoonSubtitle", "Muy pronto podrás pedir online")
-                  : t("hero.orderSubtitle", "Ver carta y hacer tu pedido")}
+                {t("hero.orderSubtitle", "Ver carta y hacer tu pedido")}
               </p>
             </div>
-            {isAdmin && (
-              <div className="absolute inset-0 border-2 border-transparent group-hover:border-accent/40 rounded-xl transition-colors" />
-            )}
+            <div className="absolute inset-0 border-2 border-transparent group-hover:border-accent/40 rounded-xl transition-colors" />
           </button>
+
 
         </div>
       </div>
