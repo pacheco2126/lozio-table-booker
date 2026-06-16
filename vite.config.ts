@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "logo_app_inicio.png", "logo_lozio_app.jpg"],
       manifest: {
+        id: "/",
         name: "Lo Zio - Auténtica Pizza Italiana",
         short_name: "Lo Zio",
         description: "Pizzeria Lo Zio: pizza artesanal italiana. Reserva mesa y haz pedidos.",
@@ -31,6 +32,9 @@ export default defineConfig(({ mode }) => ({
         orientation: "portrait",
         start_url: "/",
         scope: "/",
+        lang: "es",
+        dir: "ltr",
+        prefer_related_applications: false,
         icons: [
           {
             src: "logo_app_inicio.png",
