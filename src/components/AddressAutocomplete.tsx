@@ -21,7 +21,10 @@ interface NominatimResult {
     village?: string;
     municipality?: string;
     postcode?: string;
+    county?: string;
+    province?: string;
     state?: string;
+    state_district?: string;
     country_code?: string;
   };
 }
@@ -34,8 +37,20 @@ interface Props {
   error?: string;
 }
 
+function isInTarragonaProvince(a: NominatimResult["address"]): boolean {
+  // Tarragona province postcodes start with "43"
+  if (a.postcode && /^43\d{3}$/.test(a.postcode)) return true;
+  const provinceFields = [a.province, a.county, a.state_district]
+    .filter(Boolean)
+    .map((s) => s!.toLowerCase());
+  return provinceFields.some((f) => f.includes("tarragona"));
+}
+
 function parseNominatim(r: NominatimResult): AddressResult | null {
   const a = r.address;
+  if (a.country_code && a.country_code !== "es") return null;
+  if (!isInTarragonaProvince(a)) return null;
+
   const street = a.road || a.pedestrian || "";
   if (!street) return null;
 
