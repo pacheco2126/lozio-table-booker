@@ -663,6 +663,11 @@ const Admin = () => {
           <TabsContent value="discounts"><AdminDiscounts /></TabsContent>
           <TabsContent value="guide"><AdminGuide /></TabsContent>
           <TabsContent value="products"><AdminProducts /></TabsContent>
+          <TabsContent value="notifications">
+            <div className="max-w-2xl">
+              <PushNotificationToggle />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
       <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
