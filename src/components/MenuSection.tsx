@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { UtensilsCrossed, Plus, Flame, AlertTriangle } from "lucide-react";
+import { UtensilsCrossed, Plus, Flame, AlertTriangle, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import pizzaPlaceholder from "@/assets/pizza-placeholder.jpg";
 import { useCart } from "@/contexts/CartContext";
@@ -15,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import AddToCartDialog from "@/components/AddToCartDialog";
 import CartSidebar from "@/components/CartSidebar";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MenuItemData {
   name: string;
