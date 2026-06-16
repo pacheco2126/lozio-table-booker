@@ -591,6 +591,8 @@ export type Database = {
           full_name: string | null
           id: string
           internal_notes: string | null
+          notify_orders: boolean
+          notify_reservations: boolean
           phone: string | null
           postal_code: string | null
           special_dates: Json | null
@@ -609,6 +611,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           internal_notes?: string | null
+          notify_orders?: boolean
+          notify_reservations?: boolean
           phone?: string | null
           postal_code?: string | null
           special_dates?: Json | null
@@ -627,6 +631,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           internal_notes?: string | null
+          notify_orders?: boolean
+          notify_reservations?: boolean
           phone?: string | null
           postal_code?: string | null
           special_dates?: Json | null
@@ -673,6 +679,7 @@ export type Database = {
           location: string
           notes: string | null
           phone: string
+          reminder_sent_at: string | null
           reservation_date: string
           reservation_time: string
           status: string
@@ -689,6 +696,7 @@ export type Database = {
           location: string
           notes?: string | null
           phone: string
+          reminder_sent_at?: string | null
           reservation_date: string
           reservation_time: string
           status?: string
@@ -705,6 +713,7 @@ export type Database = {
           location?: string
           notes?: string | null
           phone?: string
+          reminder_sent_at?: string | null
           reservation_date?: string
           reservation_time?: string
           status?: string
