@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
-import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse, Tag, BookOpen, Bell } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse, Tag, BookOpen, Bell, Truck } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -27,6 +27,7 @@ import AdminReports from "@/components/AdminReports";
 import AdminReviews from "@/components/AdminReviews";
 import AdminMedia from "@/components/AdminMedia";
 import AdminProducts from "@/components/AdminProducts";
+import AdminDeliveryMinimums from "@/components/admin/AdminDeliveryMinimums";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -445,6 +446,9 @@ const Admin = () => {
                 <DropdownMenuItem onClick={() => setActiveTab("discounts")}>
                   <Tag className="w-4 h-4 mr-2" /> Descuentos
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("delivery-minimums")}>
+                  <Truck className="w-4 h-4 mr-2" /> Pedido mínimo (km)
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveTab("roles")}>
                   <Shield className="w-4 h-4 mr-2" /> Roles de usuario
                 </DropdownMenuItem>
@@ -473,7 +477,7 @@ const Admin = () => {
                 ← Volver
               </Button>
               <Badge variant="secondary" className="font-body capitalize">
-                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab === "discounts" ? "Descuentos" : activeTab === "guide" ? "Guía de uso" : activeTab === "notifications" ? "Notificaciones" : activeTab}
+                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab === "discounts" ? "Descuentos" : activeTab === "delivery-minimums" ? "Pedido mínimo (km)" : activeTab === "guide" ? "Guía de uso" : activeTab === "notifications" ? "Notificaciones" : activeTab}
               </Badge>
             </div>
           )}
@@ -661,6 +665,7 @@ const Admin = () => {
           <TabsContent value="media"><AdminMedia /></TabsContent>
           <TabsContent value="roles"><AdminUserRoles /></TabsContent>
           <TabsContent value="discounts"><AdminDiscounts /></TabsContent>
+          <TabsContent value="delivery-minimums"><AdminDeliveryMinimums /></TabsContent>
           <TabsContent value="guide"><AdminGuide /></TabsContent>
           <TabsContent value="products"><AdminProducts /></TabsContent>
           <TabsContent value="notifications">

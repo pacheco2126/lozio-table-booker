@@ -24,11 +24,16 @@ import {
   User,
   Tag,
   X,
+  Truck,
 } from "lucide-react";
 import { useDiscount, type DiscountReason } from "@/hooks/useDiscount";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { locationsData } from "@/lib/locations";
 import { getNearestStore } from "@/lib/nearestStore";
+import {
+  computeDeliveryMinimumForAddress,
+  type DeliveryMinimumResult,
+} from "@/lib/deliveryMinimum";
 import {
   isStoreOpen,
   getScheduleStatus,
@@ -183,10 +188,74 @@ const Checkout = () => {
     notes: "",
   });
 
+  // Delivery minimum (based on distance from nearest store)
+  const [deliveryMin, setDeliveryMin] = useState<DeliveryMinimumResult | null>(null);
+  const [deliveryMinLoading, setDeliveryMinLoading] = useState(false);
+
+  useEffect(() => {
+    if (form.orderType !== "delivery") {
+      setDeliveryMin(null);
+      return;
+    }
+    const addr = form.address.trim();
+    const num = form.streetNumber.trim();
+    if (!addr || !num || !form.postalCode.trim()) {
+      setDeliveryMin(null);
+      return;
+    }
+    let cancelled = false;
+    setDeliveryMinLoading(true);
+    const handle = setTimeout(async () => {
+      const fullAddress = `${addr} ${num}`;
+      const at = scheduledFor ?? new Date();
+      try {
+        const result = await computeDeliveryMinimumForAddress(
+          fullAddress,
+          form.city,
+          form.postalCode,
+          at,
+        );
+        if (!cancelled) setDeliveryMin(result);
+      } catch (err) {
+        console.warn("[Checkout] deliveryMinimum error", err);
+        if (!cancelled) setDeliveryMin(null);
+      } finally {
+        if (!cancelled) setDeliveryMinLoading(false);
+      }
+    }, 600);
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    form.orderType,
+    form.address,
+    form.streetNumber,
+    form.city,
+    form.postalCode,
+    scheduledFor?.getTime(),
+  ]);
+
+  const deliveryBelowMin =
+    form.orderType === "delivery" &&
+    deliveryMin !== null &&
+    deliveryMin.geocoded &&
+    deliveryMin.minOrderAmount !== null &&
+    totalPrice < deliveryMin.minOrderAmount;
+
+  const deliveryOutOfRange =
+    form.orderType === "delivery" &&
+    deliveryMin !== null &&
+    deliveryMin.geocoded &&
+    deliveryMin.minOrderAmount === null &&
+    deliveryMin.maxKmConfigured > 0;
+
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -227,6 +296,22 @@ const Checkout = () => {
       }
       toast.error(t("checkout.formIncomplete", { defaultValue: "Faltan datos por completar" }));
       return;
+    }
+
+    if (form.orderType === "delivery") {
+      if (deliveryOutOfRange) {
+        toast.error(
+          `Esta dirección está fuera de nuestra zona de reparto (máx. ${deliveryMin?.maxKmConfigured?.toFixed(1)} km).`,
+        );
+        document.getElementById("address")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      if (deliveryBelowMin && deliveryMin?.minOrderAmount != null) {
+        toast.error(
+          `El pedido mínimo para tu dirección es ${deliveryMin.minOrderAmount.toFixed(2)} €.`,
+        );
+        return;
+      }
     }
 
     setLoading(true);
@@ -831,9 +916,62 @@ const Checkout = () => {
                         />
                       </div>
                     </div>
+
+                    {/* Delivery minimum banner */}
+                    {deliveryMinLoading && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
+                        <MapPin className="w-3 h-3 animate-pulse" />
+                        Calculando distancia y pedido mínimo…
+                      </p>
+                    )}
+                    {!deliveryMinLoading && deliveryMin && deliveryMin.geocoded && (
+                      <>
+                        {deliveryOutOfRange && (
+                          <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm">
+                            <p className="font-display font-bold text-destructive flex items-center gap-1.5">
+                              <AlertTriangle className="w-4 h-4" />
+                              Fuera de zona de reparto
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Tu dirección está a {deliveryMin.distanceKm.toFixed(1)} km de
+                              nuestra pizzería más cercana. Solo entregamos hasta{" "}
+                              {deliveryMin.maxKmConfigured.toFixed(1)} km.
+                            </p>
+                          </div>
+                        )}
+                        {!deliveryOutOfRange && deliveryMin.minOrderAmount != null && (
+                          <div
+                            className={`rounded-lg border p-3 text-sm ${
+                              deliveryBelowMin
+                                ? "border-amber-400/50 bg-amber-50 dark:bg-amber-950/20"
+                                : "border-menu-teal/30 bg-menu-teal/5"
+                            }`}
+                          >
+                            <p className="font-display font-bold text-foreground flex items-center gap-1.5">
+                              <Truck className="w-4 h-4 text-menu-teal" />
+                              Pedido mínimo: {deliveryMin.minOrderAmount.toFixed(2)} €
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              A {deliveryMin.distanceKm.toFixed(1)} km de nuestra pizzería.
+                              {deliveryBelowMin && (
+                                <>
+                                  {" "}
+                                  Te faltan{" "}
+                                  <span className="font-bold text-amber-700 dark:text-amber-400">
+                                    {(deliveryMin.minOrderAmount - totalPrice).toFixed(2)} €
+                                  </span>{" "}
+                                  para llegar al mínimo.
+                                </>
+                              )}
+                            </p>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 )}
               </div>
+
 
               {/* Payment */}
               <div className="bg-card rounded-xl p-6 border border-border">
@@ -990,12 +1128,21 @@ const Checkout = () => {
 
               <Button
                 type="submit"
-                disabled={loading || (form.paymentMethod === "stripe" && !stripe)}
+                disabled={
+                  loading ||
+                  (form.paymentMethod === "stripe" && !stripe) ||
+                  deliveryOutOfRange ||
+                  deliveryBelowMin
+                }
                 className="w-full bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display text-lg py-7 min-h-[56px]"
               >
                 {loading
                   ? t("checkout.processing")
-                  : `${t("checkout.confirmOrder")} · ${finalTotal.toFixed(2)} €`}
+                  : deliveryOutOfRange
+                    ? "Fuera de zona de reparto"
+                    : deliveryBelowMin && deliveryMin?.minOrderAmount != null
+                      ? `Pedido mínimo ${deliveryMin.minOrderAmount.toFixed(2)} €`
+                      : `${t("checkout.confirmOrder")} · ${finalTotal.toFixed(2)} €`}
               </Button>
             </form>
 
