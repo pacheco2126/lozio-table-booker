@@ -8,6 +8,17 @@ import Navbar from "@/components/Navbar";
 import { EU_ALLERGENS } from "@/lib/allergens";
 import { MyDiscountsSection } from "@/components/MyDiscountsSection";
 import UserPushNotificationToggle from "@/components/UserPushNotificationToggle";
+import { Settings, Lock, Bell } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -17,8 +28,10 @@ const Profile = () => {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [settingsPanel, setSettingsPanel] = useState<null | "password" | "notifications">(null);
   const [profile, setProfile] = useState({
     full_name: "",
+
     phone: "",
     address: "",
     city: "",
@@ -129,10 +142,35 @@ const Profile = () => {
               <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">{t("profile.title")}</h1>
               <p className="text-muted-foreground font-body text-sm mt-1">{user?.email}</p>
             </div>
-            <button onClick={handleSignOut} className="text-destructive font-body text-sm font-bold hover:underline">
-              {t("profile.signOut")}
-            </button>
+            <div className="flex items-center gap-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    aria-label="Configuración"
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card text-foreground hover:bg-muted transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-popover">
+                  <DropdownMenuLabel>{t("profile.title")}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setSettingsPanel("notifications")}>
+                    <Bell className="w-4 h-4 mr-2" />
+                    {t("profile.notificationsLabel", "Notificaciones")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSettingsPanel("password")}>
+                    <Lock className="w-4 h-4 mr-2" />
+                    {t("profile.changePassword")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <button onClick={handleSignOut} className="text-destructive font-body text-sm font-bold hover:underline">
+                {t("profile.signOut")}
+              </button>
+            </div>
           </div>
+
 
           {/* Points Section */}
           <div className="bg-card rounded-lg p-6 shadow-lg border border-border mb-6">
@@ -276,63 +314,81 @@ const Profile = () => {
               >
                 {loading ? t("profile.saving") : t("profile.save")}
               </button>
-              {/* Change Password Section */}
-              <div className="bg-card rounded-lg p-6 shadow-lg border border-border mb-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl">🔒</span>
-                  <h2 className="font-display text-lg font-bold text-foreground">{t("profile.changePassword")}</h2>
-                </div>
-                <form onSubmit={handlePasswordChange} className="space-y-4">
-                  <div>
-                    <label className="block font-body text-sm font-bold text-foreground mb-1.5">
-                      {t("profile.newPassword")}
-                    </label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                      placeholder="••••••••"
-                      minLength={6}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-body text-sm font-bold text-foreground mb-1.5">
-                      {t("profile.confirmPassword")}
-                    </label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                      placeholder="••••••••"
-                      minLength={6}
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={passwordLoading}
-                    className="w-full bg-foreground text-background py-3 min-h-[48px] rounded-sm font-body font-bold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
-                  >
-                    {passwordLoading ? t("profile.changingPassword") : t("profile.changePassword")}
-                  </button>
-                </form>
-              </div>
             </form>
 
             <MyDiscountsSection />
           </div>
-
-          <div className="mt-6">
-            <UserPushNotificationToggle />
-          </div>
-
         </div>
       </div>
+
+      <Dialog open={settingsPanel !== null} onOpenChange={(open) => !open && setSettingsPanel(null)}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              {settingsPanel === "password" ? (
+                <>
+                  <Lock className="w-5 h-5" />
+                  {t("profile.changePassword")}
+                </>
+              ) : (
+                <>
+                  <Bell className="w-5 h-5" />
+                  {t("profile.notificationsLabel", "Notificaciones")}
+                </>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          {settingsPanel === "password" && (
+            <form onSubmit={handlePasswordChange} className="space-y-4 pt-2">
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">
+                  {t("profile.newPassword")}
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="••••••••"
+                  minLength={6}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-body text-sm font-bold text-foreground mb-1.5">
+                  {t("profile.confirmPassword")}
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 rounded-sm bg-background border border-input font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="••••••••"
+                  minLength={6}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={passwordLoading}
+                className="w-full bg-foreground text-background py-3 min-h-[48px] rounded-sm font-body font-bold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {passwordLoading ? t("profile.changingPassword") : t("profile.changePassword")}
+              </button>
+            </form>
+          )}
+
+          {settingsPanel === "notifications" && (
+            <div className="pt-2">
+              <UserPushNotificationToggle />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
+
 };
 
 export default Profile;
