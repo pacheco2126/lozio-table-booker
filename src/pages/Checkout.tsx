@@ -187,10 +187,74 @@ const Checkout = () => {
     notes: "",
   });
 
+  // Delivery minimum (based on distance from nearest store)
+  const [deliveryMin, setDeliveryMin] = useState<DeliveryMinimumResult | null>(null);
+  const [deliveryMinLoading, setDeliveryMinLoading] = useState(false);
+
+  useEffect(() => {
+    if (form.orderType !== "delivery") {
+      setDeliveryMin(null);
+      return;
+    }
+    const addr = form.address.trim();
+    const num = form.streetNumber.trim();
+    if (!addr || !num || !form.postalCode.trim()) {
+      setDeliveryMin(null);
+      return;
+    }
+    let cancelled = false;
+    setDeliveryMinLoading(true);
+    const handle = setTimeout(async () => {
+      const fullAddress = `${addr} ${num}`;
+      const at = scheduledFor ?? new Date();
+      try {
+        const result = await computeDeliveryMinimumForAddress(
+          fullAddress,
+          form.city,
+          form.postalCode,
+          at,
+        );
+        if (!cancelled) setDeliveryMin(result);
+      } catch (err) {
+        console.warn("[Checkout] deliveryMinimum error", err);
+        if (!cancelled) setDeliveryMin(null);
+      } finally {
+        if (!cancelled) setDeliveryMinLoading(false);
+      }
+    }, 600);
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    form.orderType,
+    form.address,
+    form.streetNumber,
+    form.city,
+    form.postalCode,
+    scheduledFor?.getTime(),
+  ]);
+
+  const deliveryBelowMin =
+    form.orderType === "delivery" &&
+    deliveryMin !== null &&
+    deliveryMin.geocoded &&
+    deliveryMin.minOrderAmount !== null &&
+    totalPrice < deliveryMin.minOrderAmount;
+
+  const deliveryOutOfRange =
+    form.orderType === "delivery" &&
+    deliveryMin !== null &&
+    deliveryMin.geocoded &&
+    deliveryMin.minOrderAmount === null &&
+    deliveryMin.maxKmConfigured > 0;
+
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
