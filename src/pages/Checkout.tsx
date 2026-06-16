@@ -160,6 +160,10 @@ const Checkout = () => {
         return true;
       },
       { message: "El número es obligatorio", path: ["streetNumber"] },
+    )
+    .refine(
+      (data) => !(data.orderType === "delivery" && data.paymentMethod === "cash"),
+      { message: "El pago en efectivo no está disponible para envíos a domicilio", path: ["paymentMethod"] },
     );
 
   const [form, setForm] = useState({
