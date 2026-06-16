@@ -86,7 +86,8 @@ const ORDER_STATUSES = [
   { value: "pending", label: "Pendiente", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
   { value: "confirmed", label: "Confirmado", color: "bg-blue-100 text-blue-800 border-blue-200" },
   { value: "preparing", label: "Preparando", color: "bg-orange-100 text-orange-800 border-orange-200" },
-  { value: "ready", label: "Listo", color: "bg-green-100 text-green-800 border-green-200" },
+  { value: "ready", label: "Listo para recoger", color: "bg-green-100 text-green-800 border-green-200" },
+  { value: "out_for_delivery", label: "En camino", color: "bg-indigo-100 text-indigo-800 border-indigo-200" },
   { value: "delivered", label: "Entregado", color: "bg-gray-100 text-gray-600 border-gray-200" },
   { value: "cancelled", label: "Cancelado", color: "bg-red-100 text-red-800 border-red-200" },
 ];
@@ -380,12 +381,22 @@ const AdminOrders = () => {
   );
 };
 
-const NEXT_STATUS: Record<string, string> = {
+const NEXT_STATUS_PICKUP: Record<string, string> = {
   pending:   "confirmed",
   confirmed: "preparing",
   preparing: "ready",
   ready:     "delivered",
 };
+
+const NEXT_STATUS_DELIVERY: Record<string, string> = {
+  pending:   "confirmed",
+  confirmed: "preparing",
+  preparing: "out_for_delivery",
+  out_for_delivery: "delivered",
+};
+
+const getNextStatus = (status: string, orderType: string): string | undefined =>
+  orderType === "delivery" ? NEXT_STATUS_DELIVERY[status] : NEXT_STATUS_PICKUP[status];
 
 interface OrderCardProps {
   order: Order;
@@ -410,11 +421,14 @@ const OrderCard = ({
 }: OrderCardProps) => {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const info = statusInfo(order.status);
-  const nextStatus = NEXT_STATUS[order.status];
+  const nextStatus = getNextStatus(order.status, order.order_type);
   const nextInfo = nextStatus ? ORDER_STATUSES.find((s) => s.value === nextStatus) : null;
   const isDone = order.status === "delivered" || order.status === "cancelled";
+  // Filter out statuses that don't apply to this order_type
+  const validForType = (v: string) =>
+    order.order_type === "delivery" ? v !== "ready" : v !== "out_for_delivery";
   const otherStatuses = ORDER_STATUSES.filter(
-    (s) => s.value !== order.status && s.value !== nextStatus
+    (s) => s.value !== order.status && s.value !== nextStatus && validForType(s.value)
   );
 
   return (
