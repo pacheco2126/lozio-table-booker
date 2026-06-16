@@ -535,7 +535,9 @@ export type Database = {
           badge_style: string | null
           category: string
           description: string | null
+          free_extras: number | null
           id: string
+          image_key: string | null
           is_active: boolean | null
           name: string
           price: number
@@ -549,7 +551,9 @@ export type Database = {
           badge_style?: string | null
           category: string
           description?: string | null
+          free_extras?: number | null
           id?: string
+          image_key?: string | null
           is_active?: boolean | null
           name: string
           price: number
@@ -563,7 +567,9 @@ export type Database = {
           badge_style?: string | null
           category?: string
           description?: string | null
+          free_extras?: number | null
           id?: string
+          image_key?: string | null
           is_active?: boolean | null
           name?: string
           price?: number
