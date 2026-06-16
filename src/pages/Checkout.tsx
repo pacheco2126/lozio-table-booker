@@ -599,8 +599,13 @@ const Checkout = () => {
                 <RadioGroup
                   value={form.orderType}
                   onValueChange={(v) => {
-                    updateField("orderType", v);
-                    updateField("pickupStore", "");
+                    setForm((prev) => ({
+                      ...prev,
+                      orderType: v as "pickup" | "delivery",
+                      pickupStore: "",
+                      // Cash is not allowed for delivery orders
+                      paymentMethod: v === "delivery" ? "stripe" : prev.paymentMethod,
+                    }));
                   }}
                   className="grid sm:grid-cols-2 gap-3"
                 >
