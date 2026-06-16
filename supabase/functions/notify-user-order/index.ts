@@ -72,7 +72,7 @@ serve(async (req) => {
       });
     }
 
-    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, serviceRoleKey);
+    const supabase = supabaseAuth;
 
     // Respect user preference
     const { data: profile } = await supabase
