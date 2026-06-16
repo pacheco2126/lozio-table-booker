@@ -225,7 +225,7 @@ const Checkout = () => {
           assigned_to: assignedTo,
           delivery_address: form.orderType === "delivery"
             ? [
-                form.address,
+                [form.address, form.streetNumber].filter(Boolean).join(", "),
                 form.staircase ? `Esc. ${form.staircase}` : null,
                 form.floor ? `Piso ${form.floor}` : null,
                 form.door ? `Puerta ${form.door}` : null,
