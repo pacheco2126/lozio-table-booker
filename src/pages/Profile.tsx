@@ -142,10 +142,35 @@ const Profile = () => {
               <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">{t("profile.title")}</h1>
               <p className="text-muted-foreground font-body text-sm mt-1">{user?.email}</p>
             </div>
-            <button onClick={handleSignOut} className="text-destructive font-body text-sm font-bold hover:underline">
-              {t("profile.signOut")}
-            </button>
+            <div className="flex items-center gap-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    aria-label="Configuración"
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card text-foreground hover:bg-muted transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-popover">
+                  <DropdownMenuLabel>{t("profile.title")}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setSettingsPanel("notifications")}>
+                    <Bell className="w-4 h-4 mr-2" />
+                    {t("profile.notificationsLabel", "Notificaciones")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSettingsPanel("password")}>
+                    <Lock className="w-4 h-4 mr-2" />
+                    {t("profile.changePassword")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <button onClick={handleSignOut} className="text-destructive font-body text-sm font-bold hover:underline">
+                {t("profile.signOut")}
+              </button>
+            </div>
           </div>
+
 
           {/* Points Section */}
           <div className="bg-card rounded-lg p-6 shadow-lg border border-border mb-6">
