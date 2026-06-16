@@ -7,9 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, Plus, Check, X } from "lucide-react";
+import { Pencil, Trash2, Plus, Check, X, Store as StoreIcon, Clock } from "lucide-react";
 import { EU_ALLERGENS } from "@/lib/allergens";
 
 interface Product {
@@ -46,8 +46,22 @@ const emptyProduct: Omit<Product, "id"> = {
   sort_order: 0,
 };
 
+interface StoreRow { slug: string; name: string; accepts_delivery: boolean; accepts_pickup: boolean; }
+interface AvailabilityRow { menu_item_id: string; store_slug: string; is_available: boolean; unavailable_until: string | null; }
+
+type AvailabilityMap = Record<string, AvailabilityRow>; // key = `${menu_item_id}__${store_slug}`
+const availKey = (itemId: string, slug: string) => `${itemId}__${slug}`;
+
+function isAvailableNow(row?: AvailabilityRow): boolean {
+  if (!row) return true; // default available
+  if (row.unavailable_until && new Date(row.unavailable_until) <= new Date()) return true;
+  return row.is_available;
+}
+
 const AdminProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [stores, setStores] = useState<StoreRow[]>([]);
+  const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [editing, setEditing] = useState<Product | null>(null);
@@ -56,20 +70,30 @@ const AdminProducts = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [inlinePriceId, setInlinePriceId] = useState<string | null>(null);
   const [inlinePriceValue, setInlinePriceValue] = useState("");
+  const [disableTarget, setDisableTarget] = useState<{ product: Product; store: StoreRow } | null>(null);
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => { fetchAll(); }, []);
 
-  const fetchProducts = async () => {
+  const fetchAll = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("menu_items")
-      .select("*")
-      .order("category")
-      .order("sort_order");
-    if (error) toast.error("Error al cargar productos");
-    setProducts((data as Product[]) || []);
+    const [productsRes, storesRes, availRes] = await Promise.all([
+      supabase.from("menu_items").select("*").order("category").order("sort_order"),
+      supabase.from("stores").select("slug,name,accepts_delivery,accepts_pickup").eq("is_active", true).order("sort_order"),
+      supabase.from("menu_item_store_availability").select("menu_item_id,store_slug,is_available,unavailable_until"),
+    ]);
+    if (productsRes.error) toast.error("Error al cargar productos");
+    if (storesRes.error) toast.error("Error al cargar locales");
+    setProducts((productsRes.data as Product[]) || []);
+    const orderingStores = ((storesRes.data as StoreRow[]) || []).filter(s => s.accepts_delivery || s.accepts_pickup);
+    setStores(orderingStores);
+    const map: AvailabilityMap = {};
+    ((availRes.data as AvailabilityRow[]) || []).forEach(r => { map[availKey(r.menu_item_id, r.store_slug)] = r; });
+    setAvailability(map);
     setLoading(false);
   };
+
+  const fetchProducts = fetchAll;
+
 
   const openEdit = (p: Product) => {
     setEditing(p);
@@ -126,6 +150,41 @@ const AdminProducts = () => {
     if (error) toast.error("Error: " + error.message);
     else { toast.success(p.is_active ? "Producto oculto" : "Producto visible"); fetchProducts(); }
   };
+
+  const enableAtStore = async (product: Product, store: StoreRow) => {
+    const { error } = await supabase
+      .from("menu_item_store_availability")
+      .upsert({ menu_item_id: product.id, store_slug: store.slug, is_available: true, unavailable_until: null }, { onConflict: "menu_item_id,store_slug" });
+    if (error) { toast.error("Error: " + error.message); return; }
+    toast.success(`Disponible en ${store.name}`);
+    fetchAll();
+  };
+
+  const disableAtStore = async (product: Product, store: StoreRow, until: Date | null) => {
+    const { error } = await supabase
+      .from("menu_item_store_availability")
+      .upsert({
+        menu_item_id: product.id,
+        store_slug: store.slug,
+        is_available: false,
+        unavailable_until: until ? until.toISOString() : null,
+      }, { onConflict: "menu_item_id,store_slug" });
+    if (error) { toast.error("Error: " + error.message); return; }
+    toast.success(until ? `Oculto en ${store.name} hasta mañana` : `Desactivado en ${store.name}`);
+    setDisableTarget(null);
+    fetchAll();
+  };
+
+  const nextOpenAt = (_store: StoreRow): Date => {
+    // 19:00 next day; storeHours handles closed days but for "hasta mañana" we use literal mañana 19:00
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    d.setHours(19, 0, 0, 0);
+    return d;
+  };
+
+
+
 
   const saveInlinePrice = async (id: string) => {
     const v = parseFloat(inlinePriceValue);
@@ -221,7 +280,40 @@ const AdminProducts = () => {
                   <Button size="icon" variant="ghost" onClick={() => setDeleteId(p.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
               </div>
+
+              {stores.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center gap-2">
+                  <span className="flex items-center gap-1 text-xs font-body text-muted-foreground">
+                    <StoreIcon className="w-3.5 h-3.5" /> Disponibilidad por local:
+                  </span>
+                  {stores.map((s) => {
+                    const row = availability[availKey(p.id, s.slug)];
+                    const available = isAvailableNow(row);
+                    const until = row?.unavailable_until ? new Date(row.unavailable_until) : null;
+                    const reactivatesSoon = !available && until && until > new Date();
+                    return (
+                      <div key={s.slug} className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50">
+                        <span className="text-xs font-body">{s.name}</span>
+                        <Switch
+                          checked={available}
+                          onCheckedChange={(v) => {
+                            if (v) enableAtStore(p, s);
+                            else setDisableTarget({ product: p, store: s });
+                          }}
+                        />
+                        {reactivatesSoon && (
+                          <span className="flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400">
+                            <Clock className="w-3 h-3" />
+                            {until!.toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
+
           ))}
         </div>
       )}
@@ -329,6 +421,38 @@ const AdminProducts = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!disableTarget} onOpenChange={(o) => !o && setDisableTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Desactivar producto</DialogTitle>
+            <DialogDescription>
+              {disableTarget && (
+                <>¿Cómo quieres desactivar <strong>{disableTarget.product.name}</strong> en <strong>{disableTarget.store.name}</strong>?</>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <Button
+              variant="outline"
+              className="w-full justify-start font-body"
+              onClick={() => disableTarget && disableAtStore(disableTarget.product, disableTarget.store, nextOpenAt(disableTarget.store))}
+            >
+              <Clock className="w-4 h-4 mr-2" /> Solo hasta mañana (19:00)
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start font-body"
+              onClick={() => disableTarget && disableAtStore(disableTarget.product, disableTarget.store, null)}
+            >
+              <X className="w-4 h-4 mr-2" /> Desactivar indefinidamente
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDisableTarget(null)}>Cancelar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
