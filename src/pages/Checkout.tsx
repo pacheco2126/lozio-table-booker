@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useCart } from "@/contexts/CartContext";
+import { useOrderFlow } from "@/contexts/OrderFlowContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,7 @@ const Checkout = () => {
   const { t } = useTranslation();
   const stripe = useStripe();
   const elements = useElements();
+  const orderFlow = useOrderFlow();
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -175,18 +177,19 @@ const Checkout = () => {
     name: "",
     email: "",
     phone: "",
-    orderType: "pickup" as "pickup" | "delivery",
-    pickupStore: "",
-    address: "",
-    streetNumber: "",
-    city: "",
-    postalCode: "",
+    orderType: (orderFlow.orderType ?? "pickup") as "pickup" | "delivery",
+    pickupStore: orderFlow.orderType === "pickup" ? (orderFlow.storeSlug ?? "") : "",
+    address: orderFlow.address?.address ?? "",
+    streetNumber: orderFlow.address?.streetNumber ?? "",
+    city: orderFlow.address?.city ?? "",
+    postalCode: orderFlow.address?.postalCode ?? "",
     staircase: "",
     floor: "",
     door: "",
     paymentMethod: "cash" as "cash" | "stripe",
     notes: "",
   });
+
 
   // Delivery minimum (based on distance from nearest store)
   const [deliveryMin, setDeliveryMin] = useState<DeliveryMinimumResult | null>(null);

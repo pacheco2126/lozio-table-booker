@@ -7,6 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/contexts/CartContext";
+import { OrderFlowProvider } from "@/contexts/OrderFlowContext";
+import OrderTypeDialog from "@/components/OrderTypeDialog";
 import CartDrawer from "@/components/CartDrawer";
 import CartFloatingButton from "@/components/CartFloatingButton";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -58,6 +60,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
+        <OrderFlowProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner position="top-center" />
@@ -91,8 +94,10 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <OrderTypeDialog />
           </BrowserRouter>
         </TooltipProvider>
+        </OrderFlowProvider>
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
