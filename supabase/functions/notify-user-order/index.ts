@@ -34,10 +34,23 @@ function buildMessage(status: string, orderType: OrderType): { title: string; bo
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  // Require service-role (DB trigger only)
-  const authHeader = req.headers.get("Authorization");
+  // Require shared secret (set by DB trigger) OR service-role bearer.
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!authHeader?.startsWith("Bearer ") || !serviceRoleKey || authHeader.replace("Bearer ", "") !== serviceRoleKey) {
+  if (!serviceRoleKey) {
+    return new Response(JSON.stringify({ error: "Server misconfigured" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const supabaseAuth = createClient(Deno.env.get("SUPABASE_URL")!, serviceRoleKey);
+  const { data: cfg } = await supabaseAuth
+    .from("internal_config")
+    .select("value")
+    .eq("key", "edge_shared_secret")
+    .maybeSingle();
+  const sharedSecret = (cfg as { value?: string } | null)?.value ?? "";
+  if (bearer !== serviceRoleKey && (!sharedSecret || bearer !== sharedSecret)) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
