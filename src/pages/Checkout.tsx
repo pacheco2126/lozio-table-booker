@@ -689,13 +689,17 @@ const Checkout = () => {
                       <button
                         type="button"
                         onClick={() => {
+                          const match = profileAddress.address.match(/^(.*?)[,\s]+(\d+[A-Za-z]?(?:\s*-\s*\d+[A-Za-z]?)?)\s*$/);
+                          const street = match ? match[1].trim() : profileAddress.address;
+                          const number = match ? match[2].trim() : "";
                           setForm((prev) => ({
                             ...prev,
-                            address: profileAddress.address,
+                            address: street,
+                            streetNumber: number || prev.streetNumber,
                             city: profileAddress.city,
                             postalCode: profileAddress.postalCode,
                           }));
-                          setErrors((prev) => ({ ...prev, address: "" }));
+                          setErrors((prev) => ({ ...prev, address: "", streetNumber: "" }));
                         }}
                         className="w-full flex items-center gap-2.5 px-4 py-3 rounded-lg border-2 border-dashed border-menu-teal/50 bg-menu-teal/5 hover:bg-menu-teal/10 hover:border-menu-teal transition-all text-left"
                       >
