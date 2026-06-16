@@ -85,11 +85,11 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
         q: query,
         format: "json",
         addressdetails: "1",
-        limit: "6",
+        limit: "10",
         countrycodes: "es",
-        // Bias results towards Tarragona area
-        viewbox: "-0.5,40.5,3.5,42.5",
-        bounded: "0",
+        // Restrict strictly to Tarragona province bounding box
+        viewbox: "0.0,41.6,1.55,40.45",
+        bounded: "1",
       });
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?${params}`,
@@ -100,7 +100,8 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
 
       const results = data
         .map(parseNominatim)
-        .filter((r): r is AddressResult => r !== null);
+        .filter((r): r is AddressResult => r !== null)
+        .slice(0, 6);
 
       setSuggestions(results);
       setOpen(results.length > 0);
