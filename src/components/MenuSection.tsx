@@ -17,6 +17,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import AddToCartDialog from "@/components/AddToCartDialog";
 import CartSidebar from "@/components/CartSidebar";
 import { supabase } from "@/integrations/supabase/client";
+import { useOrderFlow } from "@/contexts/OrderFlowContext";
+import { Badge } from "@/components/ui/badge";
 
 interface MenuItemData {
   name: string;
