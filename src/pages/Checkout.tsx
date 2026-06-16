@@ -151,6 +151,15 @@ const Checkout = () => {
         return true;
       },
       { message: t("checkout.addressRequired"), path: ["address"] },
+    )
+    .refine(
+      (data) => {
+        if (data.orderType === "delivery") {
+          return data.streetNumber && data.streetNumber.trim().length > 0;
+        }
+        return true;
+      },
+      { message: "El número es obligatorio", path: ["streetNumber"] },
     );
 
   const [form, setForm] = useState({
