@@ -7,6 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/contexts/CartContext";
+import { OrderFlowProvider } from "@/contexts/OrderFlowContext";
+import OrderTypeDialog from "@/components/OrderTypeDialog";
 import CartDrawer from "@/components/CartDrawer";
 import CartFloatingButton from "@/components/CartFloatingButton";
 import MobileBottomNav from "@/components/MobileBottomNav";
