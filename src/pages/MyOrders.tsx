@@ -232,7 +232,7 @@ const MyOrders = () => {
                                 : "bg-orange-100 text-orange-800 border-orange-200"
                             }`}
                           >
-                            {STATUS_LABELS[order.status] ?? order.status}
+                            {getStatusLabel(order.status, order.order_type)}
                           </Badge>
                           <Badge
                             className={`text-[10px] border ${PAYMENT_STATUS_STYLES[order.payment_status]}`}
@@ -280,9 +280,9 @@ const MyOrders = () => {
                     {!cancelled && (
                       <div className="mt-4">
                         <div className="flex items-center gap-0">
-                          {PROGRESS_STEPS.map((s, i) => {
+                          {steps.map((s, i) => {
                             const done = i <= step;
-                            const isLast = i === PROGRESS_STEPS.length - 1;
+                            const isLast = i === steps.length - 1;
                             return (
                               <div key={s.key} className="flex items-center flex-1 last:flex-none">
                                 <div className="flex flex-col items-center gap-1">
