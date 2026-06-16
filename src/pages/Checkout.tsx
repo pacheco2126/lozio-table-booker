@@ -159,6 +159,7 @@ const Checkout = () => {
     orderType: "pickup" as "pickup" | "delivery",
     pickupStore: "",
     address: "",
+    streetNumber: "",
     city: "",
     postalCode: "",
     staircase: "",
