@@ -477,7 +477,7 @@ const Admin = () => {
                 ← Volver
               </Button>
               <Badge variant="secondary" className="font-body capitalize">
-                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab === "discounts" ? "Descuentos" : activeTab === "guide" ? "Guía de uso" : activeTab === "notifications" ? "Notificaciones" : activeTab}
+                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab === "discounts" ? "Descuentos" : activeTab === "delivery-minimums" ? "Pedido mínimo (km)" : activeTab === "guide" ? "Guía de uso" : activeTab === "notifications" ? "Notificaciones" : activeTab}
               </Badge>
             </div>
           )}
