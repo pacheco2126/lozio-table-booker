@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
-import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse, Tag, BookOpen } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse, Tag, BookOpen, Bell } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -448,6 +448,9 @@ const Admin = () => {
                 <DropdownMenuItem onClick={() => setActiveTab("roles")}>
                   <Shield className="w-4 h-4 mr-2" /> Roles de usuario
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("notifications")}>
+                  <Bell className="w-4 h-4 mr-2" /> Notificaciones
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveTab("guide")}>
                   <BookOpen className="w-4 h-4 mr-2" /> Guía de uso
                 </DropdownMenuItem>
@@ -470,7 +473,7 @@ const Admin = () => {
                 ← Volver
               </Button>
               <Badge variant="secondary" className="font-body capitalize">
-                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab === "discounts" ? "Descuentos" : activeTab === "guide" ? "Guía de uso" : activeTab}
+                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab === "discounts" ? "Descuentos" : activeTab === "guide" ? "Guía de uso" : activeTab === "notifications" ? "Notificaciones" : activeTab}
               </Badge>
             </div>
           )}
@@ -483,8 +486,7 @@ const Admin = () => {
               </TabsList>
 
               <TabsContent value="lista" className="space-y-6 mt-4">
-                {/* Push notifications toggle (admin device) */}
-                <PushNotificationToggle />
+
 
                 {/* Toggle reservas */}
                 <div className="flex items-center justify-between bg-card rounded-lg p-4 border border-border shadow-sm">
@@ -661,6 +663,11 @@ const Admin = () => {
           <TabsContent value="discounts"><AdminDiscounts /></TabsContent>
           <TabsContent value="guide"><AdminGuide /></TabsContent>
           <TabsContent value="products"><AdminProducts /></TabsContent>
+          <TabsContent value="notifications">
+            <div className="max-w-2xl">
+              <PushNotificationToggle />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
       <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
