@@ -150,7 +150,8 @@ const Profile = () => {
             </div>
           </div>
 
-          <UserPushNotificationToggle />
+
+
 
 
           <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
@@ -323,6 +324,11 @@ const Profile = () => {
 
             <MyDiscountsSection />
           </div>
+
+          <div className="mt-6">
+            <UserPushNotificationToggle />
+          </div>
+
         </div>
       </div>
     </div>
