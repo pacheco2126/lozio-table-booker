@@ -150,7 +150,8 @@ const Profile = () => {
             </div>
           </div>
 
-          <UserPushNotificationToggle />
+
+
 
 
           <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
