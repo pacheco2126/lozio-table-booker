@@ -488,6 +488,15 @@ const AdminInventory = () => {
                             >
                               <Plus className="w-3 h-3 mr-1" /> Entrada
                             </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="font-body gap-1 text-amber-700 border-amber-300 hover:bg-amber-50 dark:text-amber-400 dark:border-amber-700 dark:hover:bg-amber-950"
+                              onClick={() => setCascadeItem(item)}
+                              title="Marcar agotado y desactivar productos que lo usan"
+                            >
+                              <AlertOctagon className="w-3.5 h-3.5" /> Agotado
+                            </Button>
                             {canManageCatalog && (
                               <>
                                 <Button size="sm" variant="ghost" onClick={() => openEdit(item)}>
