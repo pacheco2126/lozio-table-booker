@@ -142,7 +142,7 @@ const Checkout = () => {
         }
         return true;
       },
-      { message: "Debes seleccionar en qué local recoges el pedido", path: ["pickupStore"] },
+      { message: t("checkout.pickupStoreRequired"), path: ["pickupStore"] },
     )
     .refine(
       (data) => {
@@ -160,11 +160,11 @@ const Checkout = () => {
         }
         return true;
       },
-      { message: "El número es obligatorio", path: ["streetNumber"] },
+      { message: t("checkout.streetNumberRequired"), path: ["streetNumber"] },
     )
     .refine(
       (data) => !(data.orderType === "delivery" && data.paymentMethod === "cash"),
-      { message: "El pago en efectivo no está disponible para envíos a domicilio", path: ["paymentMethod"] },
+      { message: t("checkout.cashUnavailableForDelivery"), path: ["paymentMethod"] },
     );
 
   const [form, setForm] = useState({
