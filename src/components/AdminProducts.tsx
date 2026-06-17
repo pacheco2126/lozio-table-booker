@@ -35,6 +35,31 @@ const CATEGORY_LABELS: Record<string, string> = {
 const BADGE_STYLES = ["", "fire", "gold", "teal"] as const;
 const INGREDIENT_LINKABLE = new Set(["pizzas", "focaccias", "calzones"]);
 const PAGE_SIZE = 10;
+const EXTRA_INGREDIENT_ALIASES: Record<string, string[]> = {
+  "jamon dulce": ["jamon york", "prosciutto cotto"],
+  "jamon serrano": ["prosciutto crudo"],
+  "mozzarella bufala": ["mozzarella di bufala"],
+  "mozzarella extra": ["mozzarella fior di latte", "fior di latte"],
+};
+
+const normalizeIngredientName = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/['’]/g, "")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+const findInventoryItemForExtra = (extraName: string, items: InventoryItemRow[]) => {
+  const target = normalizeIngredientName(extraName);
+  const candidates = [target, ...(EXTRA_INGREDIENT_ALIASES[target] ?? [])].map(normalizeIngredientName);
+  return items.find((it) => {
+    const itemName = normalizeIngredientName(it.name);
+    return candidates.some((candidate) => itemName === candidate || itemName.includes(candidate) || candidate.includes(itemName));
+  });
+};
 
 const emptyProduct: Omit<Product, "id"> = {
   name: "",
@@ -229,12 +254,7 @@ const AdminProducts = () => {
     fetchAll();
     // Si es un extra, buscar el ingrediente del inventario y proponer cascada
     if (product.category === "extras") {
-      const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-      const target = norm(product.name);
-      const match = inventoryItems.find(it => {
-        const n = norm(it.name);
-        return n === target || n.includes(target) || target.includes(n);
-      });
+      const match = findInventoryItemForExtra(product.name, inventoryItems);
       if (match) {
         // Esperar a que el Dialog anterior se cierre antes de abrir el siguiente
         setTimeout(() => {
