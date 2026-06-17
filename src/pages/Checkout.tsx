@@ -684,7 +684,7 @@ const Checkout = () => {
                         <MapPin className="w-5 h-5 text-menu-teal shrink-0 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="font-display font-bold text-sm text-foreground">
-                            Entrega a domicilio
+                            {t("checkout.deliveryToHome")}
                           </p>
                           <p className="text-xs text-muted-foreground mt-0.5 break-words">
                             {[
@@ -692,7 +692,7 @@ const Checkout = () => {
                               [form.postalCode, form.city].filter(Boolean).join(" "),
                             ]
                               .filter(Boolean)
-                              .join(" · ") || "Sin dirección"}
+                              .join(" · ") || t("checkout.noAddress")}
                           </p>
                         </div>
                         <button
@@ -700,7 +700,7 @@ const Checkout = () => {
                           onClick={() => orderFlow.openDialog()}
                           className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
                         >
-                          Cambiar
+                          {t("checkout.change")}
                         </button>
                       </div>
                       {(errors.address || errors.streetNumber) && (
@@ -712,7 +712,7 @@ const Checkout = () => {
                       {/* Escalera / Piso / Puerta */}
                       <div className="grid grid-cols-3 gap-3 mt-4">
                         <div>
-                          <Label htmlFor="staircase" className="text-xs">Escalera</Label>
+                          <Label htmlFor="staircase" className="text-xs">{t("checkout.staircase")}</Label>
                           <Input
                             id="staircase"
                             value={form.staircase}
@@ -721,7 +721,7 @@ const Checkout = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="floor" className="text-xs">Piso</Label>
+                          <Label htmlFor="floor" className="text-xs">{t("checkout.floor")}</Label>
                           <Input
                             id="floor"
                             value={form.floor}
@@ -730,7 +730,7 @@ const Checkout = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="door" className="text-xs">Puerta</Label>
+                          <Label htmlFor="door" className="text-xs">{t("checkout.door")}</Label>
                           <Input
                             id="door"
                             value={form.door}
@@ -745,12 +745,13 @@ const Checkout = () => {
                         <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm mt-4">
                           <p className="font-display font-bold text-destructive flex items-center gap-1.5">
                             <AlertTriangle className="w-4 h-4" />
-                            Fuera de zona de reparto
+                            {t("checkout.outOfDeliveryZone")}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            Tu dirección está a {deliveryMin?.distanceKm.toFixed(1)} km de
-                            nuestra pizzería más cercana. Solo entregamos hasta{" "}
-                            {deliveryMin?.maxKmConfigured.toFixed(1)} km.
+                            {t("checkout.outOfDeliveryZoneDesc", {
+                              distance: deliveryMin?.distanceKm.toFixed(1),
+                              max: deliveryMin?.maxKmConfigured.toFixed(1),
+                            })}
                           </p>
                         </div>
                       )}
@@ -758,14 +759,12 @@ const Checkout = () => {
                         <div className="rounded-lg border border-amber-400/50 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm mt-4">
                           <p className="font-display font-bold text-foreground flex items-center gap-1.5">
                             <Truck className="w-4 h-4 text-menu-teal" />
-                            Pedido mínimo: {deliveryMin.minOrderAmount.toFixed(2)} €
+                            {t("checkout.minOrder", { amount: deliveryMin.minOrderAmount.toFixed(2) })}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            Te faltan{" "}
-                            <span className="font-bold text-amber-700 dark:text-amber-400">
-                              {(deliveryMin.minOrderAmount - totalPrice).toFixed(2)} €
-                            </span>{" "}
-                            para llegar al mínimo.
+                            {t("checkout.minOrderRemaining", {
+                              remaining: (deliveryMin.minOrderAmount - totalPrice).toFixed(2),
+                            })}
                           </p>
                         </div>
                       )}
@@ -776,12 +775,12 @@ const Checkout = () => {
                         <Store className="w-5 h-5 text-menu-teal shrink-0 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="font-display font-bold text-sm text-foreground">
-                            Recogida en local
+                            {t("checkout.pickupAtStore")}
                           </p>
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {form.pickupStore
                               ? locationsData[form.pickupStore as keyof typeof locationsData]?.name ?? form.pickupStore
-                              : "Sin local seleccionado"}
+                              : t("checkout.noStoreSelected")}
                           </p>
                           {form.pickupStore && (
                             <p className="text-xs text-muted-foreground mt-0.5">
@@ -794,7 +793,7 @@ const Checkout = () => {
                           onClick={() => orderFlow.openDialog()}
                           className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
                         >
-                          Cambiar
+                          {t("checkout.change")}
                         </button>
                       </div>
                       {errors.pickupStore && (
