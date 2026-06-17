@@ -128,6 +128,9 @@ const AdminInventory = () => {
   // Collapsed categories
   const [collapsedCats, setCollapsedCats] = useState<Set<string>>(new Set());
 
+  // Ingredient cascade dialog
+  const [cascadeItem, setCascadeItem] = useState<InventoryItem | null>(null);
+
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   // ─── Guard: redirect if no inventory access ──────────────────────────────
