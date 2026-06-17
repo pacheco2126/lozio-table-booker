@@ -75,6 +75,9 @@ const AdminProducts = () => {
   const [disableTarget, setDisableTarget] = useState<{ product: Product; store: StoreRow } | null>(null);
   const [linkingProduct, setLinkingProduct] = useState<Product | null>(null);
   const [linkSelection, setLinkSelection] = useState<Set<string>>(new Set());
+  const [inventoryItems, setInventoryItems] = useState<InventoryItemRow[]>([]);
+  const [ingredientsByProduct, setIngredientsByProduct] = useState<Record<string, Set<string>>>({});
+
 
   useEffect(() => { fetchAll(); }, []);
 
