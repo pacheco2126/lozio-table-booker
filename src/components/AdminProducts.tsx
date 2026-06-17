@@ -68,6 +68,7 @@ const AdminProducts = () => {
   const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<Product | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<Omit<Product, "id">>(emptyProduct);
