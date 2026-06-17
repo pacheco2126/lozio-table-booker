@@ -55,6 +55,7 @@ interface MenuItemRow {
 function mapRow(row: MenuItemRow): MenuItemData {
   const priceNum = Number(row.price);
   return {
+    id: row.id,
     name: row.name,
     imageKey: row.image_key ?? undefined,
     freeExtras: row.free_extras ?? undefined,
