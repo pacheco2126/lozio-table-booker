@@ -323,6 +323,14 @@ const AdminProducts = () => {
                   )}
 
                   <Switch checked={!!p.is_active} onCheckedChange={() => toggleActive(p)} />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => openLinking(p)}
+                    title="Vincular ingredientes"
+                  >
+                    <Carrot className={`w-4 h-4 ${(ingredientsByProduct[p.id]?.size ?? 0) > 0 ? "text-amber-600" : ""}`} />
+                  </Button>
                   <Button size="icon" variant="ghost" onClick={() => openEdit(p)}><Pencil className="w-4 h-4" /></Button>
                   <Button size="icon" variant="ghost" onClick={() => setDeleteId(p.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
