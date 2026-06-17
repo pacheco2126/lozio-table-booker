@@ -252,6 +252,12 @@ const AdminProducts = () => {
   };
 
   const filtered = filterCategory === "all" ? products : products.filter((p) => p.category === filterCategory);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Reset page when filter changes
+  useEffect(() => { setPage(1); }, [filterCategory]);
 
   return (
     <div className="space-y-6">
