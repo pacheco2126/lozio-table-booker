@@ -187,7 +187,7 @@ const MenuSection = () => {
   const { t } = useTranslation();
   const { getImageForItem } = useMedia("menu_item");
   const isMobile = useIsMobile();
-  const { storeSlug } = useOrderFlow();
+  const { storeSlug, intent, openDialog } = useOrderFlow();
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
@@ -252,6 +252,10 @@ const MenuSection = () => {
 
 
   const handleAdd = (item: MenuItemData, imageUrl?: string | null) => {
+    if (!storeSlug && !isAdmin) {
+      openDialog();
+      return;
+    }
     setDialogItem(item);
     setDialogImageUrl(imageUrl ?? null);
   };
@@ -406,7 +410,7 @@ const MenuSection = () => {
                       </div>
                       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
                         {items.map((item) => (
-                          <MenuCard key={item.id} item={item} onAdd={() => handleAdd(item, getImageForItem(item.imageKey ?? item.name))} showAddButton={isAdmin || !!storeSlug} imageUrl={getImageForItem(item.imageKey ?? item.name)} />
+                          <MenuCard key={item.id} item={item} onAdd={() => handleAdd(item, getImageForItem(item.imageKey ?? item.name))} showAddButton={intent !== "reservation"} imageUrl={getImageForItem(item.imageKey ?? item.name)} />
                         ))}
                       </div>
                     </div>
