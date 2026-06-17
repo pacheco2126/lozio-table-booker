@@ -437,10 +437,9 @@ const CartDrawer = () => {
                 <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-2.5 text-xs flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
                   <p className="text-foreground">
-                    Tu dirección está fuera de la zona de reparto
                     {deliveryMin?.maxKmConfigured
-                      ? ` (máx. ${deliveryMin.maxKmConfigured.toFixed(1)} km).`
-                      : "."}
+                      ? t("cart.outOfZoneFullKm", { km: deliveryMin.maxKmConfigured.toFixed(1) })
+                      : `${t("cart.outOfZoneFull")}.`}
                   </p>
                 </div>
               )}
@@ -448,9 +447,9 @@ const CartDrawer = () => {
                 <div className="rounded-lg border border-amber-400/50 bg-amber-50 dark:bg-amber-950/20 p-2.5 text-xs flex items-start gap-2">
                   <Truck className="w-4 h-4 text-menu-teal shrink-0 mt-0.5" />
                   <p className="text-foreground">
-                    Pedido mínimo a domicilio:{" "}
+                    {t("cart.minOrderDelivery")}{" "}
                     <span className="font-bold">{deliveryMin.minOrderAmount.toFixed(2)} €</span>.
-                    Te faltan{" "}
+                    {" "}{t("cart.minOrderRemaining")}{" "}
                     <span className="font-bold text-amber-700 dark:text-amber-400">
                       {(deliveryMin.minOrderAmount - totalPrice).toFixed(2)} €
                     </span>
@@ -473,9 +472,9 @@ const CartDrawer = () => {
                 className="w-full bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display text-base py-6 rounded-xl"
               >
                 {deliveryOutOfRange
-                  ? "Fuera de zona"
+                  ? t("cart.outOfZoneShort")
                   : deliveryBelowMin && deliveryMin?.minOrderAmount != null
-                    ? `Mínimo ${deliveryMin.minOrderAmount.toFixed(2)} €`
+                    ? t("cart.minShort", { amount: deliveryMin.minOrderAmount.toFixed(2) })
                     : t("cart.checkout")}
                 {!deliveryOutOfRange && !deliveryBelowMin && <ArrowRight className="w-4 h-4 ml-2" />}
               </Button>

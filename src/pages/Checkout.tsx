@@ -142,7 +142,7 @@ const Checkout = () => {
         }
         return true;
       },
-      { message: "Debes seleccionar en qué local recoges el pedido", path: ["pickupStore"] },
+      { message: t("checkout.pickupStoreRequired"), path: ["pickupStore"] },
     )
     .refine(
       (data) => {
@@ -160,11 +160,11 @@ const Checkout = () => {
         }
         return true;
       },
-      { message: "El número es obligatorio", path: ["streetNumber"] },
+      { message: t("checkout.streetNumberRequired"), path: ["streetNumber"] },
     )
     .refine(
       (data) => !(data.orderType === "delivery" && data.paymentMethod === "cash"),
-      { message: "El pago en efectivo no está disponible para envíos a domicilio", path: ["paymentMethod"] },
+      { message: t("checkout.cashUnavailableForDelivery"), path: ["paymentMethod"] },
     );
 
   const [form, setForm] = useState({
@@ -264,7 +264,7 @@ const Checkout = () => {
     }
 
     if (scheduleMode === "scheduled" && !scheduledFor) {
-      toast.error("Selecciona una hora para programar tu pedido");
+      toast.error(t("checkout.scheduleTimeRequired"));
       return;
     }
 
@@ -291,21 +291,21 @@ const Checkout = () => {
           }
         }, 50);
       }
-      toast.error(t("checkout.formIncomplete", { defaultValue: "Faltan datos por completar" }));
+      toast.error(t("checkout.formIncomplete"));
       return;
     }
 
     if (form.orderType === "delivery") {
       if (deliveryOutOfRange) {
         toast.error(
-          `Esta dirección está fuera de nuestra zona de reparto (máx. ${deliveryMin?.maxKmConfigured?.toFixed(1)} km).`,
+          t("checkout.outOfDeliveryZoneMsg", { km: deliveryMin?.maxKmConfigured?.toFixed(1) }),
         );
         document.getElementById("address")?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
       }
       if (deliveryBelowMin && deliveryMin?.minOrderAmount != null) {
         toast.error(
-          `El pedido mínimo para tu dirección es ${deliveryMin.minOrderAmount.toFixed(2)} €.`,
+          t("checkout.minOrderForAddressMsg", { amount: deliveryMin.minOrderAmount.toFixed(2) }),
         );
         return;
       }
@@ -505,7 +505,7 @@ const Checkout = () => {
               <div className="mb-6 bg-card border border-border rounded-xl p-5">
                 <h2 className="font-display text-base font-bold text-foreground mb-4 flex items-center gap-2">
                   <CalendarClock className="w-4 h-4 text-menu-teal" />
-                  ¿Cuándo quieres tu pedido?
+                  {t("checkout.scheduleTitle")}
                 </h2>
 
                 <div className="grid grid-cols-2 gap-3 mb-4">
@@ -524,9 +524,9 @@ const Checkout = () => {
                   >
                     <Zap className="w-4 h-4 text-menu-teal shrink-0" />
                     <div>
-                      <p className="font-display font-bold text-sm">Lo antes posible</p>
+                      <p className="font-display font-bold text-sm">{t("checkout.asap")}</p>
                       <p className="text-xs text-muted-foreground">
-                        {isCurrentlyOpen ? "Estamos abiertos" : "Cerrado ahora"}
+                        {isCurrentlyOpen ? t("checkout.openNow") : t("checkout.closedNow")}
                       </p>
                     </div>
                   </button>
@@ -552,8 +552,8 @@ const Checkout = () => {
                   >
                     <CalendarClock className="w-4 h-4 text-menu-teal shrink-0" />
                     <div>
-                      <p className="font-display font-bold text-sm">Programar</p>
-                      <p className="text-xs text-muted-foreground">Elige día y hora</p>
+                      <p className="font-display font-bold text-sm">{t("checkout.schedule")}</p>
+                      <p className="text-xs text-muted-foreground">{t("checkout.scheduleHint")}</p>
                     </div>
                   </button>
                 </div>
@@ -563,7 +563,7 @@ const Checkout = () => {
                   <div className="space-y-3">
                     {/* Day selector */}
                     <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Día</p>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t("checkout.day")}</p>
                       <div className="flex gap-2 flex-wrap">
                         {availableDays.map((day, i) => {
                           const isSelected =
@@ -593,9 +593,9 @@ const Checkout = () => {
 
                     {/* Time selector */}
                     <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Hora</p>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t("checkout.time")}</p>
                       {timeSlots.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No hay horarios disponibles para este día.</p>
+                        <p className="text-sm text-muted-foreground">{t("checkout.noTimeSlots")}</p>
                       ) : (
                         <div className="flex gap-2 flex-wrap">
                           {timeSlots.map((slot) => (
@@ -618,7 +618,7 @@ const Checkout = () => {
 
                     {scheduledFor && (
                       <p className="text-xs text-menu-teal font-semibold mt-1">
-                        ✓ Pedido programado para el {formatDayLabel(scheduledDay)} a las {scheduledTime}
+                        {t("checkout.scheduledFor", { day: formatDayLabel(scheduledDay), time: scheduledTime })}
                       </p>
                     )}
                   </div>
@@ -684,7 +684,7 @@ const Checkout = () => {
                         <MapPin className="w-5 h-5 text-menu-teal shrink-0 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="font-display font-bold text-sm text-foreground">
-                            Entrega a domicilio
+                            {t("checkout.deliveryToHome")}
                           </p>
                           <p className="text-xs text-muted-foreground mt-0.5 break-words">
                             {[
@@ -692,7 +692,7 @@ const Checkout = () => {
                               [form.postalCode, form.city].filter(Boolean).join(" "),
                             ]
                               .filter(Boolean)
-                              .join(" · ") || "Sin dirección"}
+                              .join(" · ") || t("checkout.noAddress")}
                           </p>
                         </div>
                         <button
@@ -700,7 +700,7 @@ const Checkout = () => {
                           onClick={() => orderFlow.openDialog()}
                           className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
                         >
-                          Cambiar
+                          {t("checkout.change")}
                         </button>
                       </div>
                       {(errors.address || errors.streetNumber) && (
@@ -712,7 +712,7 @@ const Checkout = () => {
                       {/* Escalera / Piso / Puerta */}
                       <div className="grid grid-cols-3 gap-3 mt-4">
                         <div>
-                          <Label htmlFor="staircase" className="text-xs">Escalera</Label>
+                          <Label htmlFor="staircase" className="text-xs">{t("checkout.staircase")}</Label>
                           <Input
                             id="staircase"
                             value={form.staircase}
@@ -721,7 +721,7 @@ const Checkout = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="floor" className="text-xs">Piso</Label>
+                          <Label htmlFor="floor" className="text-xs">{t("checkout.floor")}</Label>
                           <Input
                             id="floor"
                             value={form.floor}
@@ -730,7 +730,7 @@ const Checkout = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="door" className="text-xs">Puerta</Label>
+                          <Label htmlFor="door" className="text-xs">{t("checkout.door")}</Label>
                           <Input
                             id="door"
                             value={form.door}
@@ -745,12 +745,13 @@ const Checkout = () => {
                         <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm mt-4">
                           <p className="font-display font-bold text-destructive flex items-center gap-1.5">
                             <AlertTriangle className="w-4 h-4" />
-                            Fuera de zona de reparto
+                            {t("checkout.outOfDeliveryZone")}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            Tu dirección está a {deliveryMin?.distanceKm.toFixed(1)} km de
-                            nuestra pizzería más cercana. Solo entregamos hasta{" "}
-                            {deliveryMin?.maxKmConfigured.toFixed(1)} km.
+                            {t("checkout.outOfDeliveryZoneDesc", {
+                              distance: deliveryMin?.distanceKm.toFixed(1),
+                              max: deliveryMin?.maxKmConfigured.toFixed(1),
+                            })}
                           </p>
                         </div>
                       )}
@@ -758,14 +759,12 @@ const Checkout = () => {
                         <div className="rounded-lg border border-amber-400/50 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm mt-4">
                           <p className="font-display font-bold text-foreground flex items-center gap-1.5">
                             <Truck className="w-4 h-4 text-menu-teal" />
-                            Pedido mínimo: {deliveryMin.minOrderAmount.toFixed(2)} €
+                            {t("checkout.minOrder", { amount: deliveryMin.minOrderAmount.toFixed(2) })}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            Te faltan{" "}
-                            <span className="font-bold text-amber-700 dark:text-amber-400">
-                              {(deliveryMin.minOrderAmount - totalPrice).toFixed(2)} €
-                            </span>{" "}
-                            para llegar al mínimo.
+                            {t("checkout.minOrderRemaining", {
+                              remaining: (deliveryMin.minOrderAmount - totalPrice).toFixed(2),
+                            })}
                           </p>
                         </div>
                       )}
@@ -776,12 +775,12 @@ const Checkout = () => {
                         <Store className="w-5 h-5 text-menu-teal shrink-0 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="font-display font-bold text-sm text-foreground">
-                            Recogida en local
+                            {t("checkout.pickupAtStore")}
                           </p>
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {form.pickupStore
                               ? locationsData[form.pickupStore as keyof typeof locationsData]?.name ?? form.pickupStore
-                              : "Sin local seleccionado"}
+                              : t("checkout.noStoreSelected")}
                           </p>
                           {form.pickupStore && (
                             <p className="text-xs text-muted-foreground mt-0.5">
@@ -794,7 +793,7 @@ const Checkout = () => {
                           onClick={() => orderFlow.openDialog()}
                           className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
                         >
-                          Cambiar
+                          {t("checkout.change")}
                         </button>
                       </div>
                       {errors.pickupStore && (
@@ -848,7 +847,7 @@ const Checkout = () => {
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {form.orderType === "delivery"
-                          ? "No disponible para entregas a domicilio"
+                          ? t("checkout.cashUnavailableShort")
                           : t("checkout.cashPaymentDesc")}
                       </p>
                     </div>
@@ -974,9 +973,9 @@ const Checkout = () => {
                 {loading
                   ? t("checkout.processing")
                   : deliveryOutOfRange
-                    ? "Fuera de zona de reparto"
+                    ? t("checkout.outOfZoneBtn")
                     : deliveryBelowMin && deliveryMin?.minOrderAmount != null
-                      ? `Pedido mínimo ${deliveryMin.minOrderAmount.toFixed(2)} €`
+                      ? t("checkout.minOrderBtn", { amount: deliveryMin.minOrderAmount.toFixed(2) })
                       : `${t("checkout.confirmOrder")} · ${finalTotal.toFixed(2)} €`}
               </Button>
             </form>
