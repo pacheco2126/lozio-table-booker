@@ -298,14 +298,14 @@ const Checkout = () => {
     if (form.orderType === "delivery") {
       if (deliveryOutOfRange) {
         toast.error(
-          `Esta dirección está fuera de nuestra zona de reparto (máx. ${deliveryMin?.maxKmConfigured?.toFixed(1)} km).`,
+          t("checkout.outOfDeliveryZoneMsg", { km: deliveryMin?.maxKmConfigured?.toFixed(1) }),
         );
         document.getElementById("address")?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
       }
       if (deliveryBelowMin && deliveryMin?.minOrderAmount != null) {
         toast.error(
-          `El pedido mínimo para tu dirección es ${deliveryMin.minOrderAmount.toFixed(2)} €.`,
+          t("checkout.minOrderForAddressMsg", { amount: deliveryMin.minOrderAmount.toFixed(2) }),
         );
         return;
       }
