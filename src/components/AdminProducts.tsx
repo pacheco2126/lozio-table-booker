@@ -384,6 +384,36 @@ const AdminProducts = () => {
         </div>
       )}
 
+      {!loading && filtered.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-3 pt-2">
+          <p className="text-xs text-muted-foreground font-body">
+            Mostrando {(currentPage - 1) * PAGE_SIZE + 1}–
+            {Math.min(currentPage * PAGE_SIZE, filtered.length)} de {filtered.length}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </Button>
+            <span className="text-sm font-body">
+              {currentPage} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Create / Edit dialog */}
       <Dialog open={!!editing || creating} onOpenChange={(o) => !o && closeDialog()}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
