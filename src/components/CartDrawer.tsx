@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { useOrderFlow } from "@/contexts/OrderFlowContext";
 import {
   Minus,
   Plus,
@@ -12,11 +13,18 @@ import {
   ChevronUp,
   ArrowRight,
   MessageSquare,
+  Truck,
+  AlertTriangle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { extraCategories } from "@/lib/extras";
 import { ALL_UPSELL, UPSELL_IDS, type UpsellItem } from "@/lib/upsell";
+import {
+  computeDeliveryMinimumForAddress,
+  type DeliveryMinimumResult,
+} from "@/lib/deliveryMinimum";
+
 
 // Extras picker with category tabs
 const ExtrasPicker = ({
