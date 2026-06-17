@@ -9,7 +9,8 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, Plus, Check, X, Store as StoreIcon, Clock, Carrot } from "lucide-react";
+import { Pencil, Trash2, Plus, Check, X, Store as StoreIcon, Clock, Carrot, Search, AlertTriangle, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { EU_ALLERGENS } from "@/lib/allergens";
 import IngredientCascadeDialog from "@/components/admin/IngredientCascadeDialog";
 
@@ -94,6 +95,8 @@ const AdminProducts = () => {
   const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [nameFilter, setNameFilter] = useState("");
+  const [showDisabledPanel, setShowDisabledPanel] = useState(false);
   const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<Product | null>(null);
   const [creating, setCreating] = useState(false);
@@ -292,13 +295,25 @@ const AdminProducts = () => {
     });
   };
 
-  const filtered = filterCategory === "all" ? products : products.filter((p) => p.category === filterCategory);
+  const normalizedName = normalizeIngredientName(nameFilter);
+  const byCategory = filterCategory === "all" ? products : products.filter((p) => p.category === filterCategory);
+  const filtered = normalizedName
+    ? byCategory.filter((p) => normalizeIngredientName(p.name).includes(normalizedName))
+    : byCategory;
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   // Reset page when filter changes
-  useEffect(() => { setPage(1); }, [filterCategory]);
+  useEffect(() => { setPage(1); }, [filterCategory, nameFilter]);
+
+  // Productos desactivados (globalmente o en algún local)
+  const disabledEntries = products
+    .map((p) => {
+      const disabledStores = stores.filter((s) => !isAvailableNow(availability[availKey(p.id, s.slug)]));
+      return { product: p, disabledStores };
+    })
+    .filter((e) => !e.product.is_active || e.disabledStores.length > 0);
 
   return (
     <div className="space-y-6">
