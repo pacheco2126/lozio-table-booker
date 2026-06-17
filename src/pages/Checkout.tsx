@@ -20,15 +20,12 @@ import {
   Minus,
   Plus,
   Trash2,
-  Clock,
-  Phone,
   User,
   Tag,
   X,
   Truck,
 } from "lucide-react";
 import { useDiscount, type DiscountReason } from "@/hooks/useDiscount";
-import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { locationsData } from "@/lib/locations";
 import { getNearestStore } from "@/lib/nearestStore";
 import {
@@ -36,14 +33,13 @@ import {
   type DeliveryMinimumResult,
 } from "@/lib/deliveryMinimum";
 import {
-  isStoreOpen,
   getScheduleStatus,
   getAvailableDays,
   getTimeSlots,
   formatDayLabel,
   formatTime,
-  type ScheduleStatus,
 } from "@/lib/storeHours";
+
 import { AlertTriangle, CalendarClock, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -122,10 +118,8 @@ const Checkout = () => {
     loadProfile();
   }, [user, authLoading]);
 
-  const pickupStores = [
-    { id: "tarragona", ...locationsData.tarragona },
-    { id: "arrabassada", ...locationsData.arrabassada },
-  ];
+
+
 
   const checkoutSchema = z
     .object({
@@ -635,7 +629,7 @@ const Checkout = () => {
 
           <div className="grid lg:grid-cols-5 gap-8">
             <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-8">
-              {/* Contact */}
+              {/* Contact + Address summary */}
               <div className="bg-card rounded-xl p-6 border border-border">
                 <h2 className="font-display text-xl font-bold text-foreground mb-4">
                   {t("checkout.contactInfo")}
@@ -681,198 +675,44 @@ const Checkout = () => {
                     )}
                   </div>
                 </div>
-              </div>
 
-              {/* Order type */}
-              <div className="bg-card rounded-xl p-6 border border-border">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                  {t("checkout.orderType")}
-                </h2>
-                <RadioGroup
-                  value={form.orderType}
-                  onValueChange={(v) => {
-                    setForm((prev) => ({
-                      ...prev,
-                      orderType: v as "pickup" | "delivery",
-                      pickupStore: "",
-                      // Cash is not allowed for delivery orders
-                      paymentMethod: v === "delivery" ? "stripe" : prev.paymentMethod,
-                    }));
-                  }}
-                  className="grid sm:grid-cols-2 gap-3"
-                >
-                  <label
-                    className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      form.orderType === "pickup"
-                        ? "border-menu-teal bg-menu-teal/5"
-                        : "border-border hover:border-menu-teal/30"
-                    }`}
-                  >
-                    <RadioGroupItem value="pickup" />
-                    <Store className="w-5 h-5 text-menu-teal" />
-                    <div>
-                      <p className="font-display font-bold text-sm">{t("checkout.pickup")}</p>
-                      <p className="text-xs text-muted-foreground">{t("checkout.pickupDesc")}</p>
-                    </div>
-                  </label>
-                  <label
-                    className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      form.orderType === "delivery"
-                        ? "border-menu-teal bg-menu-teal/5"
-                        : "border-border hover:border-menu-teal/30"
-                    }`}
-                  >
-                    <RadioGroupItem value="delivery" />
-                    <MapPin className="w-5 h-5 text-menu-teal" />
-                    <div>
-                      <p className="font-display font-bold text-sm">{t("checkout.delivery")}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t("checkout.deliveryDesc")}
-                      </p>
-                    </div>
-                  </label>
-                </RadioGroup>
-
-                {/* Estimated time */}
-                <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
-                  <Clock className="w-3.5 h-3.5 shrink-0" />
-                  <span>
-                    {form.orderType === "delivery"
-                      ? t("checkout.estimatedDelivery")
-                      : t("checkout.estimatedPickup")}
-                  </span>
-                </div>
-
-                {form.orderType === "pickup" && (
-                  <div className="mt-4 space-y-3">
-                    <p className="text-sm font-display font-semibold text-foreground">
-                      ¿En qué local recoges? *
-                    </p>
-                    <div className="grid sm:grid-cols-2 gap-3">
-                      {pickupStores.map((store) => {
-                        const fulfillAt = scheduledFor ?? new Date();
-                        const closed = !isStoreOpen(store.id, fulfillAt);
-                        return (
-                        <button
-                          key={store.id}
-                          type="button"
-                          disabled={closed}
-                          onClick={() => !closed && updateField("pickupStore", store.id)}
-                          className={`text-left p-4 rounded-lg border-2 transition-all relative ${
-                            closed
-                              ? "border-border opacity-50 cursor-not-allowed bg-muted/30"
-                              : form.pickupStore === store.id
-                              ? "border-menu-teal bg-menu-teal/5"
-                              : "border-border hover:border-menu-teal/30"
-                          }`}
-                        >
-                          {closed && (
-                            <span className="absolute top-2 right-2 text-[10px] bg-red-100 text-red-700 border border-red-200 rounded-full px-2 py-0.5 font-semibold">
-                              Cerrado hoy
-                            </span>
-                          )}
-                          <p className="font-display font-bold text-sm text-foreground mb-1">
-                            {store.name}
+                {/* Address / pickup summary (from OrderTypeDialog) */}
+                <div className="mt-5 pt-5 border-t border-border">
+                  {form.orderType === "delivery" ? (
+                    <div className="rounded-lg border-2 border-menu-teal/30 bg-menu-teal/5 p-4">
+                      <div className="flex items-start gap-3">
+                        <MapPin className="w-5 h-5 text-menu-teal shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-display font-bold text-sm text-foreground">
+                            Entrega a domicilio
                           </p>
-                          <div className="flex items-start gap-1.5 text-xs text-muted-foreground mb-1">
-                            <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
-                            <span>{store.address}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                            <Clock className="w-3 h-3 shrink-0" />
-                            <span>{store.hours}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <Phone className="w-3 h-3 shrink-0" />
-                            <span>{store.phone}</span>
-                          </div>
-                        </button>
-                        );
-                      })}
-                    </div>
-                    {errors.pickupStore && (
-                      <p className="text-destructive text-xs">{errors.pickupStore}</p>
-                    )}
-                  </div>
-                )}
-
-                {form.orderType === "delivery" && (
-                  <div className="mt-4 space-y-4">
-                    {/* Copy address from profile */}
-                    {user && profileAddress && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const match = profileAddress.address.match(/^(.*?)[,\s]+(\d+[A-Za-z]?(?:\s*-\s*\d+[A-Za-z]?)?)\s*$/);
-                          const street = match ? match[1].trim() : profileAddress.address;
-                          const number = match ? match[2].trim() : "";
-                          setForm((prev) => ({
-                            ...prev,
-                            address: street,
-                            streetNumber: number || prev.streetNumber,
-                            city: profileAddress.city,
-                            postalCode: profileAddress.postalCode,
-                          }));
-                          setErrors((prev) => ({ ...prev, address: "", streetNumber: "" }));
-                        }}
-                        className="w-full flex items-center gap-2.5 px-4 py-3 rounded-lg border-2 border-dashed border-menu-teal/50 bg-menu-teal/5 hover:bg-menu-teal/10 hover:border-menu-teal transition-all text-left"
-                      >
-                        <User className="w-4 h-4 text-menu-teal shrink-0" />
-                        <div className="min-w-0">
-                          <p className="font-display font-bold text-sm text-menu-teal">
-                            Enviarme a mi dirección
-                          </p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {[profileAddress.address, profileAddress.postalCode, profileAddress.city]
+                          <p className="text-xs text-muted-foreground mt-0.5 break-words">
+                            {[
+                              [form.address, form.streetNumber].filter(Boolean).join(", "),
+                              [form.postalCode, form.city].filter(Boolean).join(" "),
+                            ]
                               .filter(Boolean)
-                              .join(", ")}
+                              .join(" · ") || "Sin dirección"}
                           </p>
                         </div>
-                      </button>
-                    )}
-
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="sm:col-span-2 grid grid-cols-3 gap-3">
-                        <div className="col-span-2">
-                          <Label htmlFor="address">{t("checkout.address")} *</Label>
-                          <AddressAutocomplete
-                            value={form.address}
-                            onChange={(v) => updateField("address", v)}
-                            onSelect={({ address, city, postalCode }) => {
-                              // Split trailing house number out of address into its own field
-                              const match = address.match(/^(.*?)[,\s]+(\d+[A-Za-z]?(?:\s*-\s*\d+[A-Za-z]?)?)\s*$/);
-                              const street = match ? match[1].trim() : address;
-                              const number = match ? match[2].trim() : "";
-                              setForm((prev) => ({
-                                ...prev,
-                                address: street,
-                                streetNumber: number || prev.streetNumber,
-                                city: city || prev.city,
-                                postalCode: postalCode || prev.postalCode,
-                              }));
-                              setErrors((prev) => ({ ...prev, address: "" }));
-                            }}
-                            placeholder={t("checkout.addressPlaceholder")}
-                            error={errors.address}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="streetNumber">Número *</Label>
-                          <Input
-                            id="streetNumber"
-                            value={form.streetNumber}
-                            onChange={(e) => updateField("streetNumber", e.target.value)}
-                            placeholder="Nº"
-                            inputMode="numeric"
-                          />
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => orderFlow.openDialog()}
+                          className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
+                        >
+                          Cambiar
+                        </button>
                       </div>
-
+                      {(errors.address || errors.streetNumber) && (
+                        <p className="text-destructive text-xs mt-2">
+                          {errors.address || errors.streetNumber}
+                        </p>
+                      )}
 
                       {/* Escalera / Piso / Puerta */}
-                      <div className="sm:col-span-2 grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 gap-3 mt-4">
                         <div>
-                          <Label htmlFor="staircase">Escalera</Label>
+                          <Label htmlFor="staircase" className="text-xs">Escalera</Label>
                           <Input
                             id="staircase"
                             value={form.staircase}
@@ -881,7 +721,7 @@ const Checkout = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="floor">Piso</Label>
+                          <Label htmlFor="floor" className="text-xs">Piso</Label>
                           <Input
                             id="floor"
                             value={form.floor}
@@ -890,7 +730,7 @@ const Checkout = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="door">Puerta</Label>
+                          <Label htmlFor="door" className="text-xs">Puerta</Label>
                           <Input
                             id="door"
                             value={form.door}
@@ -900,80 +740,85 @@ const Checkout = () => {
                         </div>
                       </div>
 
-                      <div>
-                        <Label htmlFor="city">{t("checkout.city")}</Label>
-                        <Input
-                          id="city"
-                          value={form.city}
-                          onChange={(e) => updateField("city", e.target.value)}
-                          placeholder={t("checkout.cityPlaceholder")}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="postalCode">{t("checkout.postalCode")}</Label>
-                        <Input
-                          id="postalCode"
-                          value={form.postalCode}
-                          onChange={(e) => updateField("postalCode", e.target.value)}
-                          placeholder={t("checkout.postalCodePlaceholder")}
-                        />
-                      </div>
+                      {/* Delivery min / out of range warnings */}
+                      {deliveryOutOfRange && (
+                        <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm mt-4">
+                          <p className="font-display font-bold text-destructive flex items-center gap-1.5">
+                            <AlertTriangle className="w-4 h-4" />
+                            Fuera de zona de reparto
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Tu dirección está a {deliveryMin?.distanceKm.toFixed(1)} km de
+                            nuestra pizzería más cercana. Solo entregamos hasta{" "}
+                            {deliveryMin?.maxKmConfigured.toFixed(1)} km.
+                          </p>
+                        </div>
+                      )}
+                      {!deliveryOutOfRange && deliveryBelowMin && deliveryMin?.minOrderAmount != null && (
+                        <div className="rounded-lg border border-amber-400/50 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm mt-4">
+                          <p className="font-display font-bold text-foreground flex items-center gap-1.5">
+                            <Truck className="w-4 h-4 text-menu-teal" />
+                            Pedido mínimo: {deliveryMin.minOrderAmount.toFixed(2)} €
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Te faltan{" "}
+                            <span className="font-bold text-amber-700 dark:text-amber-400">
+                              {(deliveryMin.minOrderAmount - totalPrice).toFixed(2)} €
+                            </span>{" "}
+                            para llegar al mínimo.
+                          </p>
+                        </div>
+                      )}
                     </div>
-
-                    {/* Delivery minimum banner */}
-                    {deliveryMinLoading && (
-                      <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
-                        <MapPin className="w-3 h-3 animate-pulse" />
-                        Calculando distancia y pedido mínimo…
-                      </p>
-                    )}
-                    {!deliveryMinLoading && deliveryMin && deliveryMin.geocoded && (
-                      <>
-                        {deliveryOutOfRange && (
-                          <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm">
-                            <p className="font-display font-bold text-destructive flex items-center gap-1.5">
-                              <AlertTriangle className="w-4 h-4" />
-                              Fuera de zona de reparto
+                  ) : (
+                    <div className="rounded-lg border-2 border-menu-teal/30 bg-menu-teal/5 p-4">
+                      <div className="flex items-start gap-3">
+                        <Store className="w-5 h-5 text-menu-teal shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-display font-bold text-sm text-foreground">
+                            Recogida en local
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {form.pickupStore
+                              ? locationsData[form.pickupStore as keyof typeof locationsData]?.name ?? form.pickupStore
+                              : "Sin local seleccionado"}
+                          </p>
+                          {form.pickupStore && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {locationsData[form.pickupStore as keyof typeof locationsData]?.address}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Tu dirección está a {deliveryMin.distanceKm.toFixed(1)} km de
-                              nuestra pizzería más cercana. Solo entregamos hasta{" "}
-                              {deliveryMin.maxKmConfigured.toFixed(1)} km.
-                            </p>
-                          </div>
-                        )}
-                        {!deliveryOutOfRange && deliveryMin.minOrderAmount != null && (
-                          <div
-                            className={`rounded-lg border p-3 text-sm ${
-                              deliveryBelowMin
-                                ? "border-amber-400/50 bg-amber-50 dark:bg-amber-950/20"
-                                : "border-menu-teal/30 bg-menu-teal/5"
-                            }`}
-                          >
-                            <p className="font-display font-bold text-foreground flex items-center gap-1.5">
-                              <Truck className="w-4 h-4 text-menu-teal" />
-                              Pedido mínimo: {deliveryMin.minOrderAmount.toFixed(2)} €
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              A {deliveryMin.distanceKm.toFixed(1)} km de nuestra pizzería.
-                              {deliveryBelowMin && (
-                                <>
-                                  {" "}
-                                  Te faltan{" "}
-                                  <span className="font-bold text-amber-700 dark:text-amber-400">
-                                    {(deliveryMin.minOrderAmount - totalPrice).toFixed(2)} €
-                                  </span>{" "}
-                                  para llegar al mínimo.
-                                </>
-                              )}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => orderFlow.openDialog()}
+                          className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
+                        >
+                          Cambiar
+                        </button>
+                      </div>
+                      {errors.pickupStore && (
+                        <p className="text-destructive text-xs mt-2">{errors.pickupStore}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {/* Notes */}
+              <div className="bg-card rounded-xl p-6 border border-border">
+                <h2 className="font-display text-xl font-bold text-foreground mb-4">
+                  {t("checkout.notesTitle")}
+                </h2>
+                <Textarea
+                  value={form.notes}
+                  onChange={(e) => updateField("notes", e.target.value)}
+                  placeholder={t("checkout.notesPlaceholder")}
+                  maxLength={500}
+                  rows={3}
+                />
+              </div>
+
 
 
               {/* Payment */}
@@ -1061,19 +906,6 @@ const Checkout = () => {
                 )}
               </div>
 
-              {/* Notes */}
-              <div className="bg-card rounded-xl p-6 border border-border">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                  {t("checkout.notesTitle")}
-                </h2>
-                <Textarea
-                  value={form.notes}
-                  onChange={(e) => updateField("notes", e.target.value)}
-                  placeholder={t("checkout.notesPlaceholder")}
-                  maxLength={500}
-                  rows={3}
-                />
-              </div>
 
               {/* Discount / coupon */}
               <div className="rounded-xl border border-border bg-card p-4 space-y-3">
