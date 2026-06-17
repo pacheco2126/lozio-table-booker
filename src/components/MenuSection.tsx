@@ -118,8 +118,12 @@ const MenuCard = ({
   imageUrl?: string | null;
 }) => {
   const { t } = useTranslation();
+  const unavailable = item.isAvailable === false;
   return (
-    <div className="group bg-card rounded-xl shadow-sm border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col">
+    <div className={cn(
+      "group bg-card rounded-xl shadow-sm border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col",
+      unavailable && "opacity-60 grayscale"
+    )}>
       {/* Image */}
       <div className="relative overflow-hidden" style={{ paddingBottom: "60%" }}>
         <img
@@ -128,7 +132,7 @@ const MenuCard = ({
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        {item.badge && (
+        {item.badge && !unavailable && (
           <span
             className={`absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-body font-bold shadow-lg tracking-wide backdrop-blur-sm ${
               item.badge.style === "fire"
@@ -141,6 +145,11 @@ const MenuCard = ({
             <span>{item.badge.emoji}</span>
             {t(`menu.${item.badge.key}`)}
           </span>
+        )}
+        {unavailable && (
+          <Badge variant="destructive" className="absolute top-2 left-2 z-10 text-[10px] font-body font-bold uppercase tracking-wide">
+            {t("menu.unavailableToday", "No disponible hoy")}
+          </Badge>
         )}
       </div>
       {/* Body */}
@@ -157,7 +166,7 @@ const MenuCard = ({
         <div className="flex items-center justify-between mt-auto pt-1">
           <span className="font-display font-bold text-primary text-base md:text-lg">{item.price}</span>
         </div>
-        {showAddButton && (
+        {showAddButton && !unavailable && (
           <Button
             onClick={onAdd}
             className="w-full bg-primary text-primary-foreground font-body font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity mt-1"
