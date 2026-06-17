@@ -291,7 +291,7 @@ const Checkout = () => {
           }
         }, 50);
       }
-      toast.error(t("checkout.formIncomplete", { defaultValue: "Faltan datos por completar" }));
+      toast.error(t("checkout.formIncomplete"));
       return;
     }
 
