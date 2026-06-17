@@ -819,6 +819,14 @@ const AdminInventory = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <IngredientCascadeDialog
+        open={!!cascadeItem}
+        onOpenChange={(o) => { if (!o) setCascadeItem(null); }}
+        inventoryItemId={cascadeItem?.id ?? null}
+        inventoryItemName={cascadeItem?.name}
+        defaultStoreSlug={selectedStore}
+      />
     </div>
   );
 };
