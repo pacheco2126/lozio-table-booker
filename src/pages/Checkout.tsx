@@ -847,7 +847,7 @@ const Checkout = () => {
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {form.orderType === "delivery"
-                          ? "No disponible para entregas a domicilio"
+                          ? t("checkout.cashUnavailableShort")
                           : t("checkout.cashPaymentDesc")}
                       </p>
                     </div>
