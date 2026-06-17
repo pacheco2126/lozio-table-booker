@@ -20,7 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Pencil, Trash2, Plus, Loader2, ShoppingCart, ClipboardList, Package,
-  ChevronDown, AlertOctagon,
+  ChevronDown, AlertOctagon, Search, X, AlertTriangle,
 } from "lucide-react";
 import IngredientCascadeDialog from "@/components/admin/IngredientCascadeDialog";
 import {
@@ -127,6 +127,10 @@ const AdminInventory = () => {
 
   // Collapsed categories
   const [collapsedCats, setCollapsedCats] = useState<Set<string>>(new Set());
+
+  // Name filter
+  const [nameFilter, setNameFilter] = useState("");
+  const [showOutPanel, setShowOutPanel] = useState(false);
 
   // Ingredient cascade dialog
   const [cascadeItem, setCascadeItem] = useState<InventoryItem | null>(null);
@@ -333,13 +337,19 @@ const AdminInventory = () => {
   };
 
   // ─── Grouped items ────────────────────────────────────────────────────────
+  const normalize = (v: string) =>
+    v.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const nf = normalize(nameFilter.trim());
+  const visibleItems = nf ? items.filter((i) => normalize(i.name).includes(nf)) : items;
+
   const grouped = CATEGORIES.reduce<Record<string, InventoryItem[]>>((acc, cat) => {
-    const catItems = items.filter((i) => i.category === cat);
+    const catItems = visibleItems.filter((i) => i.category === cat);
     if (catItems.length > 0) acc[cat] = catItems;
     return acc;
   }, {});
 
   const lowItems = items.filter(isLow);
+  const outItems = items.filter((i) => qty(i.id) <= 0);
 
   // ─── Loading ──────────────────────────────────────────────────────────────
   if (accessLoading) {
