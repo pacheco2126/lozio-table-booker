@@ -603,5 +603,42 @@
     "alreadyDescription": "This email address was already unsubscribed.",
     "errorTitle": "Invalid link",
     "errorDescription": "This link has expired or is invalid. Please try again from a recent email."
+  },
+  "orderTypeDialog": {
+    "title": "How would you like your order?",
+    "description": "Choose store pickup or home delivery.",
+    "delivery": "Delivery",
+    "pickup": "Pickup",
+    "pickupStore": "Pickup location",
+    "noStores": "No locations available.",
+    "open": "Open",
+    "closedSchedule": "Closed · Schedule",
+    "address": "Address",
+    "addressPlaceholder": "Street and city",
+    "number": "Number",
+    "postalCode": "ZIP",
+    "autoAssignHint": "We'll automatically assign the nearest location.",
+    "cancel": "Cancel",
+    "viewMenu": "View menu",
+    "errors": {
+      "selectPickup": "Select a pickup location",
+      "addressRequired": "Enter address and number",
+      "noDeliveryStores": "No locations available for delivery",
+      "cannotAssign": "Could not assign a location"
+    }
+  },
+  "ingredientCascade": {
+    "title": "Affected products",
+    "descriptionUsage": "The ingredient {{name}} is used in the following products.",
+    "descriptionAction": "Disable the products you won't be able to serve.",
+    "toggleAll": "Disable all in every location",
+    "empty": "No product uses this ingredient. You can link them from the products tab.",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} / {{total}}",
+    "skip": "Only disable the ingredient",
+    "confirm": "Confirm cascade",
+    "successCount": "{{count}} product(s) marked as unavailable",
+    "errorCascade": "Cascade error: {{message}}"
   }
 }

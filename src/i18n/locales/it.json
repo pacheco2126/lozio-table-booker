@@ -603,5 +603,42 @@
     "alreadyDescription": "Questo indirizzo era già stato annullato in precedenza.",
     "errorTitle": "Link non valido",
     "errorDescription": "Il link è scaduto o non è valido. Riprova da un'email recente."
+  },
+  "orderTypeDialog": {
+    "title": "Come vuoi il tuo ordine?",
+    "description": "Scegli ritiro in negozio o consegna a domicilio.",
+    "delivery": "Domicilio",
+    "pickup": "Ritiro",
+    "pickupStore": "Punto di ritiro",
+    "noStores": "Nessun locale disponibile.",
+    "open": "Aperto",
+    "closedSchedule": "Chiuso · Programma",
+    "address": "Indirizzo",
+    "addressPlaceholder": "Via e città",
+    "number": "Numero",
+    "postalCode": "CAP",
+    "autoAssignHint": "Assegneremo automaticamente il locale più vicino.",
+    "cancel": "Annulla",
+    "viewMenu": "Vedi menu",
+    "errors": {
+      "selectPickup": "Seleziona un locale per il ritiro",
+      "addressRequired": "Inserisci indirizzo e numero",
+      "noDeliveryStores": "Nessun locale disponibile per consegna",
+      "cannotAssign": "Impossibile assegnare un locale"
+    }
+  },
+  "ingredientCascade": {
+    "title": "Prodotti interessati",
+    "descriptionUsage": "L'ingrediente {{name}} è utilizzato nei seguenti prodotti.",
+    "descriptionAction": "Disattiva i prodotti che non potrai servire.",
+    "toggleAll": "Disattiva tutti in tutti i locali",
+    "empty": "Nessun prodotto utilizza questo ingrediente. Puoi collegarli dalla scheda prodotti.",
+    "prev": "Precedente",
+    "next": "Successivo",
+    "pageOf": "Pagina {{page}} / {{total}}",
+    "skip": "Disattiva solo l'ingrediente",
+    "confirm": "Conferma cascata",
+    "successCount": "{{count}} prodotto/i contrassegnati come non disponibili",
+    "errorCascade": "Errore cascata: {{message}}"
   }
 }
