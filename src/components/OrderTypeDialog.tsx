@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ interface StoreRow {
 
 const OrderTypeDialog = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { isDialogOpen, closeDialog, setFlow } = useOrderFlow();
   const [stores, setStores] = useState<StoreRow[]>([]);
   const [tab, setTab] = useState<OrderType>("delivery");
@@ -46,7 +48,7 @@ const OrderTypeDialog = () => {
 
   const handleConfirm = async () => {
     if (tab === "pickup") {
-      if (!pickupStore) { toast.error("Selecciona un local para recoger"); return; }
+      if (!pickupStore) { toast.error(t("orderTypeDialog.errors.selectPickup")); return; }
       setFlow({
         orderType: "pickup",
         storeSlug: pickupStore,
@@ -61,11 +63,11 @@ const OrderTypeDialog = () => {
 
     // delivery
     if (!address.trim() || !streetNumber.trim()) {
-      toast.error("Introduce dirección y número");
+      toast.error(t("orderTypeDialog.errors.addressRequired"));
       return;
     }
     if (deliveryStores.length === 0) {
-      toast.error("No hay locales con domicilio disponibles");
+      toast.error(t("orderTypeDialog.errors.noDeliveryStores"));
       return;
     }
     setResolving(true);
@@ -82,7 +84,7 @@ const OrderTypeDialog = () => {
       const el = document.getElementById("menu");
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (e) {
-      toast.error("No se pudo asignar local");
+      toast.error(t("orderTypeDialog.errors.cannotAssign"));
     } finally {
       setResolving(false);
     }
@@ -92,8 +94,8 @@ const OrderTypeDialog = () => {
     <Dialog open={isDialogOpen} onOpenChange={(o) => !o && closeDialog()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display">¿Cómo quieres tu pedido?</DialogTitle>
-          <DialogDescription>Elige recogida en local o entrega a domicilio.</DialogDescription>
+          <DialogTitle className="font-display">{t("orderTypeDialog.title")}</DialogTitle>
+          <DialogDescription>{t("orderTypeDialog.description")}</DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-2 my-2">
@@ -105,7 +107,7 @@ const OrderTypeDialog = () => {
             }`}
           >
             <Bike className={`w-6 h-6 ${tab === "delivery" ? "text-primary" : "text-muted-foreground"}`} />
-            <span className="font-body text-sm font-bold">Domicilio</span>
+            <span className="font-body text-sm font-bold">{t("orderTypeDialog.delivery")}</span>
           </button>
           <button
             type="button"
@@ -115,15 +117,15 @@ const OrderTypeDialog = () => {
             }`}
           >
             <StoreIcon className={`w-6 h-6 ${tab === "pickup" ? "text-primary" : "text-muted-foreground"}`} />
-            <span className="font-body text-sm font-bold">Recoger</span>
+            <span className="font-body text-sm font-bold">{t("orderTypeDialog.pickup")}</span>
           </button>
         </div>
 
         {tab === "pickup" ? (
           <div className="space-y-2">
-            <Label className="font-body text-sm">Local de recogida</Label>
+            <Label className="font-body text-sm">{t("orderTypeDialog.pickupStore")}</Label>
             {pickupStores.length === 0 && (
-              <p className="text-sm text-muted-foreground">Sin locales disponibles.</p>
+              <p className="text-sm text-muted-foreground">{t("orderTypeDialog.noStores")}</p>
             )}
             {pickupStores.map((s) => {
               const open = isStoreOpen(s.slug);
@@ -141,7 +143,7 @@ const OrderTypeDialog = () => {
                     open ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
                          : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
                   }`}>
-                    {open ? "Abierto" : "Cerrado · Programar"}
+                    {open ? t("orderTypeDialog.open") : t("orderTypeDialog.closedSchedule")}
                   </span>
                 </button>
               );
@@ -150,7 +152,7 @@ const OrderTypeDialog = () => {
         ) : (
           <div className="space-y-3">
             <div>
-              <Label className="font-body text-sm">Dirección</Label>
+              <Label className="font-body text-sm">{t("orderTypeDialog.address")}</Label>
               <AddressAutocomplete
                 value={address}
                 onChange={setAddress}
@@ -159,30 +161,30 @@ const OrderTypeDialog = () => {
                   setCity(r.city);
                   setPostalCode(r.postalCode);
                 }}
-                placeholder="Calle y población"
+                placeholder={t("orderTypeDialog.addressPlaceholder")}
               />
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div className="col-span-1">
-                <Label className="font-body text-sm">Número</Label>
+                <Label className="font-body text-sm">{t("orderTypeDialog.number")}</Label>
                 <Input value={streetNumber} onChange={(e) => setStreetNumber(e.target.value)} placeholder="12" />
               </div>
               <div className="col-span-2">
-                <Label className="font-body text-sm">CP</Label>
+                <Label className="font-body text-sm">{t("orderTypeDialog.postalCode")}</Label>
                 <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="43001" />
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Asignaremos automáticamente el local más cercano.
+              {t("orderTypeDialog.autoAssignHint")}
             </p>
           </div>
         )}
 
         <DialogFooter>
-          <Button variant="ghost" onClick={closeDialog}>Cancelar</Button>
+          <Button variant="ghost" onClick={closeDialog}>{t("orderTypeDialog.cancel")}</Button>
           <Button onClick={handleConfirm} disabled={resolving} className="font-body">
             {resolving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            Ver carta
+            {t("orderTypeDialog.viewMenu")}
           </Button>
         </DialogFooter>
       </DialogContent>

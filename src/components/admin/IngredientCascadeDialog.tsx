@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -23,6 +24,7 @@ interface Props {
 const PAGE_SIZE = 6;
 
 const IngredientCascadeDialog = ({ open, onOpenChange, inventoryItemId, inventoryItemName, defaultStoreSlug, onConfirmed }: Props) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [stores, setStores] = useState<StoreRow[]>([]);
@@ -30,6 +32,7 @@ const IngredientCascadeDialog = ({ open, onOpenChange, inventoryItemId, inventor
   // per-item per-store selection of which to disable
   const [selection, setSelection] = useState<Record<string, Record<string, boolean>>>({});
   const [page, setPage] = useState(0);
+
 
   useEffect(() => {
     if (!open || !inventoryItemId) return;
@@ -99,8 +102,8 @@ const IngredientCascadeDialog = ({ open, onOpenChange, inventoryItemId, inventor
       .from("menu_item_store_availability")
       .upsert(rows, { onConflict: "menu_item_id,store_slug" });
     setSubmitting(false);
-    if (error) { toast.error("Error en cascada: " + error.message); return; }
-    toast.success(`${rows.length} producto(s) marcados como no disponibles`);
+    if (error) { toast.error(t("ingredientCascade.errorCascade", { message: error.message })); return; }
+    toast.success(t("ingredientCascade.successCount", { count: rows.length }));
     onConfirmed?.();
     onOpenChange(false);
   };
@@ -116,11 +119,11 @@ const IngredientCascadeDialog = ({ open, onOpenChange, inventoryItemId, inventor
         <DialogHeader>
           <DialogTitle className="font-display flex items-center gap-2">
             <Package2 className="w-5 h-5 text-primary" />
-            Productos afectados
+            {t("ingredientCascade.title")}
           </DialogTitle>
           <DialogDescription>
-            {inventoryItemName ? <>El ingrediente <strong>{inventoryItemName}</strong> se usa en los siguientes productos. </> : null}
-            Desactiva los productos que no podrás servir.
+            {inventoryItemName ? <>{t("ingredientCascade.descriptionUsage", { name: inventoryItemName })} </> : null}
+            {t("ingredientCascade.descriptionAction")}
           </DialogDescription>
         </DialogHeader>
 
@@ -130,14 +133,14 @@ const IngredientCascadeDialog = ({ open, onOpenChange, inventoryItemId, inventor
           </div>
         ) : items.length === 0 ? (
           <p className="font-body text-sm text-muted-foreground text-center py-8">
-            Ningún producto utiliza este ingrediente. Puedes vincularlos desde la pestaña de productos.
+            {t("ingredientCascade.empty")}
           </p>
         ) : (
           <div className="space-y-3 py-2">
             <div className="flex items-center gap-2 px-2">
               <Checkbox id="select-all" checked={allSelected} onCheckedChange={(v) => toggleAll(!!v)} />
               <label htmlFor="select-all" className="font-body text-sm cursor-pointer">
-                Desactivar todas en todos los locales
+                {t("ingredientCascade.toggleAll")}
               </label>
             </div>
 
@@ -173,13 +176,13 @@ const IngredientCascadeDialog = ({ open, onOpenChange, inventoryItemId, inventor
             {totalPages > 1 && (
               <div className="flex items-center justify-between pt-2">
                 <Button variant="ghost" size="sm" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-                  Anterior
+                  {t("ingredientCascade.prev")}
                 </Button>
                 <span className="text-xs font-body text-muted-foreground">
-                  Página {page + 1} / {totalPages}
+                  {t("ingredientCascade.pageOf", { page: page + 1, total: totalPages })}
                 </span>
                 <Button variant="ghost" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>
-                  Siguiente
+                  {t("ingredientCascade.next")}
                 </Button>
               </div>
             )}
@@ -188,11 +191,11 @@ const IngredientCascadeDialog = ({ open, onOpenChange, inventoryItemId, inventor
 
         <DialogFooter className="gap-2">
           <Button variant="ghost" onClick={handleSkip}>
-            Solo desactivar el ingrediente
+            {t("ingredientCascade.skip")}
           </Button>
           <Button onClick={handleConfirm} disabled={submitting || loading || items.length === 0}>
             {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-            Confirmar cascada
+            {t("ingredientCascade.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>
