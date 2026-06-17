@@ -9,7 +9,8 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, Plus, Check, X, Store as StoreIcon, Clock, Carrot } from "lucide-react";
+import { Pencil, Trash2, Plus, Check, X, Store as StoreIcon, Clock, Carrot, Search, AlertTriangle, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { EU_ALLERGENS } from "@/lib/allergens";
 import IngredientCascadeDialog from "@/components/admin/IngredientCascadeDialog";
 
@@ -94,6 +95,8 @@ const AdminProducts = () => {
   const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [nameFilter, setNameFilter] = useState("");
+  const [showDisabledPanel, setShowDisabledPanel] = useState(false);
   const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<Product | null>(null);
   const [creating, setCreating] = useState(false);
@@ -292,13 +295,25 @@ const AdminProducts = () => {
     });
   };
 
-  const filtered = filterCategory === "all" ? products : products.filter((p) => p.category === filterCategory);
+  const normalizedName = normalizeIngredientName(nameFilter);
+  const byCategory = filterCategory === "all" ? products : products.filter((p) => p.category === filterCategory);
+  const filtered = normalizedName
+    ? byCategory.filter((p) => normalizeIngredientName(p.name).includes(normalizedName))
+    : byCategory;
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   // Reset page when filter changes
-  useEffect(() => { setPage(1); }, [filterCategory]);
+  useEffect(() => { setPage(1); }, [filterCategory, nameFilter]);
+
+  // Productos desactivados (globalmente o en algún local)
+  const disabledEntries = products
+    .map((p) => {
+      const disabledStores = stores.filter((s) => !isAvailableNow(availability[availKey(p.id, s.slug)]));
+      return { product: p, disabledStores };
+    })
+    .filter((e) => !e.product.is_active || e.disabledStores.length > 0);
 
   return (
     <div className="space-y-6">
@@ -311,6 +326,67 @@ const AdminProducts = () => {
           <Plus className="w-4 h-4 mr-2" /> Nuevo producto
         </Button>
       </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+          placeholder="Buscar por nombre…"
+          className="pl-9 font-body"
+        />
+        {nameFilter && (
+          <button
+            onClick={() => setNameFilter("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            title="Limpiar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {disabledEntries.length > 0 && (
+        <Collapsible open={showDisabledPanel} onOpenChange={setShowDisabledPanel}>
+          <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800">
+            <CollapsibleTrigger asChild>
+              <button className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                  <span className="font-body text-sm text-amber-900 dark:text-amber-100">
+                    Tienes <strong>{disabledEntries.length}</strong> producto{disabledEntries.length === 1 ? "" : "s"} desactivado{disabledEntries.length === 1 ? "" : "s"} (total o por local)
+                  </span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-amber-700 dark:text-amber-400 transition-transform ${showDisabledPanel ? "rotate-180" : ""}`} />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-4 pb-3 space-y-1.5 max-h-64 overflow-y-auto">
+                {disabledEntries.map(({ product, disabledStores }) => (
+                  <div key={product.id} className="flex items-start justify-between gap-3 text-sm font-body py-1.5 border-t border-amber-200/60 dark:border-amber-800/60">
+                    <div className="min-w-0">
+                      <span className="font-medium text-foreground">{product.name}</span>
+                      <span className="text-xs text-muted-foreground ml-2">{CATEGORY_LABELS[product.category] ?? product.category}</span>
+                      {!product.is_active && <Badge variant="secondary" className="ml-2 text-[10px]">Oculto global</Badge>}
+                      {disabledStores.length > 0 && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Desactivado en: {disabledStores.map((s) => s.name).join(", ")}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => { setFilterCategory(product.category); setNameFilter(product.name); setShowDisabledPanel(false); }}
+                      className="text-xs text-primary hover:underline shrink-0"
+                    >
+                      Ver
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+      )}
 
       <div className="flex flex-wrap gap-2">
         <button
