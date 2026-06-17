@@ -10,12 +10,13 @@ const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { getBackgroundVideos } = useMedia("background_video");
-  const { openDialog } = useOrderFlow();
+  const { openDialog, setIntent } = useOrderFlow();
 
   const backgroundVideos = getBackgroundVideos();
   const videoUrl = backgroundVideos.length > 0 ? backgroundVideos[0] : null;
 
   const scrollToReservation = () => {
+    setIntent("reservation");
     const el = document.getElementById("reservar");
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
