@@ -20,15 +20,12 @@ import {
   Minus,
   Plus,
   Trash2,
-  Clock,
-  Phone,
   User,
   Tag,
   X,
   Truck,
 } from "lucide-react";
 import { useDiscount, type DiscountReason } from "@/hooks/useDiscount";
-import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { locationsData } from "@/lib/locations";
 import { getNearestStore } from "@/lib/nearestStore";
 import {
@@ -36,14 +33,13 @@ import {
   type DeliveryMinimumResult,
 } from "@/lib/deliveryMinimum";
 import {
-  isStoreOpen,
   getScheduleStatus,
   getAvailableDays,
   getTimeSlots,
   formatDayLabel,
   formatTime,
-  type ScheduleStatus,
 } from "@/lib/storeHours";
+
 import { AlertTriangle, CalendarClock, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
