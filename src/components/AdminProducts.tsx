@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, Plus, Check, X, Store as StoreIcon, Clock } from "lucide-react";
+import { Pencil, Trash2, Plus, Check, X, Store as StoreIcon, Clock, Carrot } from "lucide-react";
 import { EU_ALLERGENS } from "@/lib/allergens";
 
 interface Product {
@@ -48,6 +48,8 @@ const emptyProduct: Omit<Product, "id"> = {
 
 interface StoreRow { slug: string; name: string; accepts_delivery: boolean; accepts_pickup: boolean; }
 interface AvailabilityRow { menu_item_id: string; store_slug: string; is_available: boolean; unavailable_until: string | null; }
+interface InventoryItemRow { id: string; name: string; category: string; is_active: boolean; }
+interface IngredientLink { menu_item_id: string; inventory_item_id: string; }
 
 type AvailabilityMap = Record<string, AvailabilityRow>; // key = `${menu_item_id}__${store_slug}`
 const availKey = (itemId: string, slug: string) => `${itemId}__${slug}`;
@@ -71,15 +73,22 @@ const AdminProducts = () => {
   const [inlinePriceId, setInlinePriceId] = useState<string | null>(null);
   const [inlinePriceValue, setInlinePriceValue] = useState("");
   const [disableTarget, setDisableTarget] = useState<{ product: Product; store: StoreRow } | null>(null);
+  const [linkingProduct, setLinkingProduct] = useState<Product | null>(null);
+  const [linkSelection, setLinkSelection] = useState<Set<string>>(new Set());
+  const [inventoryItems, setInventoryItems] = useState<InventoryItemRow[]>([]);
+  const [ingredientsByProduct, setIngredientsByProduct] = useState<Record<string, Set<string>>>({});
+
 
   useEffect(() => { fetchAll(); }, []);
 
   const fetchAll = async () => {
     setLoading(true);
-    const [productsRes, storesRes, availRes] = await Promise.all([
+    const [productsRes, storesRes, availRes, invRes, linkRes] = await Promise.all([
       supabase.from("menu_items").select("*").order("category").order("sort_order"),
       supabase.from("stores").select("slug,name,accepts_delivery,accepts_pickup").eq("is_active", true).order("sort_order"),
       supabase.from("menu_item_store_availability").select("menu_item_id,store_slug,is_available,unavailable_until"),
+      supabase.from("inventory_items").select("id,name,category,is_active").eq("is_active", true).order("category").order("name"),
+      supabase.from("menu_item_ingredients").select("menu_item_id,inventory_item_id"),
     ]);
     if (productsRes.error) toast.error("Error al cargar productos");
     if (storesRes.error) toast.error("Error al cargar locales");
@@ -89,7 +98,45 @@ const AdminProducts = () => {
     const map: AvailabilityMap = {};
     ((availRes.data as AvailabilityRow[]) || []).forEach(r => { map[availKey(r.menu_item_id, r.store_slug)] = r; });
     setAvailability(map);
+    setInventoryItems((invRes.data as InventoryItemRow[]) || []);
+    const byProduct: Record<string, Set<string>> = {};
+    ((linkRes.data as IngredientLink[]) || []).forEach(l => {
+      if (!byProduct[l.menu_item_id]) byProduct[l.menu_item_id] = new Set();
+      byProduct[l.menu_item_id].add(l.inventory_item_id);
+    });
+    setIngredientsByProduct(byProduct);
     setLoading(false);
+  };
+
+
+
+
+  const openLinking = (p: Product) => {
+    setLinkingProduct(p);
+    setLinkSelection(new Set(ingredientsByProduct[p.id] ?? []));
+  };
+
+  const saveIngredientLinks = async () => {
+    if (!linkingProduct) return;
+    const current = ingredientsByProduct[linkingProduct.id] ?? new Set<string>();
+    const toAdd = Array.from(linkSelection).filter(id => !current.has(id));
+    const toRemove = Array.from(current).filter(id => !linkSelection.has(id));
+    if (toAdd.length > 0) {
+      const rows = toAdd.map(id => ({ menu_item_id: linkingProduct.id, inventory_item_id: id }));
+      const { error } = await supabase.from("menu_item_ingredients").insert(rows);
+      if (error) { toast.error("Error al vincular: " + error.message); return; }
+    }
+    if (toRemove.length > 0) {
+      const { error } = await supabase
+        .from("menu_item_ingredients")
+        .delete()
+        .eq("menu_item_id", linkingProduct.id)
+        .in("inventory_item_id", toRemove);
+      if (error) { toast.error("Error al desvincular: " + error.message); return; }
+    }
+    toast.success("Ingredientes actualizados");
+    setLinkingProduct(null);
+    fetchAll();
   };
 
   const fetchProducts = fetchAll;
@@ -276,6 +323,14 @@ const AdminProducts = () => {
                   )}
 
                   <Switch checked={!!p.is_active} onCheckedChange={() => toggleActive(p)} />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => openLinking(p)}
+                    title="Vincular ingredientes"
+                  >
+                    <Carrot className={`w-4 h-4 ${(ingredientsByProduct[p.id]?.size ?? 0) > 0 ? "text-amber-600" : ""}`} />
+                  </Button>
                   <Button size="icon" variant="ghost" onClick={() => openEdit(p)}><Pencil className="w-4 h-4" /></Button>
                   <Button size="icon" variant="ghost" onClick={() => setDeleteId(p.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
@@ -450,6 +505,69 @@ const AdminProducts = () => {
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setDisableTarget(null)}>Cancelar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!linkingProduct} onOpenChange={(o) => !o && setLinkingProduct(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Carrot className="w-5 h-5 text-amber-600" />
+              Ingredientes vinculados
+            </DialogTitle>
+            <DialogDescription>
+              {linkingProduct && <>Selecciona los ingredientes que componen <strong>{linkingProduct.name}</strong>. Se usarán para la cascada al marcar un ingrediente como agotado.</>}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2 max-h-[55vh] overflow-y-auto">
+            {inventoryItems.length === 0 ? (
+              <p className="text-sm text-muted-foreground font-body text-center py-6">
+                No hay ingredientes en el inventario.
+              </p>
+            ) : (
+              Object.entries(
+                inventoryItems.reduce<Record<string, InventoryItemRow[]>>((acc, it) => {
+                  (acc[it.category] ||= []).push(it);
+                  return acc;
+                }, {})
+              ).map(([cat, list]) => (
+                <div key={cat}>
+                  <p className="text-xs font-body uppercase tracking-wider text-muted-foreground mb-1.5">{cat}</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                    {list.map((it) => {
+                      const selected = linkSelection.has(it.id);
+                      return (
+                        <button
+                          key={it.id}
+                          type="button"
+                          onClick={() => {
+                            setLinkSelection((prev) => {
+                              const next = new Set(prev);
+                              next.has(it.id) ? next.delete(it.id) : next.add(it.id);
+                              return next;
+                            });
+                          }}
+                          className={`px-2.5 py-1.5 rounded-md text-xs font-body text-left transition-colors ${
+                            selected
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-foreground hover:bg-muted/70"
+                          }`}
+                        >
+                          {it.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setLinkingProduct(null)}>Cancelar</Button>
+            <Button onClick={saveIngredientLinks}>Guardar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

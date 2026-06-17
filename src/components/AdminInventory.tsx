@@ -20,8 +20,9 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Pencil, Trash2, Plus, Loader2, ShoppingCart, ClipboardList, Package,
-  ChevronDown,
+  ChevronDown, AlertOctagon,
 } from "lucide-react";
+import IngredientCascadeDialog from "@/components/admin/IngredientCascadeDialog";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -126,6 +127,9 @@ const AdminInventory = () => {
 
   // Collapsed categories
   const [collapsedCats, setCollapsedCats] = useState<Set<string>>(new Set());
+
+  // Ingredient cascade dialog
+  const [cascadeItem, setCascadeItem] = useState<InventoryItem | null>(null);
 
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
@@ -484,6 +488,15 @@ const AdminInventory = () => {
                             >
                               <Plus className="w-3 h-3 mr-1" /> Entrada
                             </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="font-body gap-1 text-amber-700 border-amber-300 hover:bg-amber-50 dark:text-amber-400 dark:border-amber-700 dark:hover:bg-amber-950"
+                              onClick={() => setCascadeItem(item)}
+                              title="Marcar agotado y desactivar productos que lo usan"
+                            >
+                              <AlertOctagon className="w-3.5 h-3.5" /> Agotado
+                            </Button>
                             {canManageCatalog && (
                               <>
                                 <Button size="sm" variant="ghost" onClick={() => openEdit(item)}>
@@ -806,6 +819,14 @@ const AdminInventory = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <IngredientCascadeDialog
+        open={!!cascadeItem}
+        onOpenChange={(o) => { if (!o) setCascadeItem(null); }}
+        inventoryItemId={cascadeItem?.id ?? null}
+        inventoryItemName={cascadeItem?.name}
+        defaultStoreSlug={selectedStore}
+      />
     </div>
   );
 };
