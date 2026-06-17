@@ -327,6 +327,67 @@ const AdminProducts = () => {
         </Button>
       </div>
 
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+          placeholder="Buscar por nombre…"
+          className="pl-9 font-body"
+        />
+        {nameFilter && (
+          <button
+            onClick={() => setNameFilter("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            title="Limpiar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {disabledEntries.length > 0 && (
+        <Collapsible open={showDisabledPanel} onOpenChange={setShowDisabledPanel}>
+          <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800">
+            <CollapsibleTrigger asChild>
+              <button className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                  <span className="font-body text-sm text-amber-900 dark:text-amber-100">
+                    Tienes <strong>{disabledEntries.length}</strong> producto{disabledEntries.length === 1 ? "" : "s"} desactivado{disabledEntries.length === 1 ? "" : "s"} (total o por local)
+                  </span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-amber-700 dark:text-amber-400 transition-transform ${showDisabledPanel ? "rotate-180" : ""}`} />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-4 pb-3 space-y-1.5 max-h-64 overflow-y-auto">
+                {disabledEntries.map(({ product, disabledStores }) => (
+                  <div key={product.id} className="flex items-start justify-between gap-3 text-sm font-body py-1.5 border-t border-amber-200/60 dark:border-amber-800/60">
+                    <div className="min-w-0">
+                      <span className="font-medium text-foreground">{product.name}</span>
+                      <span className="text-xs text-muted-foreground ml-2">{CATEGORY_LABELS[product.category] ?? product.category}</span>
+                      {!product.is_active && <Badge variant="secondary" className="ml-2 text-[10px]">Oculto global</Badge>}
+                      {disabledStores.length > 0 && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Desactivado en: {disabledStores.map((s) => s.name).join(", ")}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => { setFilterCategory(product.category); setNameFilter(product.name); setShowDisabledPanel(false); }}
+                      className="text-xs text-primary hover:underline shrink-0"
+                    >
+                      Ver
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+      )}
+
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setFilterCategory("all")}
