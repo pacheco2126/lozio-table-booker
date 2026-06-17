@@ -227,7 +227,7 @@ const AdminProducts = () => {
     toast.success(until ? `Oculto en ${store.name} hasta mañana` : `Desactivado en ${store.name}`);
     setDisableTarget(null);
     fetchAll();
-    // Si es un extra (ingrediente vendible), proponer cascada a pizzas que lo usan
+    // Si es un extra, buscar el ingrediente del inventario y proponer cascada
     if (product.category === "extras") {
       const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
       const target = norm(product.name);
@@ -236,7 +236,12 @@ const AdminProducts = () => {
         return n === target || n.includes(target) || target.includes(n);
       });
       if (match) {
-        setCascadeCtx({ inventoryItemId: match.id, inventoryItemName: match.name, storeSlug: store.slug });
+        // Esperar a que el Dialog anterior se cierre antes de abrir el siguiente
+        setTimeout(() => {
+          setCascadeCtx({ inventoryItemId: match.id, inventoryItemName: match.name, storeSlug: store.slug });
+        }, 200);
+      } else {
+        toast.info(`"${product.name}" no está vinculado a ningún ingrediente del inventario.`);
       }
     }
   };
@@ -347,7 +352,7 @@ const AdminProducts = () => {
                     >{Number(p.price).toFixed(2)} €</button>
                   )}
 
-                  <Switch checked={!!p.is_active} onCheckedChange={() => toggleActive(p)} />
+                  
                   {INGREDIENT_LINKABLE.has(p.category) && (
                     <Button
                       size="icon"
@@ -469,10 +474,7 @@ const AdminProducts = () => {
                 <Label>Orden</Label>
                 <Input type="number" value={form.sort_order ?? 0} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
               </div>
-              <div className="flex items-end gap-2">
-                <Switch checked={!!form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
-                <Label className="mb-2">Visible</Label>
-              </div>
+              <div />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
