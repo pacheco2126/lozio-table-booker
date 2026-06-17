@@ -118,10 +118,8 @@ const Checkout = () => {
     loadProfile();
   }, [user, authLoading]);
 
-  const pickupStores = [
-    { id: "tarragona", ...locationsData.tarragona },
-    { id: "arrabassada", ...locationsData.arrabassada },
-  ];
+
+
 
   const checkoutSchema = z
     .object({
