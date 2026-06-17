@@ -20,8 +20,9 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Pencil, Trash2, Plus, Loader2, ShoppingCart, ClipboardList, Package,
-  ChevronDown,
+  ChevronDown, AlertOctagon,
 } from "lucide-react";
+import IngredientCascadeDialog from "@/components/admin/IngredientCascadeDialog";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
