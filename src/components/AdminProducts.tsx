@@ -294,7 +294,7 @@ const AdminProducts = () => {
         <p className="font-body text-muted-foreground text-center py-8">Sin productos.</p>
       ) : (
         <div className="grid gap-3">
-          {filtered.map((p) => (
+          {paginated.map((p) => (
             <div key={p.id} className={`border border-border rounded-lg p-4 bg-card ${!p.is_active ? "opacity-60" : ""}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
