@@ -108,10 +108,8 @@ const AdminProducts = () => {
     setLoading(false);
   };
 
-  const [inventoryItems, setInventoryItems] = (function useInv() {
-    return useState<InventoryItemRow[]>([]);
-  })();
-  const [ingredientsByProduct, setIngredientsByProduct] = useState<Record<string, Set<string>>>({});
+
+
 
   const openLinking = (p: Product) => {
     setLinkingProduct(p);
