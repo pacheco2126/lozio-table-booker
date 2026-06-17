@@ -421,6 +421,61 @@ const AdminInventory = () => {
 
         {/* ── Inventario ── */}
         <TabsContent value="inventario" className="space-y-4 mt-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
+              placeholder="Buscar ingrediente por nombre…"
+              className="pl-9 font-body"
+            />
+            {nameFilter && (
+              <button
+                onClick={() => setNameFilter("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                title="Limpiar"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {outItems.length > 0 && (
+            <Collapsible open={showOutPanel} onOpenChange={setShowOutPanel}>
+              <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800">
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                      <span className="font-body text-sm text-amber-900 dark:text-amber-100">
+                        Tienes <strong>{outItems.length}</strong> ingrediente{outItems.length === 1 ? "" : "s"} agotado{outItems.length === 1 ? "" : "s"} (stock 0)
+                      </span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-amber-700 dark:text-amber-400 transition-transform ${showOutPanel ? "rotate-180" : ""}`} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 pb-3 space-y-1.5 max-h-64 overflow-y-auto">
+                    {outItems.map((it) => (
+                      <div key={it.id} className="flex items-center justify-between gap-3 text-sm font-body py-1.5 border-t border-amber-200/60 dark:border-amber-800/60">
+                        <div className="min-w-0">
+                          <span className="font-medium text-foreground">{it.name}</span>
+                          <span className="text-xs text-muted-foreground ml-2">{CATEGORY_LABELS[it.category] ?? it.category}</span>
+                        </div>
+                        <button
+                          onClick={() => { setNameFilter(it.name); setShowOutPanel(false); }}
+                          className="text-xs text-primary hover:underline shrink-0"
+                        >
+                          Ver
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+          )}
+
           {loadingData ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
