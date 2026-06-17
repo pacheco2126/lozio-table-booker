@@ -346,10 +346,6 @@ const AdminProducts = () => {
                   <Button size="icon" variant="ghost" onClick={() => setDeleteId(p.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
               </div>
-                  <Button size="icon" variant="ghost" onClick={() => openEdit(p)}><Pencil className="w-4 h-4" /></Button>
-                  <Button size="icon" variant="ghost" onClick={() => setDeleteId(p.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
-                </div>
-              </div>
 
               {stores.length > 0 && (
                 <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center gap-2">
