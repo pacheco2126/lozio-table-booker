@@ -480,9 +480,9 @@ const AdminInventory = () => {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             </div>
-          ) : items.length === 0 ? (
+          ) : visibleItems.length === 0 ? (
             <p className="text-center text-muted-foreground font-body py-10">
-              No hay artículos para este local.
+              {items.length === 0 ? "No hay artículos para este local." : "Ningún ingrediente coincide con la búsqueda."}
             </p>
           ) : (
             Object.entries(grouped).map(([cat, catItems]) => (
