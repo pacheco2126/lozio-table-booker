@@ -973,9 +973,9 @@ const Checkout = () => {
                 {loading
                   ? t("checkout.processing")
                   : deliveryOutOfRange
-                    ? "Fuera de zona de reparto"
+                    ? t("checkout.outOfZoneBtn")
                     : deliveryBelowMin && deliveryMin?.minOrderAmount != null
-                      ? `Pedido mínimo ${deliveryMin.minOrderAmount.toFixed(2)} €`
+                      ? t("checkout.minOrderBtn", { amount: deliveryMin.minOrderAmount.toFixed(2) })
                       : `${t("checkout.confirmOrder")} · ${finalTotal.toFixed(2)} €`}
               </Button>
             </form>
