@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 export type OrderType = "pickup" | "delivery";
+export type OrderIntent = "order" | "reservation" | null;
 
 export interface OrderFlowAddress {
   address: string;       // street + number
@@ -14,10 +15,12 @@ export interface OrderFlowState {
   storeSlug: string | null;          // assigned store for pickup OR delivery
   address: OrderFlowAddress | null;  // only for delivery
   scheduledFor: string | null;       // ISO datetime; null = ASAP
+  intent: OrderIntent;               // user's current visit intent
 }
 
 interface OrderFlowContextType extends OrderFlowState {
   setFlow: (state: Partial<OrderFlowState>) => void;
+  setIntent: (intent: OrderIntent) => void;
   clearFlow: () => void;
   isDialogOpen: boolean;
   openDialog: () => void;
@@ -31,6 +34,7 @@ const defaultState: OrderFlowState = {
   storeSlug: null,
   address: null,
   scheduledFor: null,
+  intent: null,
 };
 
 const OrderFlowContext = createContext<OrderFlowContextType | undefined>(undefined);
