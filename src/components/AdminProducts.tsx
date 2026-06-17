@@ -32,6 +32,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   extras: "Extras", drinks: "Bebidas", desserts: "Postres",
 };
 const BADGE_STYLES = ["", "fire", "gold", "teal"] as const;
+const INGREDIENT_LINKABLE = new Set(["pizzas", "focaccias", "calzones"]);
+const PAGE_SIZE = 10;
 
 const emptyProduct: Omit<Product, "id"> = {
   name: "",
