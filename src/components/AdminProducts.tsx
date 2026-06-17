@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Pencil, Trash2, Plus, Check, X, Store as StoreIcon, Clock, Carrot } from "lucide-react";
 import { EU_ALLERGENS } from "@/lib/allergens";
+import IngredientCascadeDialog from "@/components/admin/IngredientCascadeDialog";
 
 interface Product {
   id: string;
@@ -80,6 +81,9 @@ const AdminProducts = () => {
   const [linkSelection, setLinkSelection] = useState<Set<string>>(new Set());
   const [inventoryItems, setInventoryItems] = useState<InventoryItemRow[]>([]);
   const [ingredientsByProduct, setIngredientsByProduct] = useState<Record<string, Set<string>>>({});
+  const [cascadeCtx, setCascadeCtx] = useState<{ inventoryItemId: string; inventoryItemName: string; storeSlug: string } | null>(null);
+
+
 
 
   useEffect(() => { fetchAll(); }, []);
@@ -223,6 +227,18 @@ const AdminProducts = () => {
     toast.success(until ? `Oculto en ${store.name} hasta mañana` : `Desactivado en ${store.name}`);
     setDisableTarget(null);
     fetchAll();
+    // Si es un extra (ingrediente vendible), proponer cascada a pizzas que lo usan
+    if (product.category === "extras") {
+      const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+      const target = norm(product.name);
+      const match = inventoryItems.find(it => {
+        const n = norm(it.name);
+        return n === target || n.includes(target) || target.includes(n);
+      });
+      if (match) {
+        setCascadeCtx({ inventoryItemId: match.id, inventoryItemName: match.name, storeSlug: store.slug });
+      }
+    }
   };
 
   const nextOpenAt = (_store: StoreRow): Date => {
@@ -612,6 +628,15 @@ const AdminProducts = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <IngredientCascadeDialog
+        open={!!cascadeCtx}
+        onOpenChange={(o) => { if (!o) setCascadeCtx(null); }}
+        inventoryItemId={cascadeCtx?.inventoryItemId ?? null}
+        inventoryItemName={cascadeCtx?.inventoryItemName}
+        defaultStoreSlug={cascadeCtx?.storeSlug ?? null}
+        onConfirmed={fetchAll}
+      />
     </div>
   );
 };
