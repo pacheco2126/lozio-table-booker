@@ -252,6 +252,10 @@ const MenuSection = () => {
 
 
   const handleAdd = (item: MenuItemData, imageUrl?: string | null) => {
+    if (!storeSlug && !isAdmin) {
+      openDialog();
+      return;
+    }
     setDialogItem(item);
     setDialogImageUrl(imageUrl ?? null);
   };
