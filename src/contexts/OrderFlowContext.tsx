@@ -66,9 +66,13 @@ export const OrderFlowProvider = ({ children }: { children: ReactNode }) => {
       value={{
         ...state,
         setFlow,
+        setIntent: (intent) => setState((prev) => ({ ...prev, intent })),
         clearFlow,
         isDialogOpen,
-        openDialog: () => setDialogOpen(true),
+        openDialog: () => {
+          setState((prev) => (prev.intent === "reservation" ? { ...prev, intent: "order" } : prev));
+          setDialogOpen(true);
+        },
         closeDialog: () => setDialogOpen(false),
       }}
     >
