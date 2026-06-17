@@ -48,6 +48,8 @@ const emptyProduct: Omit<Product, "id"> = {
 
 interface StoreRow { slug: string; name: string; accepts_delivery: boolean; accepts_pickup: boolean; }
 interface AvailabilityRow { menu_item_id: string; store_slug: string; is_available: boolean; unavailable_until: string | null; }
+interface InventoryItemRow { id: string; name: string; category: string; is_active: boolean; }
+interface IngredientLink { menu_item_id: string; inventory_item_id: string; }
 
 type AvailabilityMap = Record<string, AvailabilityRow>; // key = `${menu_item_id}__${store_slug}`
 const availKey = (itemId: string, slug: string) => `${itemId}__${slug}`;
