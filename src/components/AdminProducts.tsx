@@ -32,6 +32,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   extras: "Extras", drinks: "Bebidas", desserts: "Postres",
 };
 const BADGE_STYLES = ["", "fire", "gold", "teal"] as const;
+const INGREDIENT_LINKABLE = new Set(["pizzas", "focaccias", "calzones"]);
+const PAGE_SIZE = 10;
 
 const emptyProduct: Omit<Product, "id"> = {
   name: "",
@@ -66,6 +68,7 @@ const AdminProducts = () => {
   const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<Product | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<Omit<Product, "id">>(emptyProduct);
@@ -249,6 +252,12 @@ const AdminProducts = () => {
   };
 
   const filtered = filterCategory === "all" ? products : products.filter((p) => p.category === filterCategory);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Reset page when filter changes
+  useEffect(() => { setPage(1); }, [filterCategory]);
 
   return (
     <div className="space-y-6">
@@ -285,7 +294,7 @@ const AdminProducts = () => {
         <p className="font-body text-muted-foreground text-center py-8">Sin productos.</p>
       ) : (
         <div className="grid gap-3">
-          {filtered.map((p) => (
+          {paginated.map((p) => (
             <div key={p.id} className={`border border-border rounded-lg p-4 bg-card ${!p.is_active ? "opacity-60" : ""}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
@@ -323,14 +332,16 @@ const AdminProducts = () => {
                   )}
 
                   <Switch checked={!!p.is_active} onCheckedChange={() => toggleActive(p)} />
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => openLinking(p)}
-                    title="Vincular ingredientes"
-                  >
-                    <Carrot className={`w-4 h-4 ${(ingredientsByProduct[p.id]?.size ?? 0) > 0 ? "text-amber-600" : ""}`} />
-                  </Button>
+                  {INGREDIENT_LINKABLE.has(p.category) && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => openLinking(p)}
+                      title="Vincular ingredientes"
+                    >
+                      <Carrot className={`w-4 h-4 ${(ingredientsByProduct[p.id]?.size ?? 0) > 0 ? "text-amber-600" : ""}`} />
+                    </Button>
+                  )}
                   <Button size="icon" variant="ghost" onClick={() => openEdit(p)}><Pencil className="w-4 h-4" /></Button>
                   <Button size="icon" variant="ghost" onClick={() => setDeleteId(p.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
@@ -370,6 +381,36 @@ const AdminProducts = () => {
             </div>
 
           ))}
+        </div>
+      )}
+
+      {!loading && filtered.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-3 pt-2">
+          <p className="text-xs text-muted-foreground font-body">
+            Mostrando {(currentPage - 1) * PAGE_SIZE + 1}–
+            {Math.min(currentPage * PAGE_SIZE, filtered.length)} de {filtered.length}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </Button>
+            <span className="text-sm font-body">
+              {currentPage} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </Button>
+          </div>
         </div>
       )}
 
