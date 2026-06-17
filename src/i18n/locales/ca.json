@@ -603,5 +603,42 @@
     "alreadyDescription": "Aquesta adreça ja estava donada de baixa.",
     "errorTitle": "Enllaç no vàlid",
     "errorDescription": "L'enllaç ha caducat o no és vàlid. Torna a intentar-ho des d'un email recent."
+  },
+  "orderTypeDialog": {
+    "title": "Com vols la teva comanda?",
+    "description": "Tria recollida al local o lliurament a domicili.",
+    "delivery": "Domicili",
+    "pickup": "Recollir",
+    "pickupStore": "Local de recollida",
+    "noStores": "Sense locals disponibles.",
+    "open": "Obert",
+    "closedSchedule": "Tancat · Programar",
+    "address": "Adreça",
+    "addressPlaceholder": "Carrer i població",
+    "number": "Número",
+    "postalCode": "CP",
+    "autoAssignHint": "Assignarem automàticament el local més proper.",
+    "cancel": "Cancel·lar",
+    "viewMenu": "Veure carta",
+    "errors": {
+      "selectPickup": "Selecciona un local per recollir",
+      "addressRequired": "Introdueix adreça i número",
+      "noDeliveryStores": "No hi ha locals amb lliurament a domicili",
+      "cannotAssign": "No s'ha pogut assignar local"
+    }
+  },
+  "ingredientCascade": {
+    "title": "Productes afectats",
+    "descriptionUsage": "L'ingredient {{name}} s'utilitza en els següents productes.",
+    "descriptionAction": "Desactiva els productes que no podràs servir.",
+    "toggleAll": "Desactivar totes en tots els locals",
+    "empty": "Cap producte utilitza aquest ingredient. Pots vincular-los des de la pestanya de productes.",
+    "prev": "Anterior",
+    "next": "Següent",
+    "pageOf": "Pàgina {{page}} / {{total}}",
+    "skip": "Només desactivar l'ingredient",
+    "confirm": "Confirmar cascada",
+    "successCount": "{{count}} producte(s) marcats com a no disponibles",
+    "errorCascade": "Error en cascada: {{message}}"
   }
 }
