@@ -17,8 +17,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import AddToCartDialog from "@/components/AddToCartDialog";
 import CartSidebar from "@/components/CartSidebar";
 import { supabase } from "@/integrations/supabase/client";
+import { useOrderFlow } from "@/contexts/OrderFlowContext";
+import { Badge } from "@/components/ui/badge";
 
 interface MenuItemData {
+  id: string;
   name: string;
   imageKey?: string; // override for image lookup when name changes
   freeExtras?: number; // first N ingredient extras are free
@@ -28,6 +31,8 @@ interface MenuItemData {
   allergens?: string[];
   category: "pizzas" | "focaccias" | "calzones";
   badge?: { key: string; emoji: string; style: "fire" | "gold" | "teal" };
+  isAvailable?: boolean;
+  unavailableUntil?: string | null;
 }
 
 type MenuCategory = "pizzas" | "focaccias" | "calzones";
@@ -50,6 +55,7 @@ interface MenuItemRow {
 function mapRow(row: MenuItemRow): MenuItemData {
   const priceNum = Number(row.price);
   return {
+    id: row.id,
     name: row.name,
     imageKey: row.image_key ?? undefined,
     freeExtras: row.free_extras ?? undefined,
@@ -112,8 +118,12 @@ const MenuCard = ({
   imageUrl?: string | null;
 }) => {
   const { t } = useTranslation();
+  const unavailable = item.isAvailable === false;
   return (
-    <div className="group bg-card rounded-xl shadow-sm border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col">
+    <div className={cn(
+      "group bg-card rounded-xl shadow-sm border border-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col",
+      unavailable && "opacity-60 grayscale"
+    )}>
       {/* Image */}
       <div className="relative overflow-hidden" style={{ paddingBottom: "60%" }}>
         <img
@@ -122,7 +132,7 @@ const MenuCard = ({
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        {item.badge && (
+        {item.badge && !unavailable && (
           <span
             className={`absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-body font-bold shadow-lg tracking-wide backdrop-blur-sm ${
               item.badge.style === "fire"
@@ -135,6 +145,11 @@ const MenuCard = ({
             <span>{item.badge.emoji}</span>
             {t(`menu.${item.badge.key}`)}
           </span>
+        )}
+        {unavailable && (
+          <Badge variant="destructive" className="absolute top-2 left-2 z-10 text-[10px] font-body font-bold uppercase tracking-wide">
+            {t("menu.unavailableToday", "No disponible hoy")}
+          </Badge>
         )}
       </div>
       {/* Body */}
@@ -151,7 +166,7 @@ const MenuCard = ({
         <div className="flex items-center justify-between mt-auto pt-1">
           <span className="font-display font-bold text-primary text-base md:text-lg">{item.price}</span>
         </div>
-        {showAddButton && (
+        {showAddButton && !unavailable && (
           <Button
             onClick={onAdd}
             className="w-full bg-primary text-primary-foreground font-body font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity mt-1"
@@ -172,6 +187,7 @@ const MenuSection = () => {
   const { t } = useTranslation();
   const { getImageForItem } = useMedia("menu_item");
   const isMobile = useIsMobile();
+  const { storeSlug } = useOrderFlow();
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
@@ -182,7 +198,7 @@ const MenuSection = () => {
   const [dialogItem, setDialogItem] = useState<MenuItemData | null>(null);
   const [dialogImageUrl, setDialogImageUrl] = useState<string | null>(null);
 
-  const { data: menuItems = [], isLoading } = useQuery({
+  const { data: rawItems = [], isLoading } = useQuery({
     queryKey: ["menu_items", "public"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -198,6 +214,41 @@ const MenuSection = () => {
     },
     staleTime: 60_000,
   });
+
+  const { data: availabilityRows = [] } = useQuery({
+    queryKey: ["menu_item_store_availability", storeSlug],
+    enabled: !!storeSlug,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("menu_item_store_availability")
+        .select("menu_item_id,is_available,unavailable_until")
+        .eq("store_slug", storeSlug!);
+      if (error) throw error;
+      return data ?? [];
+    },
+    staleTime: 30_000,
+  });
+
+  const availabilityMap = new Map<string, { isAvailable: boolean; unavailableUntil: string | null }>();
+  const now = Date.now();
+  for (const row of availabilityRows) {
+    const expired = row.unavailable_until && new Date(row.unavailable_until).getTime() <= now;
+    availabilityMap.set(row.menu_item_id, {
+      isAvailable: row.is_available || !!expired,
+      unavailableUntil: row.unavailable_until,
+    });
+  }
+
+  const menuItems: MenuItemData[] = rawItems.map((item) => {
+    const a = availabilityMap.get(item.id);
+    return {
+      ...item,
+      isAvailable: a ? a.isAvailable : true,
+      unavailableUntil: a?.unavailableUntil ?? null,
+    };
+  });
+
+
 
 
   const handleAdd = (item: MenuItemData, imageUrl?: string | null) => {
@@ -355,7 +406,7 @@ const MenuSection = () => {
                       </div>
                       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
                         {items.map((item) => (
-                          <MenuCard key={item.name} item={item} onAdd={() => handleAdd(item, getImageForItem(item.imageKey ?? item.name))} showAddButton={isAdmin} imageUrl={getImageForItem(item.imageKey ?? item.name)} />
+                          <MenuCard key={item.id} item={item} onAdd={() => handleAdd(item, getImageForItem(item.imageKey ?? item.name))} showAddButton={isAdmin || !!storeSlug} imageUrl={getImageForItem(item.imageKey ?? item.name)} />
                         ))}
                       </div>
                     </div>
