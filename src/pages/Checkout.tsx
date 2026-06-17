@@ -505,7 +505,7 @@ const Checkout = () => {
               <div className="mb-6 bg-card border border-border rounded-xl p-5">
                 <h2 className="font-display text-base font-bold text-foreground mb-4 flex items-center gap-2">
                   <CalendarClock className="w-4 h-4 text-menu-teal" />
-                  ¿Cuándo quieres tu pedido?
+                  {t("checkout.scheduleTitle")}
                 </h2>
 
                 <div className="grid grid-cols-2 gap-3 mb-4">
@@ -524,9 +524,9 @@ const Checkout = () => {
                   >
                     <Zap className="w-4 h-4 text-menu-teal shrink-0" />
                     <div>
-                      <p className="font-display font-bold text-sm">Lo antes posible</p>
+                      <p className="font-display font-bold text-sm">{t("checkout.asap")}</p>
                       <p className="text-xs text-muted-foreground">
-                        {isCurrentlyOpen ? "Estamos abiertos" : "Cerrado ahora"}
+                        {isCurrentlyOpen ? t("checkout.openNow") : t("checkout.closedNow")}
                       </p>
                     </div>
                   </button>
@@ -552,8 +552,8 @@ const Checkout = () => {
                   >
                     <CalendarClock className="w-4 h-4 text-menu-teal shrink-0" />
                     <div>
-                      <p className="font-display font-bold text-sm">Programar</p>
-                      <p className="text-xs text-muted-foreground">Elige día y hora</p>
+                      <p className="font-display font-bold text-sm">{t("checkout.schedule")}</p>
+                      <p className="text-xs text-muted-foreground">{t("checkout.scheduleHint")}</p>
                     </div>
                   </button>
                 </div>
@@ -563,7 +563,7 @@ const Checkout = () => {
                   <div className="space-y-3">
                     {/* Day selector */}
                     <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Día</p>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t("checkout.day")}</p>
                       <div className="flex gap-2 flex-wrap">
                         {availableDays.map((day, i) => {
                           const isSelected =
@@ -593,9 +593,9 @@ const Checkout = () => {
 
                     {/* Time selector */}
                     <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Hora</p>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t("checkout.time")}</p>
                       {timeSlots.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No hay horarios disponibles para este día.</p>
+                        <p className="text-sm text-muted-foreground">{t("checkout.noTimeSlots")}</p>
                       ) : (
                         <div className="flex gap-2 flex-wrap">
                           {timeSlots.map((slot) => (
@@ -618,7 +618,7 @@ const Checkout = () => {
 
                     {scheduledFor && (
                       <p className="text-xs text-menu-teal font-semibold mt-1">
-                        ✓ Pedido programado para el {formatDayLabel(scheduledDay)} a las {scheduledTime}
+                        {t("checkout.scheduledFor", { day: formatDayLabel(scheduledDay), time: scheduledTime })}
                       </p>
                     )}
                   </div>
