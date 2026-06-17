@@ -178,6 +178,7 @@ const MenuSection = () => {
   const { t } = useTranslation();
   const { getImageForItem } = useMedia("menu_item");
   const isMobile = useIsMobile();
+  const { storeSlug } = useOrderFlow();
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
@@ -188,7 +189,7 @@ const MenuSection = () => {
   const [dialogItem, setDialogItem] = useState<MenuItemData | null>(null);
   const [dialogImageUrl, setDialogImageUrl] = useState<string | null>(null);
 
-  const { data: menuItems = [], isLoading } = useQuery({
+  const { data: rawItems = [], isLoading } = useQuery({
     queryKey: ["menu_items", "public"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -204,6 +205,41 @@ const MenuSection = () => {
     },
     staleTime: 60_000,
   });
+
+  const { data: availabilityRows = [] } = useQuery({
+    queryKey: ["menu_item_store_availability", storeSlug],
+    enabled: !!storeSlug,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("menu_item_store_availability")
+        .select("menu_item_id,is_available,unavailable_until")
+        .eq("store_slug", storeSlug!);
+      if (error) throw error;
+      return data ?? [];
+    },
+    staleTime: 30_000,
+  });
+
+  const availabilityMap = new Map<string, { isAvailable: boolean; unavailableUntil: string | null }>();
+  const now = Date.now();
+  for (const row of availabilityRows) {
+    const expired = row.unavailable_until && new Date(row.unavailable_until).getTime() <= now;
+    availabilityMap.set(row.menu_item_id, {
+      isAvailable: row.is_available || !!expired,
+      unavailableUntil: row.unavailable_until,
+    });
+  }
+
+  const menuItems: MenuItemData[] = rawItems.map((item) => {
+    const a = availabilityMap.get(item.id);
+    return {
+      ...item,
+      isAvailable: a ? a.isAvailable : true,
+      unavailableUntil: a?.unavailableUntil ?? null,
+    };
+  });
+
+
 
 
   const handleAdd = (item: MenuItemData, imageUrl?: string | null) => {
