@@ -69,6 +69,23 @@ const Checkout = () => {
       setLocationDialogOpen(true);
     }
   }, [items.length, orderFlow.orderType, orderFlow.storeSlug]);
+
+  // Reactively sync form fields with orderFlow changes (e.g. after the dialog accepts)
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      orderType: (orderFlow.orderType ?? prev.orderType) as "pickup" | "delivery",
+      pickupStore:
+        orderFlow.orderType === "pickup"
+          ? (orderFlow.storeSlug ?? "")
+          : prev.pickupStore,
+      address: orderFlow.address?.address ?? (orderFlow.orderType === "delivery" ? prev.address : ""),
+      streetNumber: orderFlow.address?.streetNumber ?? (orderFlow.orderType === "delivery" ? prev.streetNumber : ""),
+      city: orderFlow.address?.city ?? (orderFlow.orderType === "delivery" ? prev.city : ""),
+      postalCode: orderFlow.address?.postalCode ?? (orderFlow.orderType === "delivery" ? prev.postalCode : ""),
+    }));
+    setErrors({});
+  }, [orderFlow.orderType, orderFlow.storeSlug, orderFlow.address]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [profileAddress, setProfileAddress] = useState<{
     address: string;
