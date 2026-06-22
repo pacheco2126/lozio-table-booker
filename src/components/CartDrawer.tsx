@@ -221,6 +221,10 @@ const CartDrawer = () => {
     deliveryMin.maxKmConfigured > 0;
 
   const handleCheckout = () => {
+    if (needsLocation) {
+      setLocationDialogOpen(true);
+      return;
+    }
     setIsOpen(false);
     if (!user) {
       navigate("/auth", { state: { fromCart: true } });
