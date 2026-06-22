@@ -939,7 +939,21 @@ const Checkout = () => {
                 <div className="flex items-center gap-2 font-display font-bold text-sm">
                   <Tag className="w-4 h-4" /> {t("checkout.discount.title")}
                 </div>
-                {discount.applied ? (
+                {!user ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground font-body">
+                      {t("checkout.discount.loginRequired")}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => navigate("/auth", { state: { from: "/pedido" } })}
+                      className="w-full font-body"
+                    >
+                      {t("checkout.discount.loginCta")}
+                    </Button>
+                  </div>
+                ) : discount.applied ? (
                   <div className="flex items-center justify-between gap-2 rounded-lg bg-primary/8 border border-primary/20 px-3 py-2">
                     <div className="text-sm">
                       <span className="font-bold text-primary">{discount.applied.code}</span>
