@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Truck,
   AlertTriangle,
+  MapPin,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +25,8 @@ import {
   computeDeliveryMinimumForAddress,
   type DeliveryMinimumResult,
 } from "@/lib/deliveryMinimum";
+import CartLocationDialog from "@/components/CartLocationDialog";
+
 
 
 // Extras picker with category tabs
@@ -158,6 +161,21 @@ const CartDrawer = () => {
 
   const [openNotes, setOpenNotes] = useState<Record<string, boolean>>({});
   const [showExtras, setShowExtras] = useState<Record<string, boolean>>({});
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
+
+  const needsLocation = items.length > 0 && (!orderFlow.orderType || !orderFlow.storeSlug);
+
+  // Auto-open location dialog when the cart opens with items but no chosen flow
+  useEffect(() => {
+    if (isOpen && needsLocation) setLocationDialogOpen(true);
+  }, [isOpen, needsLocation]);
+
+  const selectedStoreLabel = orderFlow.storeSlug
+    ? orderFlow.orderType === "delivery"
+      ? `Domicilio · ${orderFlow.storeSlug}`
+      : `Recoger · ${orderFlow.storeSlug}`
+    : null;
+
 
   // Delivery minimum check (only when user already picked a delivery address)
   const [deliveryMin, setDeliveryMin] = useState<DeliveryMinimumResult | null>(null);
@@ -203,6 +221,10 @@ const CartDrawer = () => {
     deliveryMin.maxKmConfigured > 0;
 
   const handleCheckout = () => {
+    if (needsLocation) {
+      setLocationDialogOpen(true);
+      return;
+    }
     setIsOpen(false);
     if (!user) {
       navigate("/auth", { state: { fromCart: true } });
@@ -230,7 +252,26 @@ const CartDrawer = () => {
               </span>
             )}
           </SheetTitle>
+          {items.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setLocationDialogOpen(true)}
+              className={`mt-2 inline-flex items-center gap-2 self-start text-xs font-body px-2.5 py-1 rounded-full border transition-colors ${
+                needsLocation
+                  ? "border-amber-400/60 bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100"
+                  : "border-border bg-muted/40 text-foreground hover:bg-muted"
+              }`}
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              {needsLocation
+                ? "Selecciona local y tipo de pedido"
+                : selectedStoreLabel}
+              <span className="text-menu-teal underline ml-1">Cambiar</span>
+            </button>
+          )}
         </SheetHeader>
+
+        <CartLocationDialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen} />
 
         {items.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-muted-foreground font-body px-5">
