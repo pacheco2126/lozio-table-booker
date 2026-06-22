@@ -440,6 +440,7 @@ const MenuSection = () => {
         onOpenChange={(open) => { if (!open) setDialogItem(null); }}
         onConfirm={handleDialogConfirm}
       />
+      <CartLocationDialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen} />
     </TooltipProvider>
   );
 };
