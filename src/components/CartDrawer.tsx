@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Truck,
   AlertTriangle,
+  MapPin,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +25,8 @@ import {
   computeDeliveryMinimumForAddress,
   type DeliveryMinimumResult,
 } from "@/lib/deliveryMinimum";
+import CartLocationDialog from "@/components/CartLocationDialog";
+
 
 
 // Extras picker with category tabs
