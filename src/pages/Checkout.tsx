@@ -43,6 +43,7 @@ import {
 import { AlertTriangle, CalendarClock, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CartLocationDialog from "@/components/CartLocationDialog";
 import { z } from "zod";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
