@@ -196,7 +196,7 @@ const CartLocationDialog = ({ open, onOpenChange }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !submitting && onOpenChange(o)}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="font-display">
             Confirma tu pedido
