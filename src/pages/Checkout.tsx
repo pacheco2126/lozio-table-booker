@@ -61,6 +61,14 @@ const Checkout = () => {
 
   const [loading, setLoading] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
+
+  // Auto-open the location dialog when arriving with cart items but no order type/store selected
+  useEffect(() => {
+    if (items.length === 0) return;
+    if (!orderFlow.orderType || !orderFlow.storeSlug) {
+      setLocationDialogOpen(true);
+    }
+  }, [items.length, orderFlow.orderType, orderFlow.storeSlug]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [profileAddress, setProfileAddress] = useState<{
     address: string;
