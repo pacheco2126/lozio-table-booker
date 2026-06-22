@@ -271,7 +271,9 @@
         "already_used": "Ja has fet servir aquest descompte.",
         "not_assigned": "Aquest descompte no està disponible per al teu compte.",
         "rate_limited": "Massa intents. Espera un minut."
-      }
+      },
+      "loginRequired": "Inicia sessió per fer servir codis de descompte.",
+      "loginCta": "Inicia sessió"
     },
     "pickupStoreRequired": "Has de seleccionar a quin local recolliràs la comanda",
     "streetNumberRequired": "El número és obligatori",
