@@ -271,7 +271,9 @@
         "already_used": "You have already used this discount.",
         "not_assigned": "This discount is not available for your account.",
         "rate_limited": "Too many attempts. Wait a minute."
-      }
+      },
+      "loginRequired": "Sign in to use discount codes.",
+      "loginCta": "Sign in"
     },
     "pickupStoreRequired": "You must select a store for pickup",
     "streetNumberRequired": "Street number is required",

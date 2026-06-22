@@ -290,7 +290,9 @@
         "already_used": "Ya has usado este descuento.",
         "not_assigned": "Este descuento no está disponible para tu cuenta.",
         "rate_limited": "Demasiados intentos. Espera un minuto."
-      }
+      },
+      "loginRequired": "Inicia sesión para usar códigos de descuento.",
+      "loginCta": "Iniciar sesión"
     },
     "pickupStoreRequired": "Debes seleccionar en qué local recoges el pedido",
     "streetNumberRequired": "El número es obligatorio",
