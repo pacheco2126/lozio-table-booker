@@ -15,6 +15,7 @@ import { getAllergenById } from "@/lib/allergens";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import AddToCartDialog from "@/components/AddToCartDialog";
+import CartLocationDialog from "@/components/CartLocationDialog";
 import CartSidebar from "@/components/CartSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrderFlow } from "@/contexts/OrderFlowContext";
