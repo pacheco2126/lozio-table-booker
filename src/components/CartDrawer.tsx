@@ -252,7 +252,26 @@ const CartDrawer = () => {
               </span>
             )}
           </SheetTitle>
+          {items.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setLocationDialogOpen(true)}
+              className={`mt-2 inline-flex items-center gap-2 self-start text-xs font-body px-2.5 py-1 rounded-full border transition-colors ${
+                needsLocation
+                  ? "border-amber-400/60 bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100"
+                  : "border-border bg-muted/40 text-foreground hover:bg-muted"
+              }`}
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              {needsLocation
+                ? "Selecciona local y tipo de pedido"
+                : selectedStoreLabel}
+              <span className="text-menu-teal underline ml-1">Cambiar</span>
+            </button>
+          )}
         </SheetHeader>
+
+        <CartLocationDialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen} />
 
         {items.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-muted-foreground font-body px-5">
