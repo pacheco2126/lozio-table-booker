@@ -15,6 +15,7 @@ import { getAllergenById } from "@/lib/allergens";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import AddToCartDialog from "@/components/AddToCartDialog";
+import CartLocationDialog from "@/components/CartLocationDialog";
 import CartSidebar from "@/components/CartSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrderFlow } from "@/contexts/OrderFlowContext";
@@ -187,7 +188,8 @@ const MenuSection = () => {
   const { t } = useTranslation();
   const { getImageForItem } = useMedia("menu_item");
   const isMobile = useIsMobile();
-  const { storeSlug, intent, openDialog } = useOrderFlow();
+  const { storeSlug, intent } = useOrderFlow();
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
@@ -253,7 +255,7 @@ const MenuSection = () => {
 
   const handleAdd = (item: MenuItemData, imageUrl?: string | null) => {
     if (!storeSlug && !isAdmin) {
-      openDialog();
+      setLocationDialogOpen(true);
       return;
     }
     setDialogItem(item);
@@ -438,6 +440,7 @@ const MenuSection = () => {
         onOpenChange={(open) => { if (!open) setDialogItem(null); }}
         onConfirm={handleDialogConfirm}
       />
+      <CartLocationDialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen} />
     </TooltipProvider>
   );
 };
