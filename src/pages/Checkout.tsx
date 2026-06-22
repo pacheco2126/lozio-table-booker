@@ -43,6 +43,7 @@ import {
 import { AlertTriangle, CalendarClock, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CartLocationDialog from "@/components/CartLocationDialog";
 import { z } from "zod";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
@@ -59,6 +60,7 @@ const Checkout = () => {
   const orderFlow = useOrderFlow();
 
   const [loading, setLoading] = useState(false);
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [profileAddress, setProfileAddress] = useState<{
     address: string;
@@ -472,6 +474,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
+      <CartLocationDialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen} />
       <div className="pt-24 md:pt-28 pb-24 px-3 md:px-4">
         <div className="max-w-5xl mx-auto">
           <Button
@@ -697,7 +700,7 @@ const Checkout = () => {
                         </div>
                         <button
                           type="button"
-                          onClick={() => orderFlow.openDialog()}
+                          onClick={() => setLocationDialogOpen(true)}
                           className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
                         >
                           {t("checkout.change")}
@@ -790,7 +793,7 @@ const Checkout = () => {
                         </div>
                         <button
                           type="button"
-                          onClick={() => orderFlow.openDialog()}
+                          onClick={() => setLocationDialogOpen(true)}
                           className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
                         >
                           {t("checkout.change")}
