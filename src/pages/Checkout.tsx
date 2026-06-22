@@ -60,6 +60,7 @@ const Checkout = () => {
   const orderFlow = useOrderFlow();
 
   const [loading, setLoading] = useState(false);
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [profileAddress, setProfileAddress] = useState<{
     address: string;
