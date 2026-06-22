@@ -20,6 +20,7 @@ import CartSidebar from "@/components/CartSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrderFlow } from "@/contexts/OrderFlowContext";
 import { Badge } from "@/components/ui/badge";
+import { locationsData } from "@/lib/locations";
 
 interface MenuItemData {
   id: string;
@@ -337,7 +338,7 @@ const MenuSection = () => {
             <p className="text-menu-teal font-body uppercase tracking-[0.25em] text-sm mb-3">{t("menu.header")}</p>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-2">{t("menu.title")}</h2>
             <p className="font-display text-lg tracking-[0.3em] uppercase text-muted-foreground mb-6">
-              {t("menu.location")}
+              {storeSlug && locationsData[storeSlug]?.name ? locationsData[storeSlug].name : ""}
             </p>
           </div>
 
