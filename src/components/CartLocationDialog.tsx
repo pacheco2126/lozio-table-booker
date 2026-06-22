@@ -120,15 +120,26 @@ const CartLocationDialog = ({ open, onOpenChange }: Props) => {
   const [postalCode, setPostalCode] = useState(existingAddress?.postalCode ?? "");
   const [submitting, setSubmitting] = useState(false);
 
+  // Fetch stores once on mount so the dialog is ready immediately the first time it opens
   useEffect(() => {
-    if (!open) return;
     supabase
       .from("stores")
       .select("slug,name,accepts_delivery,accepts_pickup")
       .eq("is_active", true)
       .order("sort_order")
       .then(({ data }) => setStores((data as StoreRow[]) || []));
-  }, [open]);
+  }, []);
+
+  // Sync local form state with the latest orderFlow whenever the dialog opens
+  useEffect(() => {
+    if (!open) return;
+    setTab(orderType ?? "delivery");
+    setPickupStore(orderType === "pickup" && storeSlug ? storeSlug : "");
+    setAddress(existingAddress?.address ?? "");
+    setStreetNumber(existingAddress?.streetNumber ?? "");
+    setCity(existingAddress?.city ?? "");
+    setPostalCode(existingAddress?.postalCode ?? "");
+  }, [open, orderType, storeSlug, existingAddress]);
 
   const pickupStores = useMemo(() => stores.filter((s) => s.accepts_pickup), [stores]);
   const deliveryStores = useMemo(() => stores.filter((s) => s.accepts_delivery), [stores]);
@@ -185,7 +196,7 @@ const CartLocationDialog = ({ open, onOpenChange }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !submitting && onOpenChange(o)}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="font-display">
             Confirma tu pedido
