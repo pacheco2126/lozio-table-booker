@@ -255,7 +255,7 @@ const MenuSection = () => {
 
   const handleAdd = (item: MenuItemData, imageUrl?: string | null) => {
     if (!storeSlug && !isAdmin) {
-      openDialog();
+      setLocationDialogOpen(true);
       return;
     }
     setDialogItem(item);
