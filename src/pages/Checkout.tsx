@@ -699,7 +699,7 @@ const Checkout = () => {
                         </div>
                         <button
                           type="button"
-                          onClick={() => orderFlow.openDialog()}
+                          onClick={() => setLocationDialogOpen(true)}
                           className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
                         >
                           {t("checkout.change")}
@@ -792,7 +792,7 @@ const Checkout = () => {
                         </div>
                         <button
                           type="button"
-                          onClick={() => orderFlow.openDialog()}
+                          onClick={() => setLocationDialogOpen(true)}
                           className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
                         >
                           {t("checkout.change")}
