@@ -474,6 +474,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
+      <CartLocationDialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen} />
       <div className="pt-24 md:pt-28 pb-24 px-3 md:px-4">
         <div className="max-w-5xl mx-auto">
           <Button
