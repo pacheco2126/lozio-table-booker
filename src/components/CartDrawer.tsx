@@ -161,6 +161,21 @@ const CartDrawer = () => {
 
   const [openNotes, setOpenNotes] = useState<Record<string, boolean>>({});
   const [showExtras, setShowExtras] = useState<Record<string, boolean>>({});
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
+
+  const needsLocation = items.length > 0 && (!orderFlow.orderType || !orderFlow.storeSlug);
+
+  // Auto-open location dialog when the cart opens with items but no chosen flow
+  useEffect(() => {
+    if (isOpen && needsLocation) setLocationDialogOpen(true);
+  }, [isOpen, needsLocation]);
+
+  const selectedStoreLabel = orderFlow.storeSlug
+    ? orderFlow.orderType === "delivery"
+      ? `Domicilio · ${orderFlow.storeSlug}`
+      : `Recoger · ${orderFlow.storeSlug}`
+    : null;
+
 
   // Delivery minimum check (only when user already picked a delivery address)
   const [deliveryMin, setDeliveryMin] = useState<DeliveryMinimumResult | null>(null);
