@@ -188,7 +188,8 @@ const MenuSection = () => {
   const { t } = useTranslation();
   const { getImageForItem } = useMedia("menu_item");
   const isMobile = useIsMobile();
-  const { storeSlug, intent, openDialog } = useOrderFlow();
+  const { storeSlug, intent } = useOrderFlow();
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>("pizzas");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navRef = useRef<HTMLDivElement>(null);
