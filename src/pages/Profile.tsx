@@ -8,7 +8,7 @@ import Navbar from "@/components/Navbar";
 import { EU_ALLERGENS } from "@/lib/allergens";
 import { MyDiscountsSection } from "@/components/MyDiscountsSection";
 import UserPushNotificationToggle from "@/components/UserPushNotificationToggle";
-import { Settings, Lock, Bell } from "lucide-react";
+import { Settings, Lock, Bell, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
