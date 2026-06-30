@@ -368,7 +368,7 @@ const MenuSection = () => {
                     key={cat.id}
                     onClick={() => scrollToCategory(cat.id)}
                     className={cn(
-                      "flex items-center gap-2 px-5 py-2.5 rounded-full font-body font-bold text-sm whitespace-nowrap transition-all duration-200 shrink-0",
+                      "flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full font-body font-bold text-xs sm:text-sm whitespace-nowrap transition-all duration-200",
                       activeCategory === cat.id
                         ? "bg-primary text-primary-foreground shadow-md"
                         : "bg-card text-foreground border border-border hover:border-primary/50",
