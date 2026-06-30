@@ -8,7 +8,7 @@ import Navbar from "@/components/Navbar";
 import { EU_ALLERGENS } from "@/lib/allergens";
 import { MyDiscountsSection } from "@/components/MyDiscountsSection";
 import UserPushNotificationToggle from "@/components/UserPushNotificationToggle";
-import { Settings, Lock, Bell } from "lucide-react";
+import { Settings, Lock, Bell, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -137,37 +137,89 @@ const Profile = () => {
       <Navbar forceSolid />
       <div className="pt-24 md:pt-32 pb-16 px-3 md:px-4">
         <div className="max-w-xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">{t("profile.title")}</h1>
-              <p className="text-muted-foreground font-body text-sm mt-1">{user?.email}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+          <div className="mb-8">
+            {/* Mobile: stacked card */}
+            <div className="md:hidden bg-card rounded-xl border border-border p-5 shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                  <span className="font-display text-xl font-bold text-primary">
+                    {(profile.full_name || user?.email || "?").trim().charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h1 className="font-display text-xl font-bold text-foreground truncate">
+                    {profile.full_name || t("profile.title")}
+                  </h1>
+                  <p className="text-muted-foreground font-body text-xs mt-0.5 truncate">{user?.email}</p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        aria-label={t("profile.title")}
+                        className="inline-flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Settings className="w-5 h-5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 bg-popover">
+                      <DropdownMenuLabel>{t("profile.title")}</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => setSettingsPanel("notifications")}>
+                        <Bell className="w-4 h-4 mr-2" />
+                        {t("profile.notificationsLabel", "Notificaciones")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setSettingsPanel("password")}>
+                        <Lock className="w-4 h-4 mr-2" />
+                        {t("profile.changePassword")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <button
-                    aria-label="Configuración"
-                    className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-border bg-card text-foreground hover:bg-muted transition-colors"
+                    onClick={handleSignOut}
+                    aria-label={t("profile.signOut")}
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-full text-destructive hover:bg-destructive/10 transition-colors"
                   >
-                    <Settings className="w-4 h-4" />
+                    <LogOut className="w-5 h-5" />
                   </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-popover">
-                  <DropdownMenuLabel>{t("profile.title")}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setSettingsPanel("notifications")}>
-                    <Bell className="w-4 h-4 mr-2" />
-                    {t("profile.notificationsLabel", "Notificaciones")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSettingsPanel("password")}>
-                    <Lock className="w-4 h-4 mr-2" />
-                    {t("profile.changePassword")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <button onClick={handleSignOut} className="text-destructive font-body text-sm font-bold hover:underline">
-                {t("profile.signOut")}
-              </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop: original row */}
+            <div className="hidden md:flex items-center justify-between">
+              <div>
+                <h1 className="font-display text-3xl font-bold text-foreground">{t("profile.title")}</h1>
+                <p className="text-muted-foreground font-body text-sm mt-1">{user?.email}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      aria-label={t("profile.title")}
+                      className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-border bg-card text-foreground text-sm font-body font-medium hover:bg-muted transition-colors"
+                    >
+                      <Settings className="w-4 h-4" />
+                      {t("profile.notificationsLabel", "Ajustes")}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-popover">
+                    <DropdownMenuLabel>{t("profile.title")}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setSettingsPanel("notifications")}>
+                      <Bell className="w-4 h-4 mr-2" />
+                      {t("profile.notificationsLabel", "Notificaciones")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSettingsPanel("password")}>
+                      <Lock className="w-4 h-4 mr-2" />
+                      {t("profile.changePassword")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <button onClick={handleSignOut} className="text-destructive font-body text-sm font-bold hover:underline">
+                  {t("profile.signOut")}
+                </button>
+              </div>
             </div>
           </div>
 
