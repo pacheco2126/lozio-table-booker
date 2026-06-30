@@ -360,7 +360,7 @@ const MenuSection = () => {
               !showCategoryNav ? "opacity-0 pointer-events-none" : "opacity-100",
             )}
           >
-            <div className="flex gap-2 overflow-x-auto no-scrollbar justify-center">
+            <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 return (
