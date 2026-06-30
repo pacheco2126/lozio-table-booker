@@ -90,7 +90,7 @@ const HeroSection = () => {
             className={`group relative flex-1 rounded-xl overflow-hidden border border-primary-foreground/20 backdrop-blur-sm transition-all duration-300 min-h-[140px] md:min-h-[200px] animate-fade-in-up ${
               isAdmin
                 ? "bg-foreground/40 hover:bg-foreground/50 cursor-pointer"
-                : "bg-foreground/20 cursor-not-allowed opacity-60"
+                : "bg-foreground/20 cursor-not-allowed"
             }`}
             style={{ animationDelay: "0.5s" }}
           >
@@ -103,12 +103,26 @@ const HeroSection = () => {
             </span>
             <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
               <Bike className={`w-10 h-10 md:w-12 md:h-12 mb-3 transition-transform text-accent ${isAdmin ? "group-hover:scale-110" : ""}`} />
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground mb-1">
-                {isAdmin ? t("hero.orderCta", "Hacer un pedido") : t("hero.comingSoon")}
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground mb-3">
+                {t("hero.orderCta", "Hacer un pedido")}
               </h2>
-              <p className="text-primary-foreground/60 text-sm font-body italic">
-                {isAdmin ? t("hero.orderSubtitle", "Ver carta y hacer tu pedido") : t("hero.orderComingSoonHint")}
-              </p>
+              {isAdmin ? (
+                <p className="text-primary-foreground/60 text-sm font-body">
+                  {t("hero.orderSubtitle", "Ver carta y hacer tu pedido")}
+                </p>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="inline-flex items-center gap-2 px-5 py-2 rounded-lg border border-dashed border-primary-foreground/40 bg-foreground/20 text-primary-foreground/90">
+                    <Clock className="w-4 h-4" />
+                    <span className="text-sm font-bold tracking-widest uppercase">
+                      {t("hero.comingSoon")}
+                    </span>
+                  </div>
+                  <p className="text-primary-foreground/60 text-sm font-body italic">
+                    {t("hero.orderComingSoonHint")}
+                  </p>
+                </div>
+              )}
             </div>
             <div className={`absolute inset-0 border-2 border-transparent rounded-xl transition-colors ${isAdmin ? "group-hover:border-accent/40" : ""}`} />
           </button>
