@@ -141,11 +141,6 @@ const Profile = () => {
             {/* Mobile: stacked card */}
             <div className="md:hidden bg-card rounded-xl border border-border p-5 shadow-sm">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                  <span className="font-display text-xl font-bold text-primary">
-                    {(profile.full_name || user?.email || "?").trim().charAt(0).toUpperCase()}
-                  </span>
-                </div>
                 <div className="min-w-0 flex-1">
                   <h1 className="font-display text-xl font-bold text-foreground truncate">
                     {profile.full_name || t("profile.title")}
