@@ -161,6 +161,9 @@ const Checkout = () => {
       postalCode: z.string().optional(),
       paymentMethod: z.enum(["cash", "stripe"]),
       notes: z.string().max(500).optional(),
+      staircase: z.string().optional(),
+      floor: z.string().optional(),
+      door: z.string().optional(),
     })
     .refine(
       (data) => {
@@ -192,6 +195,15 @@ const Checkout = () => {
     .refine(
       (data) => !(data.orderType === "delivery" && data.paymentMethod === "cash"),
       { message: t("checkout.cashUnavailableForDelivery"), path: ["paymentMethod"] },
+    )
+    .refine(
+      (data) => {
+        if (data.orderType === "delivery") {
+          return data.floor && data.floor.trim().length > 0;
+        }
+        return true;
+      },
+      { message: t("checkout.floorRequired"), path: ["floor"] },
     );
 
   const [form, setForm] = useState({
@@ -749,13 +761,16 @@ const Checkout = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="floor" className="text-xs">{t("checkout.floor")}</Label>
+                          <Label htmlFor="floor" className="text-xs">{t("checkout.floor")} *</Label>
                           <Input
                             id="floor"
                             value={form.floor}
                             onChange={(e) => updateField("floor", e.target.value)}
                             placeholder="1º, 2º…"
                           />
+                          {errors.floor && (
+                            <p className="text-destructive text-xs mt-1">{errors.floor}</p>
+                          )}
                         </div>
                         <div>
                           <Label htmlFor="door" className="text-xs">{t("checkout.door")}</Label>
