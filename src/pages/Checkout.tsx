@@ -161,6 +161,9 @@ const Checkout = () => {
       postalCode: z.string().optional(),
       paymentMethod: z.enum(["cash", "stripe"]),
       notes: z.string().max(500).optional(),
+      staircase: z.string().optional(),
+      floor: z.string().optional(),
+      door: z.string().optional(),
     })
     .refine(
       (data) => {
