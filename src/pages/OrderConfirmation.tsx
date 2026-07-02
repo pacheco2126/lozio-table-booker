@@ -89,6 +89,27 @@ const OrderConfirmation = () => {
     fetchOrder();
   }, [orderId]);
 
+  // Auto-prompt to enable push notifications — PWA (standalone) only
+  useEffect(() => {
+    if (pushPrompted) return;
+    if (!user || !order || !supported) return;
+    if (status !== "granted-unsubscribed" && status !== "default") return;
+
+    const isStandalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      // iOS Safari
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    if (!isStandalone) return;
+
+    setPushPrompted(true);
+    const timer = setTimeout(async () => {
+      const ok = await enablePush();
+      if (ok) toast.success("🔔 Te avisaremos del estado de tu pedido");
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [user, order, supported, status, enablePush, pushPrompted]);
+
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
