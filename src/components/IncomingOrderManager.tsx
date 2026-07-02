@@ -81,6 +81,30 @@ const IncomingOrderManager = () => {
   useEffect(() => {
     if (!pizzeria) return;
 
+    // Load any pending orders already assigned to this pizzeria (covers the
+    // case where the user just signed in and missed the realtime INSERT).
+    (async () => {
+      const { data } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("assigned_to", pizzeria)
+        .eq("status", "pending")
+        .order("created_at", { ascending: true });
+      const rows = (data as IncomingOrder[]) ?? [];
+      if (rows.length === 0) return;
+      setQueue((q) => {
+        const merged = [...q];
+        for (const o of rows) {
+          if (seenIdsRef.current.has(o.id)) continue;
+          seenIdsRef.current.add(o.id);
+          merged.push(o);
+        }
+        return merged;
+      });
+    })();
+
+
+
     const channel = supabase
       .channel(`new-orders-${pizzeria}`)
       .on(
