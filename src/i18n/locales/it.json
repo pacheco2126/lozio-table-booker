@@ -278,6 +278,7 @@
     "pickupStoreRequired": "Devi selezionare il locale dove ritirare l'ordine",
     "streetNumberRequired": "Il numero civico è obbligatorio",
     "cashUnavailableForDelivery": "Il pagamento in contanti non è disponibile per le consegne a domicilio",
+    "floorRequired": "Il piano è obbligatorio per la consegna a domicilio",
     "scheduleTimeRequired": "Seleziona un orario per programmare il tuo ordine",
     "outOfDeliveryZoneMsg": "Questo indirizzo è fuori dalla nostra zona di consegna (max. {{km}} km).",
     "minOrderForAddressMsg": "L'ordine minimo per il tuo indirizzo è {{amount}} €.",

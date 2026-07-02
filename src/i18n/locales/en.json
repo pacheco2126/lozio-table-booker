@@ -278,6 +278,7 @@
     "pickupStoreRequired": "You must select a store for pickup",
     "streetNumberRequired": "Street number is required",
     "cashUnavailableForDelivery": "Cash payment is not available for home delivery",
+    "floorRequired": "Floor is required for home delivery",
     "scheduleTimeRequired": "Select a time to schedule your order",
     "outOfDeliveryZoneMsg": "This address is outside our delivery zone (max. {{km}} km).",
     "minOrderForAddressMsg": "The minimum order for your address is {{amount}} €.",

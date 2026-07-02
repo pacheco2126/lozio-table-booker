@@ -297,6 +297,7 @@
     "pickupStoreRequired": "Debes seleccionar en qué local recoges el pedido",
     "streetNumberRequired": "El número es obligatorio",
     "cashUnavailableForDelivery": "El pago en efectivo no está disponible para envíos a domicilio",
+    "floorRequired": "El piso es obligatorio para entregas a domicilio",
     "scheduleTimeRequired": "Selecciona una hora para programar tu pedido",
     "outOfDeliveryZoneMsg": "Esta dirección está fuera de nuestra zona de reparto (máx. {{km}} km).",
     "minOrderForAddressMsg": "El pedido mínimo para tu dirección es {{amount}} €.",

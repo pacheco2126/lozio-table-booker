@@ -278,6 +278,7 @@
     "pickupStoreRequired": "Has de seleccionar a quin local recolliràs la comanda",
     "streetNumberRequired": "El número és obligatori",
     "cashUnavailableForDelivery": "El pagament en efectiu no està disponible per a enviaments a domicili",
+    "floorRequired": "El pis és obligatori per a enviaments a domicili",
     "scheduleTimeRequired": "Selecciona una hora per programar la teva comanda",
     "outOfDeliveryZoneMsg": "Aquesta adreça està fora de la nostra zona de repartiment (màx. {{km}} km).",
     "minOrderForAddressMsg": "La comanda mínima per a la teva adreça és {{amount}} €.",
