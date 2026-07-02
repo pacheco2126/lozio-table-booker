@@ -47,11 +47,14 @@ const OrderConfirmation = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("id");
+  const { user } = useAuth();
+  const { status, supported, enablePush } = usePushSubscription();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [items, setItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [pushPrompted, setPushPrompted] = useState(false);
 
   useEffect(() => {
     if (!orderId) {
