@@ -8,8 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
 import {
+  Bell,
   CheckCircle2,
   Clock,
   MapPin,
