@@ -2,10 +2,14 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { usePushSubscription } from "@/hooks/usePushSubscription";
+import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
+  Bell,
   CheckCircle2,
   Clock,
   MapPin,
@@ -43,11 +47,14 @@ const OrderConfirmation = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("id");
+  const { user } = useAuth();
+  const { status, supported, enablePush } = usePushSubscription();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [items, setItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [pushPrompted, setPushPrompted] = useState(false);
 
   useEffect(() => {
     if (!orderId) {
@@ -81,6 +88,27 @@ const OrderConfirmation = () => {
 
     fetchOrder();
   }, [orderId]);
+
+  // Auto-prompt to enable push notifications — PWA (standalone) only
+  useEffect(() => {
+    if (pushPrompted) return;
+    if (!user || !order || !supported) return;
+    if (status !== "granted-unsubscribed" && status !== "default") return;
+
+    const isStandalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      // iOS Safari
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    if (!isStandalone) return;
+
+    setPushPrompted(true);
+    const timer = setTimeout(async () => {
+      const ok = await enablePush();
+      if (ok) toast.success("🔔 Te avisaremos del estado de tu pedido");
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [user, order, supported, status, enablePush, pushPrompted]);
+
 
   if (loading) {
     return (
