@@ -87,9 +87,18 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clients) => {
+      .then(async (clients) => {
         for (const client of clients) {
-          if ('focus' in client) return (client as WindowClient).focus();
+          const win = client as WindowClient;
+          try {
+            await win.focus();
+            if ('navigate' in win && typeof win.navigate === 'function') {
+              await win.navigate(url);
+            } else {
+              win.postMessage({ type: 'NAVIGATE', url });
+            }
+            return;
+          } catch { /* try next */ }
         }
         return self.clients.openWindow(url);
       }),
