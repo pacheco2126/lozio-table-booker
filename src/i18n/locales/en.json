@@ -138,7 +138,10 @@
   "footer": {
     "description": "Authentic Italian pizza made with fresh ingredients and the passion of our family.",
     "copyright": "© {{year}} Pizzeria Lo Zio. All rights reserved.",
-    "rinconHours": "Mon–Sat: 8:00–22:00"
+    "rinconHours": "Mon–Sat: 8:00–22:00",
+    "corporate": "Corporate",
+    "ourLocations": "Our Locations",
+    "careers": "Work with us"
   },
   "auth": {
     "loginTitle": "Sign in to your account",
@@ -681,5 +684,45 @@
     "confirm": "Confirm cascade",
     "successCount": "{{count}} product(s) marked as unavailable",
     "errorCascade": "Cascade error: {{message}}"
+  },
+  "jobs": {
+    "title": "Work with us",
+    "subtitle": "Join the Lo Zio family. Explore our open positions and grow with us.",
+    "seoTitle": "Careers | Pizzerías Lo Zio",
+    "seoDescription": "Browse open positions at Pizzerías Lo Zio in Tarragona and join our team.",
+    "viewDetail": "View details",
+    "empty": "There are no open positions right now.",
+    "addVacancy": "Add vacancy",
+    "activeTab": "Active",
+    "inactiveTab": "Inactive",
+    "back": "Back to vacancies",
+    "notFound": "Vacancy not found.",
+    "closed": "This vacancy is no longer active.",
+    "apply": "Send application",
+    "applyText": "Send us your CV quoting the vacancy reference.",
+    "fields": {
+      "title": "Position",
+      "location": "Location",
+      "category": "Category",
+      "subcategory": "Subcategory",
+      "sector": "Sector",
+      "schedule": "Working hours",
+      "mode": "Work mode",
+      "level": "Professional level",
+      "department": "Department",
+      "description": "Description",
+      "active": "Active"
+    },
+    "form": {
+      "createTitle": "New vacancy",
+      "editTitle": "Edit vacancy",
+      "description": "Fill in the vacancy details.",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "requiredError": "Position, location and category are required.",
+      "created": "Vacancy created",
+      "updated": "Vacancy updated"
+    }
   }
 }

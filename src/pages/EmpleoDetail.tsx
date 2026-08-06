@@ -102,7 +102,7 @@ const EmpleoDetail = () => {
             {job.is_active && (
               <div className="mt-8 border-t border-border pt-6">
                 <p className="font-body text-sm text-muted-foreground mb-4">{t("jobs.applyText")}</p>
-                <a href="mailto:info@pizzeriaslozio.com?subject=Vacante%20%23{job.ref}">
+                <a href={`mailto:info@pizzeriaslozio.com?subject=${encodeURIComponent(`Vacante #${job.ref} - ${job.title}`)}`}>
                   <Button className="font-body font-bold">{t("jobs.apply")}</Button>
                 </a>
               </div>
