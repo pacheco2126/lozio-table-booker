@@ -17,11 +17,7 @@ const EmpleoDetail = () => {
   const { data: job, isLoading } = useQuery({
     queryKey: ["job-posting", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("job_postings")
-        .select("*")
-        .eq("ref", Number(id))
-        .maybeSingle();
+      const { data, error } = await supabase.from("job_postings").select("*").eq("ref", Number(id)).maybeSingle();
       if (error) throw error;
       return data as JobPosting | null;
     },
@@ -66,23 +62,17 @@ const EmpleoDetail = () => {
         ) : (
           <article className="rounded-xl border border-border bg-card p-6 md:p-8 shadow-sm">
             <div className="flex items-start justify-between gap-3">
-              <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                {job.title}
-              </h1>
+              <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">{job.title}</h1>
               <Badge variant="secondary" className="font-body shrink-0">
                 #{job.ref}
               </Badge>
             </div>
-            {!job.is_active && (
-              <p className="mt-3 font-body text-sm text-muted-foreground">{t("jobs.closed")}</p>
-            )}
+            {!job.is_active && <p className="mt-3 font-body text-sm text-muted-foreground">{t("jobs.closed")}</p>}
 
             <dl className="mt-7 grid gap-5 sm:grid-cols-2">
               {rows.map((row) => (
                 <div key={row.label}>
-                  <dt className="font-body text-xs uppercase tracking-widest text-muted-foreground">
-                    {row.label}
-                  </dt>
+                  <dt className="font-body text-xs uppercase tracking-widest text-muted-foreground">{row.label}</dt>
                   <dd className="font-body text-foreground mt-1">{row.value || "—"}</dd>
                 </div>
               ))}
@@ -90,19 +80,17 @@ const EmpleoDetail = () => {
 
             {job.description && (
               <div className="mt-8 border-t border-border pt-6">
-                <h2 className="font-display text-xl font-bold text-foreground mb-3">
-                  {t("jobs.fields.description")}
-                </h2>
-                <p className="font-body text-muted-foreground leading-relaxed whitespace-pre-line">
-                  {job.description}
-                </p>
+                <h2 className="font-display text-xl font-bold text-foreground mb-3">{t("jobs.fields.description")}</h2>
+                <p className="font-body text-muted-foreground leading-relaxed whitespace-pre-line">{job.description}</p>
               </div>
             )}
 
             {job.is_active && (
               <div className="mt-8 border-t border-border pt-6">
                 <p className="font-body text-sm text-muted-foreground mb-4">{t("jobs.applyText")}</p>
-                <a href={`mailto:info@pizzeriaslozio.com?subject=${encodeURIComponent(`Vacante #${job.ref} - ${job.title}`)}`}>
+                <a
+                  href={`mailto:empleo@pizzeriaslozio.com?subject=${encodeURIComponent(`Vacante #${job.ref} - ${job.title}`)}`}
+                >
                   <Button className="font-body font-bold">{t("jobs.apply")}</Button>
                 </a>
               </div>
