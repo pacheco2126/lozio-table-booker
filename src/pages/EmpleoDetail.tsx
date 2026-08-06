@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { ArrowLeft, Briefcase } from "lucide-react";
 import type { JobPosting } from "@/components/admin/AdminJobForm";
 
@@ -63,10 +63,8 @@ const EmpleoDetail = () => {
           <article className="rounded-xl border border-border bg-card p-6 md:p-8 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">{job.title}</h1>
-              <Badge variant="secondary" className="font-body shrink-0">
-                #{job.ref}
-              </Badge>
             </div>
+
             {!job.is_active && <p className="mt-3 font-body text-sm text-muted-foreground">{t("jobs.closed")}</p>}
 
             <dl className="mt-7 grid gap-5 sm:grid-cols-2">
@@ -89,7 +87,7 @@ const EmpleoDetail = () => {
               <div className="mt-8 border-t border-border pt-6">
                 <p className="font-body text-sm text-muted-foreground mb-4">{t("jobs.applyText")}</p>
                 <a
-                  href={`mailto:empleo@pizzeriaslozio.com?subject=${encodeURIComponent(`Vacante #${job.ref} - ${job.title}`)}`}
+                  href={`mailto:empleo@pizzeriaslozio.com?subject=${encodeURIComponent(`Vacante - ${job.title}`)}`}
                 >
                   <Button className="font-body font-bold">{t("jobs.apply")}</Button>
                 </a>
