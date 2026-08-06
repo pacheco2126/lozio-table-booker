@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,13 +16,26 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+
 
 const OPTIONS: Record<string, string[]> = {
   location: ["Tarragona", "Arrabassada", "El Rincón"],
@@ -130,8 +144,25 @@ interface Props {
 
 const AdminJobForm = ({ open, onOpenChange, job, onSaved }: Props) => {
   const { t } = useTranslation();
+  const { isAdmin } = useIsAdmin();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!job) return;
+    setDeleting(true);
+    const { error } = await supabase.from("job_postings").delete().eq("id", job.id);
+    setDeleting(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(t("jobs.form.deleted"));
+    onOpenChange(false);
+    onSaved();
+  };
+
 
   useEffect(() => {
     if (!open) return;
@@ -265,14 +296,47 @@ const AdminJobForm = ({ open, onOpenChange, job, onSaved }: Props) => {
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="font-body">
-            {t("jobs.form.cancel")}
-          </Button>
-          <Button onClick={handleSubmit} disabled={saving} className="font-body font-bold">
-            {saving ? t("jobs.form.saving") : t("jobs.form.save")}
-          </Button>
+        <DialogFooter className="gap-2 sm:justify-between">
+          {job && isAdmin ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={deleting} className="font-body gap-2">
+                  <Trash2 className="w-4 h-4" />
+                  {deleting ? t("jobs.form.deleting") : t("jobs.form.delete")}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="max-w-[95vw] sm:max-w-md">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-display">
+                    {t("jobs.form.deleteConfirmTitle")}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="font-body">
+                    {t("jobs.form.deleteConfirmDesc")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="font-body">
+                    {t("jobs.form.cancel")}
+                  </AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="font-body font-bold">
+                    {t("jobs.form.delete")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <span />
+          )}
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="font-body">
+              {t("jobs.form.cancel")}
+            </Button>
+            <Button onClick={handleSubmit} disabled={saving} className="font-body font-bold">
+              {saving ? t("jobs.form.saving") : t("jobs.form.save")}
+            </Button>
+          </div>
         </DialogFooter>
+
       </DialogContent>
     </Dialog>
   );

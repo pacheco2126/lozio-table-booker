@@ -745,7 +745,12 @@
       "requiredError": "Puesto, ubicación y categoría son obligatorios.",
       "created": "Vacante creada",
       "updated": "Vacante actualizada",
-      "selectPlaceholder": "Selecciona una opción"
+      "selectPlaceholder": "Selecciona una opción",
+      "delete": "Eliminar",
+      "deleting": "Eliminando...",
+      "deleteConfirmTitle": "¿Eliminar esta vacante?",
+      "deleteConfirmDesc": "Esta acción no se puede deshacer. La vacante se eliminará permanentemente.",
+      "deleted": "Vacante eliminada"
     }
   }
 }

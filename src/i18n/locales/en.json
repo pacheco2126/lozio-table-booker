@@ -726,7 +726,12 @@
       "requiredError": "Position, location and category are required.",
       "created": "Vacancy created",
       "updated": "Vacancy updated",
-      "selectPlaceholder": "Select an option"
+      "selectPlaceholder": "Select an option",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "deleteConfirmTitle": "Delete this vacancy?",
+      "deleteConfirmDesc": "This action cannot be undone. The vacancy will be permanently deleted.",
+      "deleted": "Vacancy deleted"
     }
   }
 }
