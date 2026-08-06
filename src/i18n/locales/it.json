@@ -726,7 +726,12 @@
       "requiredError": "Posizione, sede e categoria sono obbligatori.",
       "created": "Posizione creata",
       "updated": "Posizione aggiornata",
-      "selectPlaceholder": "Seleziona un'opzione"
+      "selectPlaceholder": "Seleziona un'opzione",
+      "delete": "Elimina",
+      "deleting": "Eliminazione...",
+      "deleteConfirmTitle": "Eliminare questa posizione?",
+      "deleteConfirmDesc": "Questa azione non può essere annullata. La posizione sarà eliminata definitivamente.",
+      "deleted": "Posizione eliminata"
     }
   }
 }

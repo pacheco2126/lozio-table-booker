@@ -726,7 +726,12 @@
       "requiredError": "Lloc, ubicació i categoria són obligatoris.",
       "created": "Vacant creada",
       "updated": "Vacant actualitzada",
-      "selectPlaceholder": "Selecciona una opció"
+      "selectPlaceholder": "Selecciona una opció",
+      "delete": "Eliminar",
+      "deleting": "Eliminant...",
+      "deleteConfirmTitle": "Vols eliminar aquesta vacant?",
+      "deleteConfirmDesc": "Aquesta acció no es pot desfer. La vacant s'eliminarà permanentment.",
+      "deleted": "Vacant eliminada"
     }
   }
 }
