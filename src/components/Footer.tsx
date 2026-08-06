@@ -60,6 +60,27 @@ const Footer = () => {
               {t("footer.rinconHours")}
             </p>
           </div>
+          <div>
+            <h4 className="font-display text-lg font-bold text-background mb-4">{t("footer.corporate")}</h4>
+            <ul className="space-y-2">
+              <li>
+                <a
+                  href="/locales"
+                  className="text-background/60 hover:text-primary font-body text-sm transition-colors"
+                >
+                  {t("footer.ourLocations")}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/empleo"
+                  className="text-background/60 hover:text-primary font-body text-sm transition-colors"
+                >
+                  {t("footer.careers")}
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
         <div className="border-t border-background/20 pt-8 text-center space-y-2">
           <p className="text-background/40 font-body text-sm">
