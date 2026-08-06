@@ -25,14 +25,9 @@ const JobCard = ({
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
       <Link to={`/empleo/${job.ref}`} className="group block p-5 md:p-6">
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <h2 className="font-display text-lg md:text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-            {job.title}
-          </h2>
-          <Badge variant="secondary" className="font-body shrink-0">
-            #{job.ref}
-          </Badge>
-        </div>
+        <h2 className="font-display text-lg md:text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+          {job.title}
+        </h2>
         <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground font-body">
           <span className="flex items-center gap-1.5">
             <MapPin className="w-4 h-4 shrink-0" />
