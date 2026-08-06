@@ -138,7 +138,10 @@
   "footer": {
     "description": "Auténtica pizza italiana elaborada con ingredientes frescos y la pasión de nuestra familia.",
     "copyright": "© {{year}} Pizzeria Lo Zio. Todos los derechos reservados.",
-    "rinconHours": "Lun–Sáb: 8:00–22:00"
+    "rinconHours": "Lun–Sáb: 8:00–22:00",
+    "corporate": "Corporativo",
+    "ourLocations": "Nuestros Locales",
+    "careers": "Trabaja con nosotros"
   },
   "auth": {
     "loginTitle": "Inicia sesión en tu cuenta",
@@ -700,5 +703,45 @@
     "confirm": "Confirmar cascada",
     "successCount": "{{count}} producto(s) marcados como no disponibles",
     "errorCascade": "Error en cascada: {{message}}"
+  },
+  "jobs": {
+    "title": "Trabaja con nosotros",
+    "subtitle": "Forma parte de la familia Lo Zio. Descubre nuestras vacantes activas y crece con nosotros.",
+    "seoTitle": "Trabaja con nosotros | Pizzerías Lo Zio",
+    "seoDescription": "Consulta las vacantes activas de Pizzerías Lo Zio en Tarragona y únete a nuestro equipo.",
+    "viewDetail": "Ver detalle",
+    "empty": "Ahora mismo no hay vacantes disponibles.",
+    "addVacancy": "Añadir vacante",
+    "activeTab": "Activas",
+    "inactiveTab": "No activas",
+    "back": "Volver a vacantes",
+    "notFound": "Vacante no encontrada.",
+    "closed": "Esta vacante ya no está activa.",
+    "apply": "Enviar candidatura",
+    "applyText": "Envíanos tu CV indicando la referencia de la vacante.",
+    "fields": {
+      "title": "Puesto",
+      "location": "Ubicación",
+      "category": "Categoría",
+      "subcategory": "Subcategoría",
+      "sector": "Sector",
+      "schedule": "Jornada laboral",
+      "mode": "Modalidad de trabajo",
+      "level": "Nivel profesional",
+      "department": "Departamento",
+      "description": "Descripción",
+      "active": "Activa"
+    },
+    "form": {
+      "createTitle": "Nueva vacante",
+      "editTitle": "Editar vacante",
+      "description": "Completa la información de la vacante.",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "requiredError": "Puesto, ubicación y categoría son obligatorios.",
+      "created": "Vacante creada",
+      "updated": "Vacante actualizada"
+    }
   }
 }

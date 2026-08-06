@@ -138,7 +138,10 @@
   "footer": {
     "description": "Autentica pizza italiana preparata con ingredienti freschi e la passione della nostra famiglia.",
     "copyright": "© {{year}} Pizzeria Lo Zio. Tutti i diritti riservati.",
-    "rinconHours": "Lun–Sab: 8:00–22:00"
+    "rinconHours": "Lun–Sab: 8:00–22:00",
+    "corporate": "Corporate",
+    "ourLocations": "I nostri locali",
+    "careers": "Lavora con noi"
   },
   "auth": {
     "loginTitle": "Accedi al tuo account",
@@ -681,5 +684,45 @@
     "confirm": "Conferma cascata",
     "successCount": "{{count}} prodotto/i contrassegnati come non disponibili",
     "errorCascade": "Errore cascata: {{message}}"
+  },
+  "jobs": {
+    "title": "Lavora con noi",
+    "subtitle": "Entra nella famiglia Lo Zio. Scopri le nostre posizioni aperte e cresci con noi.",
+    "seoTitle": "Lavora con noi | Pizzerie Lo Zio",
+    "seoDescription": "Scopri le posizioni aperte nelle Pizzerie Lo Zio a Tarragona e unisciti al nostro team.",
+    "viewDetail": "Vedi dettagli",
+    "empty": "Al momento non ci sono posizioni aperte.",
+    "addVacancy": "Aggiungi posizione",
+    "activeTab": "Attive",
+    "inactiveTab": "Non attive",
+    "back": "Torna alle posizioni",
+    "notFound": "Posizione non trovata.",
+    "closed": "Questa posizione non è più attiva.",
+    "apply": "Invia candidatura",
+    "applyText": "Inviaci il tuo CV indicando il riferimento della posizione.",
+    "fields": {
+      "title": "Posizione",
+      "location": "Sede",
+      "category": "Categoria",
+      "subcategory": "Sottocategoria",
+      "sector": "Settore",
+      "schedule": "Orario di lavoro",
+      "mode": "Modalità di lavoro",
+      "level": "Livello professionale",
+      "department": "Reparto",
+      "description": "Descrizione",
+      "active": "Attiva"
+    },
+    "form": {
+      "createTitle": "Nuova posizione",
+      "editTitle": "Modifica posizione",
+      "description": "Compila le informazioni della posizione.",
+      "save": "Salva",
+      "saving": "Salvataggio...",
+      "cancel": "Annulla",
+      "requiredError": "Posizione, sede e categoria sono obbligatori.",
+      "created": "Posizione creata",
+      "updated": "Posizione aggiornata"
+    }
   }
 }

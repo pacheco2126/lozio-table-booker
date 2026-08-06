@@ -138,7 +138,10 @@
   "footer": {
     "description": "Autèntica pizza italiana elaborada amb ingredients frescos i la passió de la nostra família.",
     "copyright": "© {{year}} Pizzeria Lo Zio. Tots els drets reservats.",
-    "rinconHours": "Dll–Dis: 8:00–22:00"
+    "rinconHours": "Dll–Dis: 8:00–22:00",
+    "corporate": "Corporatiu",
+    "ourLocations": "Els nostres locals",
+    "careers": "Treballa amb nosaltres"
   },
   "auth": {
     "loginTitle": "Inicia sessió al teu compte",
@@ -681,5 +684,45 @@
     "confirm": "Confirmar cascada",
     "successCount": "{{count}} producte(s) marcats com a no disponibles",
     "errorCascade": "Error en cascada: {{message}}"
+  },
+  "jobs": {
+    "title": "Treballa amb nosaltres",
+    "subtitle": "Forma part de la família Lo Zio. Descobreix les nostres vacants actives i creix amb nosaltres.",
+    "seoTitle": "Treballa amb nosaltres | Pizzeries Lo Zio",
+    "seoDescription": "Consulta les vacants actives de Pizzeries Lo Zio a Tarragona i uneix-te al nostre equip.",
+    "viewDetail": "Veure detall",
+    "empty": "Ara mateix no hi ha vacants disponibles.",
+    "addVacancy": "Afegir vacant",
+    "activeTab": "Actives",
+    "inactiveTab": "No actives",
+    "back": "Tornar a vacants",
+    "notFound": "Vacant no trobada.",
+    "closed": "Aquesta vacant ja no està activa.",
+    "apply": "Enviar candidatura",
+    "applyText": "Envia'ns el teu CV indicant la referència de la vacant.",
+    "fields": {
+      "title": "Lloc",
+      "location": "Ubicació",
+      "category": "Categoria",
+      "subcategory": "Subcategoria",
+      "sector": "Sector",
+      "schedule": "Jornada laboral",
+      "mode": "Modalitat de treball",
+      "level": "Nivell professional",
+      "department": "Departament",
+      "description": "Descripció",
+      "active": "Activa"
+    },
+    "form": {
+      "createTitle": "Nova vacant",
+      "editTitle": "Editar vacant",
+      "description": "Completa la informació de la vacant.",
+      "save": "Guardar",
+      "saving": "Guardant...",
+      "cancel": "Cancel·lar",
+      "requiredError": "Lloc, ubicació i categoria són obligatoris.",
+      "created": "Vacant creada",
+      "updated": "Vacant actualitzada"
+    }
   }
 }
