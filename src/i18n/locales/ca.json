@@ -722,7 +722,8 @@
       "cancel": "Cancel·lar",
       "requiredError": "Lloc, ubicació i categoria són obligatoris.",
       "created": "Vacant creada",
-      "updated": "Vacant actualitzada"
+      "updated": "Vacant actualitzada",
+      "selectPlaceholder": "Selecciona una opció"
     }
   }
 }
