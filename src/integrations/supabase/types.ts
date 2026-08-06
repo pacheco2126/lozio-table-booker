@@ -410,6 +410,60 @@ export type Database = {
           },
         ]
       }
+      job_postings: {
+        Row: {
+          category: string
+          created_at: string
+          department: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          location: string
+          professional_level: string | null
+          ref: number
+          sector: string | null
+          subcategory: string | null
+          title: string
+          updated_at: string
+          work_mode: string | null
+          work_schedule: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          department?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location: string
+          professional_level?: string | null
+          ref?: never
+          sector?: string | null
+          subcategory?: string | null
+          title: string
+          updated_at?: string
+          work_mode?: string | null
+          work_schedule?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          department?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location?: string
+          professional_level?: string | null
+          ref?: never
+          sector?: string | null
+          subcategory?: string | null
+          title?: string
+          updated_at?: string
+          work_mode?: string | null
+          work_schedule?: string | null
+        }
+        Relationships: []
+      }
       media: {
         Row: {
           alt_text: string | null
