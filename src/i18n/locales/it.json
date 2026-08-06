@@ -141,7 +141,8 @@
     "rinconHours": "Lun–Sab: 8:00–22:00",
     "corporate": "Corporate",
     "ourLocations": "I nostri locali",
-    "careers": "Lavora con noi"
+    "careers": "Lavora con noi",
+    "faqs": "Domande frequenti"
   },
   "auth": {
     "loginTitle": "Accedi al tuo account",
@@ -482,6 +483,8 @@
     "badge": "Domande frequenti",
     "title": "Hai domande?",
     "subtitle": "Qui troverai le risposte alle domande più comuni sul nostro ristorante.",
+    "seoTitle": "Domande frequenti | Pizzeria Lo Zio",
+    "seoDescription": "Trova risposte alle tue domande su prenotazioni, orari, allergeni, consegna a domicilio e altro presso Pizzeria Lo Zio a Tarragona.",
     "q1": "Devo prenotare un tavolo?",
     "a1": "Consigliamo di prenotare, soprattutto nei fine settimana. Puoi prenotare online per l'Arrabassada, e per Tarragona chiamando il +34 687 605 647.",
     "q2": "Fate consegna a domicilio?",

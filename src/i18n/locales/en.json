@@ -141,7 +141,8 @@
     "rinconHours": "Mon–Sat: 8:00–22:00",
     "corporate": "Corporate",
     "ourLocations": "Our Locations",
-    "careers": "Work with us"
+    "careers": "Work with us",
+    "faqs": "FAQs"
   },
   "auth": {
     "loginTitle": "Sign in to your account",
@@ -482,6 +483,8 @@
     "badge": "FAQ",
     "title": "Got questions?",
     "subtitle": "Here you'll find answers to the most common questions about our restaurant.",
+    "seoTitle": "FAQs | Pizzeria Lo Zio",
+    "seoDescription": "Find answers to your questions about bookings, opening hours, allergens, delivery and more at Pizzeria Lo Zio in Tarragona.",
     "q1": "Do I need to book a table?",
     "a1": "We recommend booking, especially on weekends. You can book online for Arrabassada, and for Tarragona by calling +34 687 605 647.",
     "q2": "Do you offer home delivery?",
