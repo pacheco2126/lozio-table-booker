@@ -63,10 +63,8 @@ const EmpleoDetail = () => {
           <article className="rounded-xl border border-border bg-card p-6 md:p-8 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">{job.title}</h1>
-              <Badge variant="secondary" className="font-body shrink-0">
-                #{job.ref}
-              </Badge>
             </div>
+
             {!job.is_active && <p className="mt-3 font-body text-sm text-muted-foreground">{t("jobs.closed")}</p>}
 
             <dl className="mt-7 grid gap-5 sm:grid-cols-2">
