@@ -191,8 +191,7 @@ const AdminJobForm = ({ open, onOpenChange, job, onSaved }: Props) => {
     onSaved();
   };
 
-  const textFields: { key: keyof FormState; label: string; required?: boolean }[] = [
-    { key: "title", label: t("jobs.fields.title"), required: true },
+  const fields: { key: keyof FormState; label: string; required?: boolean }[] = [
     { key: "location", label: t("jobs.fields.location"), required: true },
     { key: "category", label: t("jobs.fields.category"), required: true },
     { key: "subcategory", label: t("jobs.fields.subcategory") },
@@ -214,18 +213,38 @@ const AdminJobForm = ({ open, onOpenChange, job, onSaved }: Props) => {
         </DialogHeader>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {textFields.map((field) => (
-            <div key={field.key} className={field.key === "title" ? "sm:col-span-2" : ""}>
+          <div className="sm:col-span-2">
+            <Label className="font-body text-xs uppercase tracking-wider text-muted-foreground">
+              {t("jobs.fields.title")} *
+            </Label>
+            <Input
+              value={form.title}
+              onChange={(e) => set("title", e.target.value)}
+              maxLength={120}
+              className="font-body mt-1"
+            />
+          </div>
+          {fields.map((field) => (
+            <div key={field.key}>
               <Label className="font-body text-xs uppercase tracking-wider text-muted-foreground">
                 {field.label}
                 {field.required && " *"}
               </Label>
-              <Input
-                value={form[field.key] as string}
-                onChange={(e) => set(field.key, e.target.value)}
-                maxLength={120}
-                className="font-body mt-1"
-              />
+              <Select
+                value={(form[field.key] as string) || undefined}
+                onValueChange={(v) => set(field.key, v)}
+              >
+                <SelectTrigger className="font-body mt-1">
+                  <SelectValue placeholder={t("jobs.form.selectPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent className="z-[60]">
+                  {OPTIONS[field.key as string].map((opt) => (
+                    <SelectItem key={opt} value={opt} className="font-body">
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           ))}
           <div className="sm:col-span-2">
