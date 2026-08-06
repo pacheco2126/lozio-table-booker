@@ -39,10 +39,12 @@ const JobCard = ({
             <MapPin className="w-4 h-4 shrink-0" />
             {job.location}
           </span>
-          <span className="flex items-center gap-1.5">
-            <Briefcase className="w-4 h-4 shrink-0" />
-            {job.category}
-          </span>
+          {job.work_mode && (
+            <span className="flex items-center gap-1.5">
+              <Briefcase className="w-4 h-4 shrink-0" />
+              {job.work_mode}
+            </span>
+          )}
           {job.work_schedule && (
             <span className="flex items-center gap-1.5">
               <Clock className="w-4 h-4 shrink-0" />

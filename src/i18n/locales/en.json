@@ -722,7 +722,8 @@
       "cancel": "Cancel",
       "requiredError": "Position, location and category are required.",
       "created": "Vacancy created",
-      "updated": "Vacancy updated"
+      "updated": "Vacancy updated",
+      "selectPlaceholder": "Select an option"
     }
   }
 }

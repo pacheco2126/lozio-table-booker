@@ -722,7 +722,8 @@
       "cancel": "Annulla",
       "requiredError": "Posizione, sede e categoria sono obbligatori.",
       "created": "Posizione creata",
-      "updated": "Posizione aggiornata"
+      "updated": "Posizione aggiornata",
+      "selectPlaceholder": "Seleziona un'opzione"
     }
   }
 }

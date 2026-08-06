@@ -741,7 +741,8 @@
       "cancel": "Cancelar",
       "requiredError": "Puesto, ubicación y categoría son obligatorios.",
       "created": "Vacante creada",
-      "updated": "Vacante actualizada"
+      "updated": "Vacante actualizada",
+      "selectPlaceholder": "Selecciona una opción"
     }
   }
 }
