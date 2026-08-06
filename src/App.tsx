@@ -36,6 +36,8 @@ import ReviewPage from "./pages/ReviewPage.tsx";
 import AdminOrders from "./pages/AdminOrders.tsx";
 import MyOrders from "./pages/MyOrders.tsx";
 import Unsubscribe from "./pages/Unsubscribe.tsx";
+import Empleo from "./pages/Empleo.tsx";
+import EmpleoDetail from "./pages/EmpleoDetail.tsx";
 
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
