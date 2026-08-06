@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Briefcase, MapPin, Plus, Clock, Pencil } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
