@@ -14,7 +14,68 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
+
+const OPTIONS: Record<string, string[]> = {
+  location: ["Tarragona", "Arrabassada", "El Rincón"],
+  category: [
+    "Turismo y restauración",
+    "Atención al cliente",
+    "Comercial y ventas",
+    "Administración y oficina",
+    "Logística y almacén",
+    "Limpieza y mantenimiento",
+  ],
+  subcategory: [
+    "Restauración",
+    "Cocina",
+    "Sala y barra",
+    "Reparto a domicilio",
+    "Hoteles y alojamiento",
+    "Atención telefónica",
+  ],
+  sector: [
+    "Hostelería y restaurantes",
+    "Alimentación y bebidas",
+    "Comercio y retail",
+    "Transporte y reparto",
+    "Servicios a empresas",
+  ],
+  work_schedule: [
+    "Completa",
+    "Parcial (Mañana)",
+    "Parcial (Tarde)",
+    "Parcial (Noche)",
+    "Fines de semana",
+    "Por horas",
+    "Turnos rotativos",
+  ],
+  work_mode: ["Presencial", "Teletrabajo", "Híbrido"],
+  professional_level: [
+    "Empleado",
+    "Especialista",
+    "Mando intermedio",
+    "Responsable de equipo",
+    "Dirección",
+    "Prácticas / Becario",
+  ],
+  department: [
+    "Cocina",
+    "Sala",
+    "Reparto",
+    "Administración",
+    "Marketing",
+    "Recursos Humanos",
+    "Dirección",
+  ],
+};
 
 export type JobPosting = {
   id: string;
