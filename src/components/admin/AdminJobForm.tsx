@@ -143,8 +143,25 @@ interface Props {
 
 const AdminJobForm = ({ open, onOpenChange, job, onSaved }: Props) => {
   const { t } = useTranslation();
+  const { isAdmin } = useIsAdmin();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!job) return;
+    setDeleting(true);
+    const { error } = await supabase.from("job_postings").delete().eq("id", job.id);
+    setDeleting(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(t("jobs.form.deleted"));
+    onOpenChange(false);
+    onSaved();
+  };
+
 
   useEffect(() => {
     if (!open) return;
