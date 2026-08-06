@@ -437,7 +437,7 @@ export type Database = {
           is_active?: boolean
           location: string
           professional_level?: string | null
-          ref?: never
+          ref?: number
           sector?: string | null
           subcategory?: string | null
           title: string
@@ -454,7 +454,7 @@ export type Database = {
           is_active?: boolean
           location?: string
           professional_level?: string | null
-          ref?: never
+          ref?: number
           sector?: string | null
           subcategory?: string | null
           title?: string
@@ -1139,6 +1139,7 @@ export type Database = {
         }
         Returns: string[]
       }
+      generate_job_ref: { Args: never; Returns: number }
       get_best_assigned_discount: {
         Args: { p_subtotal: number }
         Returns: Json
