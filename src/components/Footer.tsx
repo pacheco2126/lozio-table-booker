@@ -79,6 +79,14 @@ const Footer = () => {
                   {t("footer.careers")}
                 </a>
               </li>
+              <li>
+                <a
+                  href="/faqs"
+                  className="text-background/60 hover:text-primary font-body text-sm transition-colors"
+                >
+                  {t("footer.faqs")}
+                </a>
+              </li>
             </ul>
           </div>
         </div>
