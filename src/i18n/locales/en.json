@@ -141,7 +141,8 @@
     "rinconHours": "Mon–Sat: 8:00–22:00",
     "corporate": "Corporate",
     "ourLocations": "Our Locations",
-    "careers": "Work with us"
+    "careers": "Work with us",
+    "faqs": "FAQs"
   },
   "auth": {
     "loginTitle": "Sign in to your account",
