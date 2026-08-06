@@ -87,7 +87,7 @@ const EmpleoDetail = () => {
               <div className="mt-8 border-t border-border pt-6">
                 <p className="font-body text-sm text-muted-foreground mb-4">{t("jobs.applyText")}</p>
                 <a
-                  href={`mailto:empleo@pizzeriaslozio.com?subject=${encodeURIComponent(`Vacante #${job.ref} - ${job.title}`)}`}
+                  href={`mailto:empleo@pizzeriaslozio.com?subject=${encodeURIComponent(`Vacante - ${job.title}`)}`}
                 >
                   <Button className="font-body font-bold">{t("jobs.apply")}</Button>
                 </a>
