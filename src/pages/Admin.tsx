@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
-import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse, Tag, BookOpen, Bell, Truck } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse, Tag, BookOpen, Bell, Truck, Briefcase } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -457,6 +457,9 @@ const Admin = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveTab("guide")}>
                   <BookOpen className="w-4 h-4 mr-2" /> Guía de uso
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/empleo")}>
+                  <Briefcase className="w-4 h-4 mr-2" /> Trabaja con nosotros
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Análisis</DropdownMenuLabel>
