@@ -278,14 +278,47 @@ const AdminJobForm = ({ open, onOpenChange, job, onSaved }: Props) => {
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="font-body">
-            {t("jobs.form.cancel")}
-          </Button>
-          <Button onClick={handleSubmit} disabled={saving} className="font-body font-bold">
-            {saving ? t("jobs.form.saving") : t("jobs.form.save")}
-          </Button>
+        <DialogFooter className="gap-2 sm:justify-between">
+          {job && isAdmin ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={deleting} className="font-body gap-2">
+                  <Trash2 className="w-4 h-4" />
+                  {deleting ? t("jobs.form.deleting") : t("jobs.form.delete")}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="max-w-[95vw] sm:max-w-md">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-display">
+                    {t("jobs.form.deleteConfirmTitle")}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="font-body">
+                    {t("jobs.form.deleteConfirmDesc")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="font-body">
+                    {t("jobs.form.cancel")}
+                  </AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="font-body font-bold">
+                    {t("jobs.form.delete")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <span />
+          )}
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="font-body">
+              {t("jobs.form.cancel")}
+            </Button>
+            <Button onClick={handleSubmit} disabled={saving} className="font-body font-bold">
+              {saving ? t("jobs.form.saving") : t("jobs.form.save")}
+            </Button>
+          </div>
         </DialogFooter>
+
       </DialogContent>
     </Dialog>
   );
