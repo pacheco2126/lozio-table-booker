@@ -289,7 +289,11 @@ const AdminOrders = () => {
           </Button>
         </div>
 
+        {/* Order intake pause */}
+        <StoreOrderPausePanel store={store!} storeName={location.name} />
+
         {/* Stats strip */}
+
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
             { label: "Hoy", value: orders.filter((o) => isToday(new Date(o.created_at))).length },
