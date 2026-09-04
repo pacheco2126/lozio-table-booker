@@ -15,7 +15,6 @@ import {
   Search,
   BookOpen,
   Pizza,
-  Compass,
   MapPin,
   Bike,
   PauseCircle,
@@ -45,62 +44,6 @@ interface Topic {
 // ─── Content ─────────────────────────────────────────────────────────────────
 
 const TOPICS: Topic[] = [
-  {
-    id: "primeros-pasos",
-    icon: <Compass className="w-5 h-5" />,
-    title: "Primeros pasos (empieza por aquí)",
-    role: "Todos",
-    faqs: [
-      {
-        q: "¿Qué es esta plataforma y para qué sirve?",
-        a: [
-          "Es la web oficial de Pizzería Lo Zio. Sirve para tres cosas: que el cliente reserve mesa, que haga un pedido online (recogida o entrega a domicilio) y que el equipo gestione todo desde el panel de administración.",
-          "Está disponible en 4 idiomas (español, inglés, catalán e italiano) y se detecta el idioma del navegador automáticamente.",
-          "Funciona también como app instalable (PWA): se puede añadir a la pantalla de inicio del móvil.",
-        ],
-      },
-      {
-        q: "¿Qué páginas públicas tiene la web?",
-        a: [
-          "/ — Inicio: vídeo de portada y dos accesos principales: «Reservar mesa» y «Hacer un pedido». Debajo: la carta, la sección de reservas y las reseñas.",
-          "/locales y /locales/{local} — Fichas de los 3 locales (Tarragona, Arrabassada y El Rincón de Lo Zio) con dirección, horarios, teléfono y mapa.",
-          "/pedido — Finalizar el pedido (checkout).",
-          "/pedido-confirmado — Pantalla de confirmación con el seguimiento del estado del pedido.",
-          "/faqs — Preguntas frecuentes para clientes (horarios, entregas, alérgenos…).",
-          "/empleo y /empleo/{id} — «Trabaja con nosotros»: ofertas de empleo publicadas.",
-          "/resenas — Formulario de valoración (1–5 estrellas).",
-          "/auth — Iniciar sesión o registrarse (email, Google o Apple).",
-        ],
-      },
-      {
-        q: "¿Qué páginas tiene la zona privada del cliente?",
-        a: [
-          "/perfil — Datos personales, preferencias, descuentos asignados y ajustes de notificaciones.",
-          "/mis-reservas — Reservas del cliente, con opción de cancelarlas.",
-          "/mis-pedidos — Historial de pedidos y estado en tiempo real.",
-        ],
-      },
-      {
-        q: "¿Qué páginas tiene el panel de administración?",
-        a: [
-          "/admin — Panel principal con pestañas: Reservas, Pedidos, Reportes, Reseñas, Clientes, Media, Roles, Descuentos, Pedido mínimo (km), Productos, Notificaciones y esta Guía.",
-          "/admin/pedidos/tarragona y /admin/pedidos/arrabassada — Pantalla operativa de pedidos de cada local (la que usa el equipo en cocina/barra).",
-          "/admin/inventario — Inventario y lista de la compra.",
-          "En el menú desplegable del panel también hay accesos rápidos a esta Guía y a /empleo.",
-        ],
-      },
-      {
-        q: "Soy nuevo en el equipo, ¿qué debo saber el primer día?",
-        a: [
-          "1. Pide que te asignen tu rol (pizzeriaTarragona, pizzeriaArrabassada, pizzeriaRincon…). Sin rol no verás nada del panel.",
-          "2. Inicia sesión en la web y activa las notificaciones cuando el navegador te lo pida: así te avisará al entrar un pedido.",
-          "3. Abre /admin/pedidos/{tu local} y déjalo abierto durante el servicio. Los pedidos nuevos suenan y aparecen en una ventana flotante.",
-          "4. Aprende los estados del pedido: Pendiente → Confirmado → Preparando → Listo/En camino → Entregado.",
-          "5. Si el local no puede atender más pedidos, usa el panel «Pausar pedidos» (1 hora / todo el día / indefinido) en lugar de rechazarlos uno a uno.",
-        ],
-      },
-    ],
-  },
   {
     id: "reservas",
     icon: <CalendarDays className="w-5 h-5" />,
