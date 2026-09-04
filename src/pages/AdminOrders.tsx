@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { format, isToday } from "date-fns";
 import { es } from "date-fns/locale";
 import Navbar from "@/components/Navbar";
+import StoreOrderPausePanel from "@/components/admin/StoreOrderPausePanel";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
