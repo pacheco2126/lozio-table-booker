@@ -18,6 +18,8 @@ import UpdateBanner from "@/components/UpdateBanner";
 import AdminFAB from "@/components/AdminFAB";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 import IncomingOrderManager from "@/components/IncomingOrderManager";
+import { initStorePauses } from "@/lib/storePause";
+
 import AdminInventoryPage from "./pages/AdminInventoryPage.tsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
