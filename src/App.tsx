@@ -50,6 +50,11 @@ const AdminNotificationListener = () => {
   return null;
 };
 
+const StorePauseSync = () => {
+  useEffect(() => initStorePauses(), []);
+  return null;
+};
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -57,6 +62,7 @@ const ScrollToTop = () => {
   }, [pathname]);
   return null;
 };
+
 
 const App = () => (
   <HelmetProvider>
