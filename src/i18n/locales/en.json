@@ -393,6 +393,24 @@
       "todayReservations": "Today's reservations",
       "floorPlan": "Floor plan",
       "reports": "Reports"
+    },
+    "pauseOrders": {
+      "title": "Receiving orders",
+      "titlePaused": "Not receiving orders",
+      "description": "You can temporarily pause incoming orders for this location.",
+      "descriptionPaused": "The location appears closed (no pickup or assigned delivery).",
+      "pauseUntil": "Paused until {{time}}",
+      "indefinite": "Paused indefinitely",
+      "toggleLabel": "Pause orders",
+      "option1h": "For 1 hour",
+      "option1hHint": "Reactivates automatically",
+      "optionToday": "All day",
+      "optionTodayHint": "Until closing time",
+      "optionIndefinite": "Indefinite",
+      "optionIndefiniteHint": "Until you reactivate manually",
+      "resumeSuccess": "{{storeName}} is receiving orders again",
+      "pauseSuccess": "{{storeName}} has stopped receiving orders",
+      "error": "Could not update the location status"
     }
   },
   "customers": {
