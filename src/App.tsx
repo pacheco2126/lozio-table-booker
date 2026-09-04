@@ -76,6 +76,8 @@ const App = () => (
           <Toaster />
           <Sonner position="top-center" />
           <AdminNotificationListener />
+          <StorePauseSync />
+
           <BrowserRouter>
             <ScrollToTop />
             <InstallBanner />
