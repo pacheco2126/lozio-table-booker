@@ -234,8 +234,9 @@ const TOPICS: Topic[] = [
           "Los pedidos nuevos aparecen automáticamente en una ventana flotante con sonido de alerta.",
           "Al iniciar sesión o abrir la pantalla, el sistema también busca los pedidos que quedaron en estado «Pendiente» y los muestra: ninguno se pierde por cerrar la pestaña.",
           "Confirma el pedido (introduce el tiempo estimado en minutos) o recházalo indicando un motivo.",
-          "Si un local no puede atender el pedido, puede transferirlo al otro local con el botón «Transferir».",
+          "Si un local no puede atender el pedido, puede transferirlo al otro local con el botón «Transferir». El local que lo recibe ve un aviso «transferido desde …» en la ficha del pedido, y en el local de origen el pedido desaparece de la cola automáticamente.",
           "La ventana muestra los pedidos en cola uno a uno.",
+
         ],
       },
       {
