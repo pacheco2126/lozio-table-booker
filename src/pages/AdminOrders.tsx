@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { format, isToday } from "date-fns";
 import { es } from "date-fns/locale";
 import Navbar from "@/components/Navbar";
+import StoreOrderPausePanel from "@/components/admin/StoreOrderPausePanel";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -289,7 +291,11 @@ const AdminOrders = () => {
           </Button>
         </div>
 
+        {/* Order intake pause */}
+        <StoreOrderPausePanel store={store!} storeName={location.name} />
+
         {/* Stats strip */}
+
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
             { label: "Hoy", value: orders.filter((o) => isToday(new Date(o.created_at))).length },

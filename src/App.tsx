@@ -18,6 +18,8 @@ import UpdateBanner from "@/components/UpdateBanner";
 import AdminFAB from "@/components/AdminFAB";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 import IncomingOrderManager from "@/components/IncomingOrderManager";
+import { initStorePauses } from "@/lib/storePause";
+
 import AdminInventoryPage from "./pages/AdminInventoryPage.tsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -50,6 +52,11 @@ const AdminNotificationListener = () => {
   return null;
 };
 
+const StorePauseSync = () => {
+  useEffect(() => initStorePauses(), []);
+  return null;
+};
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -57,6 +64,7 @@ const ScrollToTop = () => {
   }, [pathname]);
   return null;
 };
+
 
 const App = () => (
   <HelmetProvider>
@@ -68,6 +76,8 @@ const App = () => (
           <Toaster />
           <Sonner position="top-center" />
           <AdminNotificationListener />
+          <StorePauseSync />
+
           <BrowserRouter>
             <ScrollToTop />
             <InstallBanner />
