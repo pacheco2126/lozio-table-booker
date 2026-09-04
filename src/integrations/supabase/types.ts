@@ -969,6 +969,8 @@ export type Database = {
           created_at: string
           is_active: boolean
           name: string
+          orders_paused: boolean
+          orders_paused_until: string | null
           slug: string
           sort_order: number
           updated_at: string
@@ -979,6 +981,8 @@ export type Database = {
           created_at?: string
           is_active?: boolean
           name: string
+          orders_paused?: boolean
+          orders_paused_until?: string | null
           slug: string
           sort_order?: number
           updated_at?: string
@@ -989,6 +993,8 @@ export type Database = {
           created_at?: string
           is_active?: boolean
           name?: string
+          orders_paused?: boolean
+          orders_paused_until?: string | null
           slug?: string
           sort_order?: number
           updated_at?: string
