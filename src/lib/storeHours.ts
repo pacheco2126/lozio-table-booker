@@ -4,6 +4,7 @@
  * Lo Zio Tarragona:   19:00–23:30, closed Tuesdays  (getDay() === 2)
  * Lo Zio Arrabassada: 19:00–23:30, closed Mondays   (getDay() === 1)
  */
+import { isStorePaused } from "@/lib/storePause";
 
 const OPEN_HOUR = 19;
 const OPEN_MINUTE = 0;
@@ -18,6 +19,9 @@ const CLOSED_DAY: Record<string, number> = {
 
 /** Returns true if the store is open on the given Date */
 export function isStoreOpen(store: string, at: Date = new Date()): boolean {
+  // Admin pause ("dejar de recibir pedidos") acts exactly like being closed
+  if (isStorePaused(store, at)) return false;
+
   const day = at.getDay();
   if (day === CLOSED_DAY[store]) return false;
 
@@ -27,6 +31,7 @@ export function isStoreOpen(store: string, at: Date = new Date()): boolean {
 
   return totalMinutes >= openMinutes && totalMinutes < closeMinutes;
 }
+
 
 /** Returns the open stores at a given time */
 export function openStores(at: Date = new Date()): Array<"tarragona" | "arrabassada"> {
