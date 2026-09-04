@@ -89,13 +89,15 @@ const TOPICS: Topic[] = [
       {
         q: "¿Cuáles son los horarios y limitaciones del sistema de reservas?",
         a: [
-          "Horarios disponibles: 19:00, 19:30, 20:00, 20:30, 21:00, 21:30, 22:00.",
+          "Horarios disponibles para el cliente: 19:00, 19:30, 20:00, 20:30, 21:00, 21:30, 22:00. En la reserva manual del admin hay además 22:30 y 23:00.",
           "Cada reserva ocupa la mesa una ventana de 90 minutos.",
           "Máximo por grupo: limitado por las mesas activas del local.",
-          "Para grupos de más de 6 personas el sistema puede combinar varias mesas y añade una nota del tipo [Grupo 4p: Mesa1 + Mesa2].",
+          "Para grupos de más de 6 personas el sistema puede combinar varias mesas (solo M1–M8 activas) y añade una nota del tipo [Grupo 4p: Mesa1 + Mesa2]. Si la suma de capacidades no llega al total de comensales, no se crea la reserva (no hay combinación parcial).",
           "La asignación automática usa las mesas M1–M8; las mesas M9 y superiores son comodines de uso manual.",
-          "Existe un control anti-duplicados: el mismo teléfono no puede reservar dos veces la misma franja.",
+          "NO existe control anti-duplicados: el mismo teléfono puede reservar la misma franja varias veces. El único freno es la disponibilidad de mesas.",
+          "En horas punta la asignación se serializa con un bloqueo por local y día para evitar dobles reservas, por lo que la confirmación puede tardar un instante.",
           "Las reservas se crean con estado «Confirmada» cuando el sistema asigna mesa automáticamente.",
+
         ],
       },
       {
