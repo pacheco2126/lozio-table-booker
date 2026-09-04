@@ -299,9 +299,10 @@ const TOPICS: Topic[] = [
         q: "¿Cómo cambio los tramos y los importes?",
         a: [
           "Admin → pestaña «Pedido mínimo (km)».",
-          "Selecciona el local arriba (Tarragona, Arrabassada o El Rincón): cada local tiene sus propios tramos.",
+          "Selecciona el local arriba: cada local tiene sus propios tramos. Importante: hoy solo se reparte a domicilio desde Tarragona y Arrabassada, así que los tramos de El Rincón se pueden editar pero no se aplican a ningún pedido.",
           "Edita los km máximos y el importe mínimo de cada tramo, añade o elimina tramos y guarda.",
           "Los km deben ser mayores que 0 y los importes no pueden ser negativos.",
+
         ],
       },
       {
