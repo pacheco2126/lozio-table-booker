@@ -393,6 +393,24 @@
       "todayReservations": "Reserves d'avui",
       "floorPlan": "Plànol del saló",
       "reports": "Informes"
+    },
+    "pauseOrders": {
+      "title": "Rebent comandes",
+      "titlePaused": "No es reben comandes",
+      "description": "Pots pausar temporalment l'entrada de comandes en aquest local.",
+      "descriptionPaused": "El local apareix com a tancat (sense recollida ni repartiment assignat).",
+      "pauseUntil": "Pausat fins a les {{time}}",
+      "indefinite": "Pausa indefinida",
+      "toggleLabel": "Pausar comandes",
+      "option1h": "Durant 1 hora",
+      "option1hHint": "Es reactiva automàticament",
+      "optionToday": "Tot el dia",
+      "optionTodayHint": "Fins al tancament del local",
+      "optionIndefinite": "Indefinit",
+      "optionIndefiniteHint": "Fins que ho reactivis manualment",
+      "resumeSuccess": "{{storeName}} torna a rebre comandes",
+      "pauseSuccess": "{{storeName}} ha deixat de rebre comandes",
+      "error": "No s'ha pogut actualitzar l'estat del local"
     }
   },
   "customers": {

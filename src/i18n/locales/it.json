@@ -393,6 +393,24 @@
       "todayReservations": "Prenotazioni di oggi",
       "floorPlan": "Planimetria",
       "reports": "Report"
+    },
+    "pauseOrders": {
+      "title": "Ricezione ordini",
+      "titlePaused": "Non si ricevono ordini",
+      "description": "Puoi sospendere temporaneamente l'arrivo degli ordini per questo locale.",
+      "descriptionPaused": "Il locale appare chiuso (nessun ritiro o consegna assegnata).",
+      "pauseUntil": "In pausa fino alle {{time}}",
+      "indefinite": "Pausa indefinita",
+      "toggleLabel": "Sospendi ordini",
+      "option1h": "Per 1 ora",
+      "option1hHint": "Si riattiva automaticamente",
+      "optionToday": "Tutto il giorno",
+      "optionTodayHint": "Fino alla chiusura del locale",
+      "optionIndefinite": "Indefinito",
+      "optionIndefiniteHint": "Fino a riattivazione manuale",
+      "resumeSuccess": "{{storeName}} riceve di nuovo ordini",
+      "pauseSuccess": "{{storeName}} ha smesso di ricevere ordini",
+      "error": "Impossibile aggiornare lo stato del locale"
     }
   },
   "customers": {

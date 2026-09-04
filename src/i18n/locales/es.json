@@ -412,6 +412,24 @@
       "todayReservations": "Reservas de hoy",
       "floorPlan": "Plano del salón",
       "reports": "Reportes"
+    },
+    "pauseOrders": {
+      "title": "Recibiendo pedidos",
+      "titlePaused": "No se están recibiendo pedidos",
+      "description": "Puedes pausar temporalmente la entrada de pedidos en este local.",
+      "descriptionPaused": "El local aparece como cerrado (sin recogida ni reparto asignado).",
+      "pauseUntil": "Pausado hasta las {{time}}",
+      "indefinite": "Pausa indefinida",
+      "toggleLabel": "Pausar pedidos",
+      "option1h": "Durante 1 hora",
+      "option1hHint": "Se reactiva automáticamente",
+      "optionToday": "Todo el día",
+      "optionTodayHint": "Hasta el cierre del local",
+      "optionIndefinite": "Indefinido",
+      "optionIndefiniteHint": "Hasta que lo reactives manualmente",
+      "resumeSuccess": "{{storeName}} vuelve a recibir pedidos",
+      "pauseSuccess": "{{storeName}} ha dejado de recibir pedidos",
+      "error": "No se pudo actualizar el estado del local"
     }
   },
   "customers": {
