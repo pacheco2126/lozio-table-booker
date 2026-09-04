@@ -124,7 +124,7 @@ const TOPICS: Topic[] = [
         a: [
           "Actualmente el cliente recibe notificación push en su dispositivo cuando hace una reserva online y cuando se acerca la hora (recordatorio automático unos 30 min antes).",
           "El recordatorio se envía mediante una tarea programada, siempre que el cliente tenga sesión iniciada y las notificaciones activadas.",
-          "El teléfono sigue siendo obligatorio porque en el futuro se usará para WhatsApp; de momento no se envían mensajes de WhatsApp ni emails de reserva.",
+          "No se envían emails de reserva.",
         ],
       },
     ],
@@ -198,7 +198,7 @@ const TOPICS: Topic[] = [
           "Flujo estándar: Pendiente → Confirmado → Preparando → Listo/En camino → Entregado.",
           "Pulsa el botón principal del pedido para avanzar al siguiente estado.",
           "Para saltar a cualquier otro estado (incluyendo Cancelado), usa el menú desplegable (⋮) del pedido.",
-          "Cada cambio de estado notifica al cliente por notificación push (WhatsApp no está activo por ahora).",
+          "Cada cambio de estado notifica al cliente por notificación push.",
         ],
       },
       {
@@ -536,7 +536,7 @@ const TOPICS: Topic[] = [
       {
         q: "¿Qué recibe el cliente?",
         a: [
-          "Reservas: notificación push de confirmación y recordatorio (no WhatsApp ni email por ahora).",
+          "Reservas: notificación push de confirmación y recordatorio.",
           "Pedidos: notificación push y aviso de cada cambio de estado; puede seguir el pedido en /mis-pedidos.",
           "El cliente gestiona sus propias notificaciones desde /perfil.",
         ],
