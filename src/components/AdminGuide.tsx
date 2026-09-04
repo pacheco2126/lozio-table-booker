@@ -89,13 +89,15 @@ const TOPICS: Topic[] = [
       {
         q: "¿Cuáles son los horarios y limitaciones del sistema de reservas?",
         a: [
-          "Horarios disponibles: 19:00, 19:30, 20:00, 20:30, 21:00, 21:30, 22:00.",
+          "Horarios disponibles para el cliente: 19:00, 19:30, 20:00, 20:30, 21:00, 21:30, 22:00. En la reserva manual del admin hay además 22:30 y 23:00.",
           "Cada reserva ocupa la mesa una ventana de 90 minutos.",
           "Máximo por grupo: limitado por las mesas activas del local.",
-          "Para grupos de más de 6 personas el sistema puede combinar varias mesas y añade una nota del tipo [Grupo 4p: Mesa1 + Mesa2].",
+          "Para grupos de más de 6 personas el sistema puede combinar varias mesas (solo M1–M8 activas) y añade una nota del tipo [Grupo 4p: Mesa1 + Mesa2]. Si la suma de capacidades no llega al total de comensales, no se crea la reserva (no hay combinación parcial).",
           "La asignación automática usa las mesas M1–M8; las mesas M9 y superiores son comodines de uso manual.",
-          "Existe un control anti-duplicados: el mismo teléfono no puede reservar dos veces la misma franja.",
+          "NO existe control anti-duplicados: el mismo teléfono puede reservar la misma franja varias veces. El único freno es la disponibilidad de mesas.",
+          "En horas punta la asignación se serializa con un bloqueo por local y día para evitar dobles reservas, por lo que la confirmación puede tardar un instante.",
           "Las reservas se crean con estado «Confirmada» cuando el sistema asigna mesa automáticamente.",
+
         ],
       },
       {
@@ -122,9 +124,11 @@ const TOPICS: Topic[] = [
       {
         q: "¿El cliente recibe aviso de su reserva?",
         a: [
-          "Actualmente el cliente recibe notificación push en su dispositivo cuando hace una reserva online y cuando se acerca la hora (recordatorio automático unos 30 min antes).",
-          "El recordatorio se envía mediante una tarea programada, siempre que el cliente tenga sesión iniciada y las notificaciones activadas.",
+          "El cliente recibe notificación push cuando hace una reserva online y un recordatorio automático cuando faltan entre 20 y 35 minutos para su hora.",
+          "El recordatorio solo se envía a reservas hechas con cuenta de usuario: las reservas de invitado o creadas manualmente por el admin no reciben recordatorio.",
+          "Si el cliente ha desactivado los avisos de reservas en su perfil, no se le envía nada.",
           "No se envían emails de reserva.",
+
         ],
       },
     ],
@@ -230,8 +234,9 @@ const TOPICS: Topic[] = [
           "Los pedidos nuevos aparecen automáticamente en una ventana flotante con sonido de alerta.",
           "Al iniciar sesión o abrir la pantalla, el sistema también busca los pedidos que quedaron en estado «Pendiente» y los muestra: ninguno se pierde por cerrar la pestaña.",
           "Confirma el pedido (introduce el tiempo estimado en minutos) o recházalo indicando un motivo.",
-          "Si un local no puede atender el pedido, puede transferirlo al otro local con el botón «Transferir».",
+          "Si un local no puede atender el pedido, puede transferirlo al otro local con el botón «Transferir». El local que lo recibe ve un aviso «transferido desde …» en la ficha del pedido, y en el local de origen el pedido desaparece de la cola automáticamente.",
           "La ventana muestra los pedidos en cola uno a uno.",
+
         ],
       },
       {
@@ -294,9 +299,10 @@ const TOPICS: Topic[] = [
         q: "¿Cómo cambio los tramos y los importes?",
         a: [
           "Admin → pestaña «Pedido mínimo (km)».",
-          "Selecciona el local arriba (Tarragona, Arrabassada o El Rincón): cada local tiene sus propios tramos.",
+          "Selecciona el local arriba: cada local tiene sus propios tramos. Importante: hoy solo se reparte a domicilio desde Tarragona y Arrabassada, así que los tramos de El Rincón se pueden editar pero no se aplican a ningún pedido.",
           "Edita los km máximos y el importe mínimo de cada tramo, añade o elimina tramos y guarda.",
           "Los km deben ser mayores que 0 y los importes no pueden ser negativos.",
+
         ],
       },
       {
