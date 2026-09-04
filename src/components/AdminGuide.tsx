@@ -124,9 +124,11 @@ const TOPICS: Topic[] = [
       {
         q: "¿El cliente recibe aviso de su reserva?",
         a: [
-          "Actualmente el cliente recibe notificación push en su dispositivo cuando hace una reserva online y cuando se acerca la hora (recordatorio automático unos 30 min antes).",
-          "El recordatorio se envía mediante una tarea programada, siempre que el cliente tenga sesión iniciada y las notificaciones activadas.",
+          "El cliente recibe notificación push cuando hace una reserva online y un recordatorio automático cuando faltan entre 20 y 35 minutos para su hora.",
+          "El recordatorio solo se envía a reservas hechas con cuenta de usuario: las reservas de invitado o creadas manualmente por el admin no reciben recordatorio.",
+          "Si el cliente ha desactivado los avisos de reservas en su perfil, no se le envía nada.",
           "No se envían emails de reserva.",
+
         ],
       },
     ],
