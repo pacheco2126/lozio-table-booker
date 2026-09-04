@@ -198,7 +198,7 @@ const TOPICS: Topic[] = [
           "Flujo estándar: Pendiente → Confirmado → Preparando → Listo/En camino → Entregado.",
           "Pulsa el botón principal del pedido para avanzar al siguiente estado.",
           "Para saltar a cualquier otro estado (incluyendo Cancelado), usa el menú desplegable (⋮) del pedido.",
-          "Cada cambio de estado notifica al cliente (notificación push y aviso por WhatsApp).",
+          "Cada cambio de estado notifica al cliente por notificación push (WhatsApp no está activo por ahora).",
         ],
       },
       {
