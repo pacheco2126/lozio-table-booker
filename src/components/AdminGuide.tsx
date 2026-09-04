@@ -122,9 +122,9 @@ const TOPICS: Topic[] = [
       {
         q: "¿El cliente recibe aviso de su reserva?",
         a: [
-          "Sí. Las confirmaciones y recordatorios de reserva se envían por WhatsApp, no por email.",
-          "El recordatorio se envía automáticamente antes del servicio mediante una tarea programada.",
-          "Por eso el teléfono es un campo obligatorio: si está mal escrito, el cliente no recibe nada.",
+          "Actualmente el cliente recibe notificación push en su dispositivo cuando hace una reserva online y cuando se acerca la hora (recordatorio automático unos 30 min antes).",
+          "El recordatorio se envía mediante una tarea programada, siempre que el cliente tenga sesión iniciada y las notificaciones activadas.",
+          "El teléfono sigue siendo obligatorio porque en el futuro se usará para WhatsApp; de momento no se envían mensajes de WhatsApp ni emails de reserva.",
         ],
       },
     ],
@@ -536,7 +536,7 @@ const TOPICS: Topic[] = [
       {
         q: "¿Qué recibe el cliente?",
         a: [
-          "Reservas: confirmación y recordatorio por WhatsApp (nunca por email).",
+          "Reservas: notificación push de confirmación y recordatorio (no WhatsApp ni email por ahora).",
           "Pedidos: notificación push y aviso de cada cambio de estado; puede seguir el pedido en /mis-pedidos.",
           "El cliente gestiona sus propias notificaciones desde /perfil.",
         ],
