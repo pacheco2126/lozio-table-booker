@@ -5,6 +5,7 @@ import { format, addMinutes, parse } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
 import { CalendarIcon, ChevronLeft, ChevronRight, Phone, Users, Clock, MessageSquare, AlertTriangle, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -48,12 +49,12 @@ const FloorPlan = () => {
   const dateStr = format(selectedDate, "yyyy-MM-dd");
 
   const fetchTables = useCallback(async () => {
-    const { data } = await supabase.from("tables").select("*").eq("location", floorLocation).eq("is_active", true);
+    const { data } = await fetchAllResult((from, to) => supabase.from("tables").select("*").eq("location", floorLocation).eq("is_active", true).order("id").range(from, to));
     if (data) setTables(data as Table[]);
   }, [floorLocation]);
 
   const fetchReservations = useCallback(async () => {
-    const { data } = await supabase.from("reservations").select("*").eq("reservation_date", dateStr).eq("location", floorLocation).in("status", ["pending", "confirmed"]);
+    const { data } = await fetchAllResult((from, to) => supabase.from("reservations").select("*").eq("reservation_date", dateStr).eq("location", floorLocation).in("status", ["pending", "confirmed"]).order("id").range(from, to));
     if (data) setReservations(data as Reservation[]);
   }, [dateStr, floorLocation]);
 
