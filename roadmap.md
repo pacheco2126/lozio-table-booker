@@ -7,6 +7,6 @@
 - [x] Identificar catálogo: `menu_items` (85 productos actualmente).
 
 ## Revisión global
-- [ ] Revisar todas las lecturas de tablas y listas devueltas por funciones.
-- [ ] Corregir listas completas sin paginar, conservando los límites intencionados.
+- [x] Revisar todas las lecturas de tablas y listas devueltas por funciones.
+- [x] Corregir informes, clientes, reservas del cliente/plano, catálogo, disponibilidad, ingredientes, inventario, medios, empleo, usuarios, mínimos y avisos push; conservar historiales limitados y colas acotadas.
 - [ ] Ejecutar pruebas y contrastar informes con el total real de reservas.
