@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchOrderItems } from "@/lib/orderQueries";
 import { toast } from "sonner";
 import { usePushSubscription } from "@/hooks/usePushSubscription";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,17 +77,18 @@ const OrderConfirmation = () => {
         return;
       }
 
-      const { data: itemsData } = await supabase
-        .from("order_items")
-        .select("*")
-        .eq("order_id", orderId);
+      const itemsData = await fetchOrderItems(orderId);
 
       setOrder(orderData as Order);
-      setItems((itemsData as OrderItem[]) || []);
+      setItems(itemsData);
       setLoading(false);
     };
 
-    fetchOrder();
+    fetchOrder().catch(() => {
+      toast.error(t("checkout.error"));
+      setNotFound(true);
+      setLoading(false);
+    });
   }, [orderId]);
 
   // Auto-prompt to enable push notifications — PWA (standalone) only

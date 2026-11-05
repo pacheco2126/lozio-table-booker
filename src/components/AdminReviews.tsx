@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/pagination";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Star, MessageSquareHeart, Filter } from "lucide-react";
@@ -34,16 +35,17 @@ const AdminReviews = () => {
   }, []);
 
   const fetchReviews = async () => {
-    const { data, error } = await supabase
-      .from("reviews")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) {
+    try {
+      const data = await fetchAllRows((from, to) => supabase
+        .from("reviews").select("*")
+        .order("created_at", { ascending: false }).order("id")
+        .range(from, to));
+      setReviews(data);
+    } catch {
       toast.error("Error al cargar las reseñas");
-    } else {
-      setReviews((data as Review[]) || []);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const filtered = useMemo(() => {
