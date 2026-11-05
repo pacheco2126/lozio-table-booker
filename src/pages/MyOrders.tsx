@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchOrdersWithItems } from "@/lib/orderQueries";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import OrderStatusAnimation from "@/components/OrderStatusAnimation";
@@ -130,15 +131,17 @@ const MyOrders = () => {
   const fetchOrders = async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*, order_items(*)")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) toast.error("Error al cargar los pedidos");
-    else setOrders((data as Order[]) || []);
-    setLoading(false);
+    try {
+      const data = await fetchOrdersWithItems((from, to) => supabase
+        .from("orders").select("*").eq("user_id", user.id)
+        .order("created_at", { ascending: false }).order("id")
+        .range(from, to));
+      setOrders(data);
+    } catch {
+      toast.error("Error al cargar los pedidos");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggle = (id: string) => {

@@ -10,6 +10,7 @@
 // max(created_at, next_store_opening) per pickup_store/assigned_to here.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { fetchAllRows } from '../_shared/pagination.ts';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -33,14 +34,17 @@ Deno.serve(async (req) => {
   // cancel when now() - effective_time > 3 hours
   const cutoff = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
 
-  const { data: stale, error: selErr } = await supabase
-    .from('orders')
-    .select('id, scheduled_for, created_at, payment_method, payment_status, stripe_payment_intent_id')
-    .eq('status', 'pending');
-
-  if (selErr) {
+  // Finish paging before updates change the pending result set.
+  let stale: { id: string; scheduled_for: string | null; created_at: string;
+    payment_method: string; payment_status: string; stripe_payment_intent_id: string | null }[];
+  try {
+    stale = await fetchAllRows((from, to) => supabase
+      .from('orders')
+      .select('id, scheduled_for, created_at, payment_method, payment_status, stripe_payment_intent_id')
+      .eq('status', 'pending').order('id').range(from, to));
+  } catch (selErr) {
     console.error('select error', selErr);
-    return new Response(JSON.stringify({ error: selErr.message }), {
+    return new Response(JSON.stringify({ error: 'Failed to load pending orders' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

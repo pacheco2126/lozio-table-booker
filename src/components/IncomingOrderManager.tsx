@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Bell, Truck, Store, Phone, User, Minus, Plus, Check, Repeat, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/pagination";
+import { fetchOrderItems } from "@/lib/orderQueries";
 import { telHref } from "@/lib/validators";
 import { usePizzeriaRole, type PizzeriaSlug } from "@/hooks/usePizzeriaRole";
 import { useDoorbellAlarm } from "@/hooks/useDoorbellAlarm";
@@ -84,13 +86,10 @@ const IncomingOrderManager = () => {
     // Load any pending orders already assigned to this pizzeria (covers the
     // case where the user just signed in and missed the realtime INSERT).
     (async () => {
-      const { data } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("assigned_to", pizzeria)
-        .eq("status", "pending")
-        .order("created_at", { ascending: true });
-      const rows = (data as IncomingOrder[]) ?? [];
+      const rows = await fetchAllRows((from, to) => supabase
+        .from("orders").select("*").eq("assigned_to", pizzeria)
+        .eq("status", "pending").order("created_at", { ascending: true })
+        .order("id").range(from, to));
       if (rows.length === 0) return;
       setQueue((q) => {
         const merged = [...q];
@@ -101,7 +100,7 @@ const IncomingOrderManager = () => {
         }
         return merged;
       });
-    })();
+    })().catch(() => toast.error(t("incomingOrder.actionError")));
 
 
 
@@ -173,12 +172,11 @@ const IncomingOrderManager = () => {
 
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from("order_items")
-        .select("*")
-        .eq("order_id", current.id);
-      if (!cancelled) setItems((data as OrderItem[]) ?? []);
-    })();
+      const data = await fetchOrderItems(current.id);
+      if (!cancelled) setItems(data);
+    })().catch(() => {
+      if (!cancelled) toast.error(t("incomingOrder.actionError"));
+    });
 
     return () => {
       cancelled = true;

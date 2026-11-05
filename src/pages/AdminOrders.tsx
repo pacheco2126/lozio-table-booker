@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchOrdersWithItems } from "@/lib/orderQueries";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { locationsData } from "@/lib/locations";
@@ -125,18 +126,17 @@ const AdminOrders = () => {
   const fetchOrders = useCallback(async () => {
     if (!store) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*, order_items(*)")
-      .eq("pickup_store", store)
-      .order("created_at", { ascending: false });
-
-    if (error) {
+    try {
+      const data = await fetchOrdersWithItems((from, to) => supabase
+        .from("orders").select("*").eq("pickup_store", store)
+        .order("created_at", { ascending: false }).order("id")
+        .range(from, to));
+      setOrders(data);
+    } catch {
       toast.error("Error al cargar los pedidos");
-    } else {
-      setOrders((data as Order[]) || []);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [store]);
 
   useEffect(() => {
@@ -165,7 +165,7 @@ const AdminOrders = () => {
     }
   }, [isAdmin, store, fetchOrders]);
 
-  if (!location) {
+  if (!location || !store) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Local no encontrado</p>
@@ -292,7 +292,7 @@ const AdminOrders = () => {
         </div>
 
         {/* Order intake pause */}
-        <StoreOrderPausePanel store={store!} storeName={location.name} />
+        <StoreOrderPausePanel store={store} storeName={location.name} />
 
         {/* Stats strip */}
 
