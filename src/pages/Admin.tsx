@@ -125,8 +125,21 @@ const Admin = () => {
   };
 
   const fetchReservations = async () => {
-    const { data, error } = await supabase.from("reservations").select("*").order("reservation_date", { ascending: true }).order("reservation_time", { ascending: true });
-    if (error) { toast.error(t("admin.loadError")); } else { setReservations((data as Reservation[]) || []); }
+    // Paginate: the API caps each response at 1000 rows, which hid the newest reservations.
+    const PAGE = 1000;
+    const all: Reservation[] = [];
+    let error: any = null;
+    for (let from = 0; ; from += PAGE) {
+      const res = await supabase.from("reservations").select("*")
+        .order("reservation_date", { ascending: true })
+        .order("reservation_time", { ascending: true })
+        .order("id", { ascending: true })
+        .range(from, from + PAGE - 1);
+      if (res.error) { error = res.error; break; }
+      all.push(...((res.data as Reservation[]) || []));
+      if (!res.data || res.data.length < PAGE) break;
+    }
+    if (error) { toast.error(t("admin.loadError")); } else { setReservations(all); }
     setLoading(false);
   };
 
