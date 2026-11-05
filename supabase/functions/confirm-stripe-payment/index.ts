@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { fetchAllRows } from "../_shared/pagination.ts";
 
 // Verifies a Stripe payment with the Stripe API (source of truth) and marks
 // the order paid via service role. Authorization: caller must own the order
@@ -109,8 +110,9 @@ serve(async (req) => {
         throw new Error("Failed to mark order as paid");
       }
 
-      const { data: items } = await supabase
-        .from("order_items").select("*").eq("order_id", orderId);
+      const items = await fetchAllRows((from, to) => supabase
+        .from("order_items").select("*").eq("order_id", orderId)
+        .order("id").range(from, to));
 
       return new Response(
         JSON.stringify({ success: true, order: updated, items: items ?? [] }),
