@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/pagination";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -71,11 +72,8 @@ const Empleo = () => {
   const { data: jobs = [], isLoading, refetch } = useQuery({
     queryKey: ["job-postings", isAdmin],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("job_postings")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
+      const data = await fetchAllRows((from, to) => supabase.from("job_postings")
+        .select("*").order("created_at", { ascending: false }).order("id").range(from, to));
       return data as JobPosting[];
     },
   });

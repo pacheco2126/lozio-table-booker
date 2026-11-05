@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -119,14 +120,19 @@ const AdminProducts = () => {
   const fetchAll = async () => {
     setLoading(true);
     const [productsRes, storesRes, availRes, invRes, linkRes] = await Promise.all([
-      supabase.from("menu_items").select("*").order("category").order("sort_order"),
-      supabase.from("stores").select("slug,name,accepts_delivery,accepts_pickup").eq("is_active", true).order("sort_order"),
-      supabase.from("menu_item_store_availability").select("menu_item_id,store_slug,is_available,unavailable_until"),
-      supabase.from("inventory_items").select("id,name,category,is_active").eq("is_active", true).order("category").order("name"),
-      supabase.from("menu_item_ingredients").select("menu_item_id,inventory_item_id"),
+      fetchAllResult((from, to) => supabase.from("menu_items").select("*").order("category").order("sort_order").order("id").range(from, to)),
+      fetchAllResult((from, to) => supabase.from("stores").select("slug,name,accepts_delivery,accepts_pickup").eq("is_active", true).order("sort_order").order("slug").range(from, to)),
+      fetchAllResult((from, to) => supabase.from("menu_item_store_availability").select("menu_item_id,store_slug,is_available,unavailable_until").order("id").range(from, to)),
+      fetchAllResult((from, to) => supabase.from("inventory_items").select("id,name,category,is_active").eq("is_active", true).order("category").order("name").order("id").range(from, to)),
+      fetchAllResult((from, to) => supabase.from("menu_item_ingredients").select("menu_item_id,inventory_item_id").order("id").range(from, to)),
     ]);
     if (productsRes.error) toast.error("Error al cargar productos");
     if (storesRes.error) toast.error("Error al cargar locales");
+    if (availRes.error || invRes.error || linkRes.error) {
+      toast.error("Error al cargar disponibilidad e ingredientes");
+      setLoading(false);
+      return;
+    }
     setProducts((productsRes.data as Product[]) || []);
     const orderingStores = ((storesRes.data as StoreRow[]) || []).filter(s => s.accepts_delivery || s.accepts_pickup);
     setStores(orderingStores);

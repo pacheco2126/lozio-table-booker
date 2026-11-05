@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,11 +34,11 @@ export default function AdminDeliveryMinimums() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await fetchAllResult((from, to) => supabase
       .from("delivery_min_order_tiers")
       .select("*")
       .order("store")
-      .order("max_km");
+      .order("max_km").order("id").range(from, to));
     if (error) {
       toast.error("Error al cargar tramos");
     } else {

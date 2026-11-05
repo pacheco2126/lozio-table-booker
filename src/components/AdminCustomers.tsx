@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { getAllergenById } from "@/lib/allergens";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/pagination";
 import { toast } from "sonner";
 import { Search, User, Phone, MapPin, AlertTriangle, MessageSquare, CalendarDays } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -33,9 +34,15 @@ const AdminCustomers = () => {
   const [savingNotes, setSavingNotes] = useState(false);
 
   const fetchProfiles = useCallback(async () => {
-    const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-    if (data && !error) setProfiles(data as Profile[]);
-    setLoading(false);
+    try {
+      const data = await fetchAllRows((from, to) => supabase.from("profiles").select("*")
+        .order("created_at", { ascending: false }).order("id").range(from, to));
+      setProfiles(data as Profile[]);
+    } catch {
+      toast.error("Error al cargar clientes");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { fetchProfiles(); }, [fetchProfiles]);

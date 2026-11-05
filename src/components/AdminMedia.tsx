@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/pagination";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,18 +45,16 @@ const AdminMedia = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchMedia = async () => {
-    const { data, error } = await supabase
-      .from("media")
-      .select("*")
-      .order("media_category")
-      .order("reference_key")
-      .order("sort_order");
-    if (error) {
+    try {
+      const data = await fetchAllRows((from, to) => supabase.from("media").select("*")
+        .order("media_category").order("reference_key").order("sort_order")
+        .order("id").range(from, to));
+      setMedia(data as MediaItem[]);
+    } catch {
       toast.error("Error cargando media");
-      return;
+    } finally {
+      setLoading(false);
     }
-    setMedia((data as MediaItem[]) || []);
-    setLoading(false);
   };
 
   useEffect(() => {

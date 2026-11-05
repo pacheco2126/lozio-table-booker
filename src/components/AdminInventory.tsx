@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { useAuth } from "@/hooks/useAuth";
 import { useInventoryAccess, StoreSlug } from "@/hooks/useInventoryAccess";
 import { useNavigate } from "react-router-dom";
@@ -156,17 +157,17 @@ const AdminInventory = () => {
     setLoadingData(true);
     const [{ data: itemData }, { data: stockData }, { data: moveData }] =
       await Promise.all([
-        supabase
+        fetchAllResult((from, to) => supabase
           .from("inventory_items")
           .select("*")
           .contains("stores", [store])
           .eq("is_active", true)
           .order("category")
-          .order("sort_order"),
-        supabase
+          .order("sort_order").order("id").range(from, to)),
+        fetchAllResult((from, to) => supabase
           .from("inventory_stock")
           .select("item_id, store, quantity, updated_at")
-          .eq("store", store),
+          .eq("store", store).order("id").range(from, to)),
         supabase
           .from("inventory_movements")
           .select("item_id, store, type, resulting_quantity, created_at, created_by")

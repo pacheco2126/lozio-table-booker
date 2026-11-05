@@ -18,6 +18,7 @@ import AddToCartDialog from "@/components/AddToCartDialog";
 import CartLocationDialog from "@/components/CartLocationDialog";
 import CartSidebar from "@/components/CartSidebar";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { useOrderFlow } from "@/contexts/OrderFlowContext";
 import { Badge } from "@/components/ui/badge";
 import { locationsData } from "@/lib/locations";
@@ -204,14 +205,14 @@ const MenuSection = () => {
   const { data: rawItems = [], isLoading } = useQuery({
     queryKey: ["menu_items", "public"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await fetchAllResult((from, to) => supabase
         .from("menu_items")
         .select("id,name,description,price,category,allergens,badge_key,badge_emoji,badge_style,sort_order,image_key,free_extras")
         .in("category", ["pizzas", "focaccias", "calzones"])
         .eq("is_active", true)
         .order("category", { ascending: true })
         .order("sort_order", { ascending: true, nullsFirst: false })
-        .order("name", { ascending: true });
+        .order("name", { ascending: true }).order("id").range(from, to));
       if (error) throw error;
       return (data as MenuItemRow[]).map(mapRow);
     },
@@ -222,10 +223,11 @@ const MenuSection = () => {
     queryKey: ["menu_item_store_availability", storeSlug],
     enabled: !!storeSlug,
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!storeSlug) return [];
+      const { data, error } = await fetchAllResult((from, to) => supabase
         .from("menu_item_store_availability")
         .select("menu_item_id,is_available,unavailable_until")
-        .eq("store_slug", storeSlug!);
+        .eq("store_slug", storeSlug).order("id").range(from, to));
       if (error) throw error;
       return data ?? [];
     },

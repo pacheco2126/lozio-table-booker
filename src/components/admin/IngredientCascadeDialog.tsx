@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -40,12 +41,17 @@ const IngredientCascadeDialog = ({ open, onOpenChange, inventoryItemId, inventor
     (async () => {
       setLoading(true);
       const [storesRes, linkRes] = await Promise.all([
-        supabase.from("stores").select("slug,name,accepts_delivery,accepts_pickup").eq("is_active", true).order("sort_order"),
-        supabase.from("menu_item_ingredients")
+        fetchAllResult((from, to) => supabase.from("stores").select("slug,name,accepts_delivery,accepts_pickup").eq("is_active", true).order("sort_order").order("slug").range(from, to)),
+        fetchAllResult((from, to) => supabase.from("menu_item_ingredients")
           .select("menu_item_id, menu_items!inner(id,name,category,is_active)")
-          .eq("inventory_item_id", inventoryItemId),
+          .eq("inventory_item_id", inventoryItemId).order("id").range(from, to)),
       ]);
       if (cancelled) return;
+      if (storesRes.error || linkRes.error) {
+        toast.error(t("ingredientCascade.errorCascade", { message: storesRes.error?.message ?? linkRes.error?.message }));
+        setLoading(false);
+        return;
+      }
       const sList = ((storesRes.data as StoreRow[]) || []).filter(s => s.accepts_delivery || s.accepts_pickup);
       setStores(sList);
       const related: RelatedItem[] = ((linkRes.data as Array<{ menu_items: RelatedItem & { is_active: boolean } }>) || [])
