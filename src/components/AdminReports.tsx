@@ -28,7 +28,7 @@ const AdminReports = () => {
         .order("id").range(from, to));
       setReservations(data);
     };
-    fetch().catch(() => toast.error(t("admin.error")));
+    fetch().catch(() => toast.error(t("admin.loadError")));
   }, []);
 
   const today = format(new Date(), "yyyy-MM-dd");

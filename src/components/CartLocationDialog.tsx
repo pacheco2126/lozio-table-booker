@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { Bike, Store as StoreIcon, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows, fetchAllResult } from "@/lib/pagination";
 import { useOrderFlow, OrderType } from "@/contexts/OrderFlowContext";
 import { useCart } from "@/contexts/CartContext";
 import { isStoreOpen } from "@/lib/storeHours";
@@ -48,10 +49,10 @@ async function verifyCartAvailability(
   const foodItems = cartItems.filter((i) => !UPSELL_IDS.includes(i.id));
   if (foodItems.length === 0) return;
 
-  const { data: menuRows } = await supabase
+  const menuRows = await fetchAllRows((from, to) => supabase
     .from("menu_items")
     .select("id,name,is_active")
-    .in("category", ["pizzas", "focaccias", "calzones"]);
+    .in("category", ["pizzas", "focaccias", "calzones"]).order("id").range(from, to));
 
   const byName = new Map<string, { id: string; is_active: boolean }>();
   (menuRows || []).forEach((r) =>
@@ -68,11 +69,11 @@ async function verifyCartAvailability(
 
   let availMap = new Map<string, { isAvailable: boolean }>();
   if (itemIds.length) {
-    const { data: availRows } = await supabase
+    const availRows = await fetchAllRows((from, to) => supabase
       .from("menu_item_store_availability")
       .select("menu_item_id,is_available,unavailable_until")
       .eq("store_slug", storeSlug)
-      .in("menu_item_id", itemIds);
+      .in("menu_item_id", itemIds).order("id").range(from, to));
 
     const now = Date.now();
     (availRows || []).forEach((r) => {
@@ -122,11 +123,11 @@ const CartLocationDialog = ({ open, onOpenChange }: Props) => {
 
   // Fetch stores once on mount so the dialog is ready immediately the first time it opens
   useEffect(() => {
-    supabase
+    fetchAllResult((from, to) => supabase
       .from("stores")
       .select("slug,name,accepts_delivery,accepts_pickup")
       .eq("is_active", true)
-      .order("sort_order")
+      .order("sort_order").order("slug").range(from, to))
       .then(({ data }) => setStores((data as StoreRow[]) || []));
   }, []);
 

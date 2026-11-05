@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { STORE_COORDS, haversineKm, geocodeAddress } from "@/lib/nearestStore";
 import { isStoreOpen } from "@/lib/storeHours";
 
@@ -20,11 +21,11 @@ export interface DeliveryMinimumResult {
 }
 
 export async function fetchTiersForStore(store: string): Promise<DeliveryTier[]> {
-  const { data, error } = await supabase
+  const { data, error } = await fetchAllResult((from, to) => supabase
     .from("delivery_min_order_tiers")
     .select("id, store, max_km, min_order_amount, sort_order")
     .eq("store", store)
-    .order("max_km", { ascending: true });
+    .order("max_km", { ascending: true }).order("id").range(from, to));
   if (error) {
     console.warn("[deliveryMinimum] fetchTiers error:", error);
     return [];

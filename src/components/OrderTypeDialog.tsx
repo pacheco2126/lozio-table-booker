@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { Bike, Store as StoreIcon, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { useOrderFlow, OrderType } from "@/contexts/OrderFlowContext";
 import { isStoreOpen } from "@/lib/storeHours";
 import { getNearestStore } from "@/lib/nearestStore";
@@ -35,11 +36,11 @@ const OrderTypeDialog = () => {
 
   useEffect(() => {
     if (!isDialogOpen) return;
-    supabase
+    fetchAllResult((from, to) => supabase
       .from("stores")
       .select("slug,name,accepts_delivery,accepts_pickup")
       .eq("is_active", true)
-      .order("sort_order")
+      .order("sort_order").order("slug").range(from, to))
       .then(({ data }) => setStores((data as StoreRow[]) || []));
   }, [isDialogOpen]);
 

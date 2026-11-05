@@ -39,7 +39,7 @@ const AdminCustomers = () => {
         .order("created_at", { ascending: false }).order("id").range(from, to));
       setProfiles(data as Profile[]);
     } catch {
-      toast.error(t("admin.error"));
+      toast.error("Error al cargar clientes");
     } finally {
       setLoading(false);
     }

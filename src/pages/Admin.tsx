@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { format, isToday, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
@@ -144,7 +145,7 @@ const Admin = () => {
   };
 
   const fetchTableNames = async () => {
-    const { data } = await supabase.from("tables").select("id, name");
+    const { data } = await fetchAllResult((from, to) => supabase.from("tables").select("id, name").order("id").range(from, to));
     if (data) {
       const map: Record<string, string> = {};
       data.forEach((t: any) => { map[t.id] = t.name; });
@@ -159,18 +160,18 @@ const Admin = () => {
   };
 
   const loadEditAvailability = async (location: string, date: Date, guests: number, excludeIds: string[]) => {
-    const { data: resData } = await supabase
+    const { data: resData } = await fetchAllResult((from, to) => supabase
       .from("reservations")
       .select("reservation_time, guests, table_id, table_ids")
       .eq("location", location)
       .eq("reservation_date", format(date, "yyyy-MM-dd"))
       .in("status", ["pending", "confirmed"])
-      .not("id", "in", `(${excludeIds.join(",")})`);
-    const { data: tablesData } = await supabase
+      .not("id", "in", `(${excludeIds.join(",")})`).order("id").range(from, to));
+    const { data: tablesData } = await fetchAllResult((from, to) => supabase
       .from("tables")
       .select("id, name, capacity")
       .eq("location", location)
-      .eq("is_active", true);
+      .eq("is_active", true).order("id").range(from, to));
     const unavailable = getUnavailableSlots(resData || [], TIME_SLOTS, guests, tablesData || undefined);
     setEditUnavailable(unavailable);
   };

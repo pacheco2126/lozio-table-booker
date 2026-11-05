@@ -10,6 +10,7 @@
  * cache that is hydrated on app start and kept fresh via realtime.
  */
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 
 export interface StorePauseState {
   paused: boolean;
@@ -40,9 +41,9 @@ export function isStorePaused(slug: string, at: Date = new Date()): boolean {
 }
 
 export async function fetchStorePauses(): Promise<void> {
-  const { data, error } = await supabase
+  const { data, error } = await fetchAllResult((from, to) => supabase
     .from("stores")
-    .select("slug, orders_paused, orders_paused_until");
+    .select("slug, orders_paused, orders_paused_until").order("slug").range(from, to));
   if (error) {
     console.warn("[storePause] fetch error:", error);
     return;
