@@ -85,7 +85,7 @@ const OrderConfirmation = () => {
     };
 
     fetchOrder().catch(() => {
-      toast.error(t("checkout.error"));
+      toast.error(t("checkout.orderError"));
       setNotFound(true);
       setLoading(false);
     });
