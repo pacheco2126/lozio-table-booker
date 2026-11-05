@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
+import { fetchAllRows } from "../_shared/pagination.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,15 +34,14 @@ serve(async (req) => {
     const today = now.toISOString().slice(0, 10);
     const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-    const { data: reservations, error } = await supabase
+    const reservations = await fetchAllRows<{ id: string; user_id: string | null; reservation_date: string; reservation_time: string }>((from, to) => supabase
       .from("reservations")
       .select("id, user_id, reservation_date, reservation_time, guest_name, reminder_sent_at, status")
       .in("reservation_date", [today, tomorrow])
       .eq("status", "confirmed")
       .is("reminder_sent_at", null)
-      .not("user_id", "is", null);
+      .not("user_id", "is", null).order("id").range(from, to));
 
-    if (error) throw error;
     if (!reservations?.length) {
       return new Response(JSON.stringify({ processed: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -56,6 +56,7 @@ serve(async (req) => {
 
     let sentCount = 0;
     for (const r of reservations) {
+      if (!r.user_id) continue;
       const dt = new Date(`${r.reservation_date}T${r.reservation_time}`);
       if (dt < lo || dt > hi) continue;
 
@@ -63,17 +64,17 @@ serve(async (req) => {
       const { data: profile } = await supabase
         .from("profiles")
         .select("notify_reservations")
-        .eq("user_id", r.user_id!)
+        .eq("user_id", r.user_id)
         .maybeSingle();
       if (profile && profile.notify_reservations === false) {
         await supabase.from("reservations").update({ reminder_sent_at: new Date().toISOString() }).eq("id", r.id);
         continue;
       }
 
-      const { data: subs } = await supabase
+      const subs = await fetchAllRows<{ endpoint: string; p256dh: string; auth: string }>((from, to) => supabase
         .from("push_subscriptions")
         .select("*")
-        .eq("user_id", r.user_id!);
+        .eq("user_id", r.user_id).order("id").range(from, to));
 
       if (subs?.length) {
         const payload = JSON.stringify({
