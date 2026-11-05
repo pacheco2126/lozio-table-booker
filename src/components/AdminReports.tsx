@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/pagination";
+import { toast } from "sonner";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
@@ -20,12 +22,13 @@ const AdminReports = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const { data } = await supabase
+      const data = await fetchAllRows((from, to) => supabase
         .from("reservations")
-        .select("id, reservation_date, reservation_time, location, status");
-      setReservations((data as Reservation[]) || []);
+        .select("id, reservation_date, reservation_time, location, status")
+        .order("id").range(from, to));
+      setReservations(data);
     };
-    fetch();
+    fetch().catch(() => toast.error(t("admin.error")));
   }, []);
 
   const today = format(new Date(), "yyyy-MM-dd");

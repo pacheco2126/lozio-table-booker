@@ -6,6 +6,7 @@ import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
 import { CalendarIcon, Clock, Users, X, Edit2, ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/pagination";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -139,13 +140,16 @@ const MyReservations = () => {
   const fetchReservations = async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("reservations")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("reservation_date", { ascending: false });
-    if (!error && data) setReservations(data as Reservation[]);
-    setLoading(false);
+    try {
+      const data = await fetchAllRows((from, to) => supabase.from("reservations")
+        .select("*").eq("user_id", user.id)
+        .order("reservation_date", { ascending: false }).order("id").range(from, to));
+      setReservations(data);
+    } catch {
+      toast.error(t("reservation.error"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
