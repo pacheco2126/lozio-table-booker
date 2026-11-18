@@ -49,6 +49,13 @@
       JS/CSS de /assets/ que ya no existe (404 → pantalla en blanco), borra las cachés
       y recarga una sola vez. No desregistra el service worker (se perderían los push).
     -->
+    <!--
+      El bloque #seo-static (dentro de #root) es para bots/IAs que no ejecutan JavaScript.
+      Si el navegador ejecuta JS, se oculta antes de pintarse para que no parpadee;
+      React lo sustituye igualmente al arrancar.
+    -->
+    <script>document.documentElement.className += " js";</script>
+    <style>.js #seo-static { display: none; }</style>
     <script>
       (function () {
         var KEY = "lz-stale-asset-reload";
@@ -318,7 +325,7 @@
         React lo reemplaza por completo al arrancar (createRoot().render), así que no afecta a la app.
         Si cambian direcciones, teléfonos u horarios, actualízalo también aquí y en el JSON-LD de arriba.
       -->
-      <main style="font-family: Georgia, serif; max-width: 720px; margin: 0 auto; padding: 48px 16px; color: #2b2522; background: #f7f5f2; line-height: 1.5">
+      <main id="seo-static" style="font-family: Georgia, serif; max-width: 720px; margin: 0 auto; padding: 48px 16px; color: #2b2522; background: #f7f5f2; line-height: 1.5">
         <h1 style="color: #B5371B; margin: 0 0 8px">Pizzeria Lo Zio — Pizzería italiana artesanal en Tarragona</h1>
         <p>
           Auténtica pizza italiana artesanal en Tarragona, con masa elaborada a diario e ingredientes frescos.
