@@ -4,10 +4,11 @@ import { useTranslation } from "react-i18next";
 import { format, isToday, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
-import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse, Tag, BookOpen } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronUp, Pencil, Settings, BarChart3, Star, Users, Image as ImageIcon, Package, MapPin, ArrowRight, Shield, Warehouse, Tag, BookOpen, Bell, Truck, Briefcase } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -27,6 +28,7 @@ import AdminReports from "@/components/AdminReports";
 import AdminReviews from "@/components/AdminReviews";
 import AdminMedia from "@/components/AdminMedia";
 import AdminProducts from "@/components/AdminProducts";
+import AdminDeliveryMinimums from "@/components/admin/AdminDeliveryMinimums";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -124,13 +126,26 @@ const Admin = () => {
   };
 
   const fetchReservations = async () => {
-    const { data, error } = await supabase.from("reservations").select("*").order("reservation_date", { ascending: true }).order("reservation_time", { ascending: true });
-    if (error) { toast.error(t("admin.loadError")); } else { setReservations((data as Reservation[]) || []); }
+    // Paginate: the API caps each response at 1000 rows, which hid the newest reservations.
+    const PAGE = 1000;
+    const all: Reservation[] = [];
+    let error: any = null;
+    for (let from = 0; ; from += PAGE) {
+      const res = await supabase.from("reservations").select("*")
+        .order("reservation_date", { ascending: true })
+        .order("reservation_time", { ascending: true })
+        .order("id", { ascending: true })
+        .range(from, from + PAGE - 1);
+      if (res.error) { error = res.error; break; }
+      all.push(...((res.data as Reservation[]) || []));
+      if (!res.data || res.data.length < PAGE) break;
+    }
+    if (error) { toast.error(t("admin.loadError")); } else { setReservations(all); }
     setLoading(false);
   };
 
   const fetchTableNames = async () => {
-    const { data } = await supabase.from("tables").select("id, name");
+    const { data } = await fetchAllResult((from, to) => supabase.from("tables").select("id, name").order("id").range(from, to));
     if (data) {
       const map: Record<string, string> = {};
       data.forEach((t: any) => { map[t.id] = t.name; });
@@ -145,18 +160,18 @@ const Admin = () => {
   };
 
   const loadEditAvailability = async (location: string, date: Date, guests: number, excludeIds: string[]) => {
-    const { data: resData } = await supabase
+    const { data: resData } = await fetchAllResult((from, to) => supabase
       .from("reservations")
       .select("reservation_time, guests, table_id, table_ids")
       .eq("location", location)
       .eq("reservation_date", format(date, "yyyy-MM-dd"))
       .in("status", ["pending", "confirmed"])
-      .not("id", "in", `(${excludeIds.join(",")})`);
-    const { data: tablesData } = await supabase
+      .not("id", "in", `(${excludeIds.join(",")})`).order("id").range(from, to));
+    const { data: tablesData } = await fetchAllResult((from, to) => supabase
       .from("tables")
       .select("id, name, capacity")
       .eq("location", location)
-      .eq("is_active", true);
+      .eq("is_active", true).order("id").range(from, to));
     const unavailable = getUnavailableSlots(resData || [], TIME_SLOTS, guests, tablesData || undefined);
     setEditUnavailable(unavailable);
   };
@@ -331,14 +346,17 @@ const Admin = () => {
     return format(d, "EEEE d 'de' MMMM", { locale: es });
   };
 
+  const ONLINE_TABLE_NAMES = ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5","Mesa 6","Mesa 7","Mesa 8"];
+
   const renderReservationCard = (r: GroupedReservation) => {
     const st = statusLabels[r.status] || statusLabels.pending;
     const tableLabel = r.tableIds
       .map((id) => tableNames[id])
       .filter(Boolean)
       .join(" + ");
+    const isManual = r.tableIds.length > 0 && r.tableIds.every((id) => tableNames[id] && !ONLINE_TABLE_NAMES.includes(tableNames[id]));
     return (
-      <div key={r.allIds.join("-")} className="bg-card rounded-lg border border-border p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-muted/30 transition-colors">
+      <div key={r.allIds.join("-")} className={`bg-card rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-muted/30 transition-colors ${isManual ? "border-2 border-blue-500" : "border border-border"}`}>
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="text-center shrink-0 w-14">
             <p className="font-display text-lg font-bold text-foreground leading-none">{r.reservation_time.substring(0, 5)}</p>
@@ -442,11 +460,20 @@ const Admin = () => {
                 <DropdownMenuItem onClick={() => setActiveTab("discounts")}>
                   <Tag className="w-4 h-4 mr-2" /> Descuentos
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("delivery-minimums")}>
+                  <Truck className="w-4 h-4 mr-2" /> Pedido mínimo (km)
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveTab("roles")}>
                   <Shield className="w-4 h-4 mr-2" /> Roles de usuario
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("notifications")}>
+                  <Bell className="w-4 h-4 mr-2" /> Notificaciones
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveTab("guide")}>
                   <BookOpen className="w-4 h-4 mr-2" /> Guía de uso
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/empleo")}>
+                  <Briefcase className="w-4 h-4 mr-2" /> Trabaja con nosotros
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Análisis</DropdownMenuLabel>
@@ -467,7 +494,7 @@ const Admin = () => {
                 ← Volver
               </Button>
               <Badge variant="secondary" className="font-body capitalize">
-                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab === "discounts" ? "Descuentos" : activeTab === "guide" ? "Guía de uso" : activeTab}
+                {activeTab === "products" ? "Productos" : activeTab === "media" ? "Media" : activeTab === "customers" ? "Clientes" : activeTab === "reports" ? "Reportes" : activeTab === "reviews" ? "Reseñas" : activeTab === "roles" ? "Roles de usuario" : activeTab === "discounts" ? "Descuentos" : activeTab === "delivery-minimums" ? "Pedido mínimo (km)" : activeTab === "guide" ? "Guía de uso" : activeTab === "notifications" ? "Notificaciones" : activeTab}
               </Badge>
             </div>
           )}
@@ -480,8 +507,7 @@ const Admin = () => {
               </TabsList>
 
               <TabsContent value="lista" className="space-y-6 mt-4">
-                {/* Push notifications toggle (admin device) */}
-                <PushNotificationToggle />
+
 
                 {/* Toggle reservas */}
                 <div className="flex items-center justify-between bg-card rounded-lg p-4 border border-border shadow-sm">
@@ -656,8 +682,14 @@ const Admin = () => {
           <TabsContent value="media"><AdminMedia /></TabsContent>
           <TabsContent value="roles"><AdminUserRoles /></TabsContent>
           <TabsContent value="discounts"><AdminDiscounts /></TabsContent>
+          <TabsContent value="delivery-minimums"><AdminDeliveryMinimums /></TabsContent>
           <TabsContent value="guide"><AdminGuide /></TabsContent>
           <TabsContent value="products"><AdminProducts /></TabsContent>
+          <TabsContent value="notifications">
+            <div className="max-w-2xl">
+              <PushNotificationToggle />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
       <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>

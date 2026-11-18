@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchOrdersWithItems } from "@/lib/orderQueries";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { locationsData } from "@/lib/locations";
@@ -9,6 +10,8 @@ import { toast } from "sonner";
 import { format, isToday } from "date-fns";
 import { es } from "date-fns/locale";
 import Navbar from "@/components/Navbar";
+import StoreOrderPausePanel from "@/components/admin/StoreOrderPausePanel";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -86,7 +89,8 @@ const ORDER_STATUSES = [
   { value: "pending", label: "Pendiente", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
   { value: "confirmed", label: "Confirmado", color: "bg-blue-100 text-blue-800 border-blue-200" },
   { value: "preparing", label: "Preparando", color: "bg-orange-100 text-orange-800 border-orange-200" },
-  { value: "ready", label: "Listo", color: "bg-green-100 text-green-800 border-green-200" },
+  { value: "ready", label: "Listo para recoger", color: "bg-green-100 text-green-800 border-green-200" },
+  { value: "out_for_delivery", label: "En camino", color: "bg-indigo-100 text-indigo-800 border-indigo-200" },
   { value: "delivered", label: "Entregado", color: "bg-gray-100 text-gray-600 border-gray-200" },
   { value: "cancelled", label: "Cancelado", color: "bg-red-100 text-red-800 border-red-200" },
 ];
@@ -122,18 +126,17 @@ const AdminOrders = () => {
   const fetchOrders = useCallback(async () => {
     if (!store) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*, order_items(*)")
-      .eq("pickup_store", store)
-      .order("created_at", { ascending: false });
-
-    if (error) {
+    try {
+      const data = await fetchOrdersWithItems((from, to) => supabase
+        .from("orders").select("*").eq("pickup_store", store)
+        .order("created_at", { ascending: false }).order("id")
+        .range(from, to));
+      setOrders(data);
+    } catch {
       toast.error("Error al cargar los pedidos");
-    } else {
-      setOrders((data as Order[]) || []);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [store]);
 
   useEffect(() => {
@@ -162,7 +165,7 @@ const AdminOrders = () => {
     }
   }, [isAdmin, store, fetchOrders]);
 
-  if (!location) {
+  if (!location || !store) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Local no encontrado</p>
@@ -288,12 +291,16 @@ const AdminOrders = () => {
           </Button>
         </div>
 
+        {/* Order intake pause */}
+        <StoreOrderPausePanel store={store} storeName={location.name} />
+
         {/* Stats strip */}
+
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
             { label: "Hoy", value: orders.filter((o) => isToday(new Date(o.created_at))).length },
             { label: "Pendientes", value: orders.filter((o) => ["pending", "confirmed", "preparing"].includes(o.status)).length },
-            { label: "Listos", value: orders.filter((o) => o.status === "ready").length },
+            { label: "Listos / En camino", value: orders.filter((o) => o.status === "ready" || o.status === "out_for_delivery").length },
           ].map((s) => (
             <div key={s.label} className="bg-card border border-border rounded-xl p-4 text-center">
               <p className="font-display text-2xl font-bold text-menu-teal">{s.value}</p>
@@ -380,12 +387,22 @@ const AdminOrders = () => {
   );
 };
 
-const NEXT_STATUS: Record<string, string> = {
+const NEXT_STATUS_PICKUP: Record<string, string> = {
   pending:   "confirmed",
   confirmed: "preparing",
   preparing: "ready",
   ready:     "delivered",
 };
+
+const NEXT_STATUS_DELIVERY: Record<string, string> = {
+  pending:   "confirmed",
+  confirmed: "preparing",
+  preparing: "out_for_delivery",
+  out_for_delivery: "delivered",
+};
+
+const getNextStatus = (status: string, orderType: string): string | undefined =>
+  orderType === "delivery" ? NEXT_STATUS_DELIVERY[status] : NEXT_STATUS_PICKUP[status];
 
 interface OrderCardProps {
   order: Order;
@@ -410,11 +427,14 @@ const OrderCard = ({
 }: OrderCardProps) => {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const info = statusInfo(order.status);
-  const nextStatus = NEXT_STATUS[order.status];
+  const nextStatus = getNextStatus(order.status, order.order_type);
   const nextInfo = nextStatus ? ORDER_STATUSES.find((s) => s.value === nextStatus) : null;
   const isDone = order.status === "delivered" || order.status === "cancelled";
+  // Filter out statuses that don't apply to this order_type
+  const validForType = (v: string) =>
+    order.order_type === "delivery" ? v !== "ready" : v !== "out_for_delivery";
   const otherStatuses = ORDER_STATUSES.filter(
-    (s) => s.value !== order.status && s.value !== nextStatus
+    (s) => s.value !== order.status && s.value !== nextStatus && validForType(s.value)
   );
 
   return (

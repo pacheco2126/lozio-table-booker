@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { fetchAllRows } from "../_shared/pagination.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,12 +27,11 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { data: orderItems, error: itemsError } = await supabase
-      .from("order_items")
-      .select("total_price")
-      .eq("order_id", orderId);
+    const orderItems = await fetchAllRows<{ total_price: number }>((from, to) => supabase
+      .from("order_items").select("total_price")
+      .eq("order_id", orderId).order("id").range(from, to));
 
-    if (itemsError || !orderItems || orderItems.length === 0) {
+    if (orderItems.length === 0) {
       throw new Error("Order items not found");
     }
 

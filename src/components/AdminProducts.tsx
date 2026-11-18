@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,10 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, Plus, Check, X } from "lucide-react";
+import { Pencil, Trash2, Plus, Check, X, Store as StoreIcon, Clock, Carrot, Search, AlertTriangle, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { EU_ALLERGENS } from "@/lib/allergens";
+import IngredientCascadeDialog from "@/components/admin/IngredientCascadeDialog";
 
 interface Product {
   id: string;
@@ -32,6 +35,33 @@ const CATEGORY_LABELS: Record<string, string> = {
   extras: "Extras", drinks: "Bebidas", desserts: "Postres",
 };
 const BADGE_STYLES = ["", "fire", "gold", "teal"] as const;
+const INGREDIENT_LINKABLE = new Set(["pizzas", "focaccias", "calzones"]);
+const PAGE_SIZE = 10;
+const EXTRA_INGREDIENT_ALIASES: Record<string, string[]> = {
+  "jamon dulce": ["jamon york", "prosciutto cotto"],
+  "jamon serrano": ["prosciutto crudo"],
+  "mozzarella bufala": ["mozzarella di bufala"],
+  "mozzarella extra": ["mozzarella fior di latte", "fior di latte"],
+};
+
+const normalizeIngredientName = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/['’]/g, "")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+const findInventoryItemForExtra = (extraName: string, items: InventoryItemRow[]) => {
+  const target = normalizeIngredientName(extraName);
+  const candidates = [target, ...(EXTRA_INGREDIENT_ALIASES[target] ?? [])].map(normalizeIngredientName);
+  return items.find((it) => {
+    const itemName = normalizeIngredientName(it.name);
+    return candidates.some((candidate) => itemName === candidate || itemName.includes(candidate) || candidate.includes(itemName));
+  });
+};
 
 const emptyProduct: Omit<Product, "id"> = {
   name: "",
@@ -46,30 +76,112 @@ const emptyProduct: Omit<Product, "id"> = {
   sort_order: 0,
 };
 
+interface StoreRow { slug: string; name: string; accepts_delivery: boolean; accepts_pickup: boolean; }
+interface AvailabilityRow { menu_item_id: string; store_slug: string; is_available: boolean; unavailable_until: string | null; }
+interface InventoryItemRow { id: string; name: string; category: string; is_active: boolean; }
+interface IngredientLink { menu_item_id: string; inventory_item_id: string; }
+
+type AvailabilityMap = Record<string, AvailabilityRow>; // key = `${menu_item_id}__${store_slug}`
+const availKey = (itemId: string, slug: string) => `${itemId}__${slug}`;
+
+function isAvailableNow(row?: AvailabilityRow): boolean {
+  if (!row) return true; // default available
+  if (row.unavailable_until && new Date(row.unavailable_until) <= new Date()) return true;
+  return row.is_available;
+}
+
 const AdminProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [stores, setStores] = useState<StoreRow[]>([]);
+  const [availability, setAvailability] = useState<AvailabilityMap>({});
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [nameFilter, setNameFilter] = useState("");
+  const [showDisabledPanel, setShowDisabledPanel] = useState(false);
+  const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<Product | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<Omit<Product, "id">>(emptyProduct);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [inlinePriceId, setInlinePriceId] = useState<string | null>(null);
   const [inlinePriceValue, setInlinePriceValue] = useState("");
+  const [disableTarget, setDisableTarget] = useState<{ product: Product; store: StoreRow } | null>(null);
+  const [linkingProduct, setLinkingProduct] = useState<Product | null>(null);
+  const [linkSelection, setLinkSelection] = useState<Set<string>>(new Set());
+  const [inventoryItems, setInventoryItems] = useState<InventoryItemRow[]>([]);
+  const [ingredientsByProduct, setIngredientsByProduct] = useState<Record<string, Set<string>>>({});
+  const [cascadeCtx, setCascadeCtx] = useState<{ inventoryItemId: string; inventoryItemName: string; storeSlug: string } | null>(null);
 
-  useEffect(() => { fetchProducts(); }, []);
 
-  const fetchProducts = async () => {
+
+
+  useEffect(() => { fetchAll(); }, []);
+
+  const fetchAll = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("menu_items")
-      .select("*")
-      .order("category")
-      .order("sort_order");
-    if (error) toast.error("Error al cargar productos");
-    setProducts((data as Product[]) || []);
+    const [productsRes, storesRes, availRes, invRes, linkRes] = await Promise.all([
+      fetchAllResult((from, to) => supabase.from("menu_items").select("*").order("category").order("sort_order").order("id").range(from, to)),
+      fetchAllResult((from, to) => supabase.from("stores").select("slug,name,accepts_delivery,accepts_pickup").eq("is_active", true).order("sort_order").order("slug").range(from, to)),
+      fetchAllResult((from, to) => supabase.from("menu_item_store_availability").select("menu_item_id,store_slug,is_available,unavailable_until").order("id").range(from, to)),
+      fetchAllResult((from, to) => supabase.from("inventory_items").select("id,name,category,is_active").eq("is_active", true).order("category").order("name").order("id").range(from, to)),
+      fetchAllResult((from, to) => supabase.from("menu_item_ingredients").select("menu_item_id,inventory_item_id").order("id").range(from, to)),
+    ]);
+    if (productsRes.error) toast.error("Error al cargar productos");
+    if (storesRes.error) toast.error("Error al cargar locales");
+    if (availRes.error || invRes.error || linkRes.error) {
+      toast.error("Error al cargar disponibilidad e ingredientes");
+      setLoading(false);
+      return;
+    }
+    setProducts((productsRes.data as Product[]) || []);
+    const orderingStores = ((storesRes.data as StoreRow[]) || []).filter(s => s.accepts_delivery || s.accepts_pickup);
+    setStores(orderingStores);
+    const map: AvailabilityMap = {};
+    ((availRes.data as AvailabilityRow[]) || []).forEach(r => { map[availKey(r.menu_item_id, r.store_slug)] = r; });
+    setAvailability(map);
+    setInventoryItems((invRes.data as InventoryItemRow[]) || []);
+    const byProduct: Record<string, Set<string>> = {};
+    ((linkRes.data as IngredientLink[]) || []).forEach(l => {
+      if (!byProduct[l.menu_item_id]) byProduct[l.menu_item_id] = new Set();
+      byProduct[l.menu_item_id].add(l.inventory_item_id);
+    });
+    setIngredientsByProduct(byProduct);
     setLoading(false);
   };
+
+
+
+
+  const openLinking = (p: Product) => {
+    setLinkingProduct(p);
+    setLinkSelection(new Set(ingredientsByProduct[p.id] ?? []));
+  };
+
+  const saveIngredientLinks = async () => {
+    if (!linkingProduct) return;
+    const current = ingredientsByProduct[linkingProduct.id] ?? new Set<string>();
+    const toAdd = Array.from(linkSelection).filter(id => !current.has(id));
+    const toRemove = Array.from(current).filter(id => !linkSelection.has(id));
+    if (toAdd.length > 0) {
+      const rows = toAdd.map(id => ({ menu_item_id: linkingProduct.id, inventory_item_id: id }));
+      const { error } = await supabase.from("menu_item_ingredients").insert(rows);
+      if (error) { toast.error("Error al vincular: " + error.message); return; }
+    }
+    if (toRemove.length > 0) {
+      const { error } = await supabase
+        .from("menu_item_ingredients")
+        .delete()
+        .eq("menu_item_id", linkingProduct.id)
+        .in("inventory_item_id", toRemove);
+      if (error) { toast.error("Error al desvincular: " + error.message); return; }
+    }
+    toast.success("Ingredientes actualizados");
+    setLinkingProduct(null);
+    fetchAll();
+  };
+
+  const fetchProducts = fetchAll;
+
 
   const openEdit = (p: Product) => {
     setEditing(p);
@@ -127,6 +239,53 @@ const AdminProducts = () => {
     else { toast.success(p.is_active ? "Producto oculto" : "Producto visible"); fetchProducts(); }
   };
 
+  const enableAtStore = async (product: Product, store: StoreRow) => {
+    const { error } = await supabase
+      .from("menu_item_store_availability")
+      .upsert({ menu_item_id: product.id, store_slug: store.slug, is_available: true, unavailable_until: null }, { onConflict: "menu_item_id,store_slug" });
+    if (error) { toast.error("Error: " + error.message); return; }
+    toast.success(`Disponible en ${store.name}`);
+    fetchAll();
+  };
+
+  const disableAtStore = async (product: Product, store: StoreRow, until: Date | null) => {
+    const { error } = await supabase
+      .from("menu_item_store_availability")
+      .upsert({
+        menu_item_id: product.id,
+        store_slug: store.slug,
+        is_available: false,
+        unavailable_until: until ? until.toISOString() : null,
+      }, { onConflict: "menu_item_id,store_slug" });
+    if (error) { toast.error("Error: " + error.message); return; }
+    toast.success(until ? `Oculto en ${store.name} hasta mañana` : `Desactivado en ${store.name}`);
+    setDisableTarget(null);
+    fetchAll();
+    // Si es un extra, buscar el ingrediente del inventario y proponer cascada
+    if (product.category === "extras") {
+      const match = findInventoryItemForExtra(product.name, inventoryItems);
+      if (match) {
+        // Esperar a que el Dialog anterior se cierre antes de abrir el siguiente
+        setTimeout(() => {
+          setCascadeCtx({ inventoryItemId: match.id, inventoryItemName: match.name, storeSlug: store.slug });
+        }, 200);
+      } else {
+        toast.info(`"${product.name}" no está vinculado a ningún ingrediente del inventario.`);
+      }
+    }
+  };
+
+  const nextOpenAt = (_store: StoreRow): Date => {
+    // 19:00 next day; storeHours handles closed days but for "hasta mañana" we use literal mañana 19:00
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    d.setHours(19, 0, 0, 0);
+    return d;
+  };
+
+
+
+
   const saveInlinePrice = async (id: string) => {
     const v = parseFloat(inlinePriceValue);
     if (isNaN(v) || v < 0) { toast.error("Precio inválido"); return; }
@@ -142,7 +301,25 @@ const AdminProducts = () => {
     });
   };
 
-  const filtered = filterCategory === "all" ? products : products.filter((p) => p.category === filterCategory);
+  const normalizedName = normalizeIngredientName(nameFilter);
+  const byCategory = filterCategory === "all" ? products : products.filter((p) => p.category === filterCategory);
+  const filtered = normalizedName
+    ? byCategory.filter((p) => normalizeIngredientName(p.name).includes(normalizedName))
+    : byCategory;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Reset page when filter changes
+  useEffect(() => { setPage(1); }, [filterCategory, nameFilter]);
+
+  // Productos desactivados (globalmente o en algún local)
+  const disabledEntries = products
+    .map((p) => {
+      const disabledStores = stores.filter((s) => !isAvailableNow(availability[availKey(p.id, s.slug)]));
+      return { product: p, disabledStores };
+    })
+    .filter((e) => !e.product.is_active || e.disabledStores.length > 0);
 
   return (
     <div className="space-y-6">
@@ -155,6 +332,67 @@ const AdminProducts = () => {
           <Plus className="w-4 h-4 mr-2" /> Nuevo producto
         </Button>
       </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+          placeholder="Buscar por nombre…"
+          className="pl-9 font-body"
+        />
+        {nameFilter && (
+          <button
+            onClick={() => setNameFilter("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            title="Limpiar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {disabledEntries.length > 0 && (
+        <Collapsible open={showDisabledPanel} onOpenChange={setShowDisabledPanel}>
+          <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800">
+            <CollapsibleTrigger asChild>
+              <button className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                  <span className="font-body text-sm text-amber-900 dark:text-amber-100">
+                    Tienes <strong>{disabledEntries.length}</strong> producto{disabledEntries.length === 1 ? "" : "s"} desactivado{disabledEntries.length === 1 ? "" : "s"} (total o por local)
+                  </span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-amber-700 dark:text-amber-400 transition-transform ${showDisabledPanel ? "rotate-180" : ""}`} />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-4 pb-3 space-y-1.5 max-h-64 overflow-y-auto">
+                {disabledEntries.map(({ product, disabledStores }) => (
+                  <div key={product.id} className="flex items-start justify-between gap-3 text-sm font-body py-1.5 border-t border-amber-200/60 dark:border-amber-800/60">
+                    <div className="min-w-0">
+                      <span className="font-medium text-foreground">{product.name}</span>
+                      <span className="text-xs text-muted-foreground ml-2">{CATEGORY_LABELS[product.category] ?? product.category}</span>
+                      {!product.is_active && <Badge variant="secondary" className="ml-2 text-[10px]">Oculto global</Badge>}
+                      {disabledStores.length > 0 && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Desactivado en: {disabledStores.map((s) => s.name).join(", ")}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => { setFilterCategory(product.category); setNameFilter(product.name); setShowDisabledPanel(false); }}
+                      className="text-xs text-primary hover:underline shrink-0"
+                    >
+                      Ver
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+      )}
 
       <div className="flex flex-wrap gap-2">
         <button
@@ -179,7 +417,7 @@ const AdminProducts = () => {
         <p className="font-body text-muted-foreground text-center py-8">Sin productos.</p>
       ) : (
         <div className="grid gap-3">
-          {filtered.map((p) => (
+          {paginated.map((p) => (
             <div key={p.id} className={`border border-border rounded-lg p-4 bg-card ${!p.is_active ? "opacity-60" : ""}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
@@ -216,13 +454,86 @@ const AdminProducts = () => {
                     >{Number(p.price).toFixed(2)} €</button>
                   )}
 
-                  <Switch checked={!!p.is_active} onCheckedChange={() => toggleActive(p)} />
+                  
+                  {INGREDIENT_LINKABLE.has(p.category) && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => openLinking(p)}
+                      title="Vincular ingredientes"
+                    >
+                      <Carrot className={`w-4 h-4 ${(ingredientsByProduct[p.id]?.size ?? 0) > 0 ? "text-amber-600" : ""}`} />
+                    </Button>
+                  )}
                   <Button size="icon" variant="ghost" onClick={() => openEdit(p)}><Pencil className="w-4 h-4" /></Button>
                   <Button size="icon" variant="ghost" onClick={() => setDeleteId(p.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
               </div>
+
+              {stores.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center gap-2">
+                  <span className="flex items-center gap-1 text-xs font-body text-muted-foreground">
+                    <StoreIcon className="w-3.5 h-3.5" /> Disponibilidad por local:
+                  </span>
+                  {stores.map((s) => {
+                    const row = availability[availKey(p.id, s.slug)];
+                    const available = isAvailableNow(row);
+                    const until = row?.unavailable_until ? new Date(row.unavailable_until) : null;
+                    const reactivatesSoon = !available && until && until > new Date();
+                    return (
+                      <div key={s.slug} className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50">
+                        <span className="text-xs font-body">{s.name}</span>
+                        <Switch
+                          checked={available}
+                          onCheckedChange={(v) => {
+                            if (v) enableAtStore(p, s);
+                            else setDisableTarget({ product: p, store: s });
+                          }}
+                        />
+                        {reactivatesSoon && (
+                          <span className="flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400">
+                            <Clock className="w-3 h-3" />
+                            {until!.toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
+
           ))}
+        </div>
+      )}
+
+      {!loading && filtered.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-3 pt-2">
+          <p className="text-xs text-muted-foreground font-body">
+            Mostrando {(currentPage - 1) * PAGE_SIZE + 1}–
+            {Math.min(currentPage * PAGE_SIZE, filtered.length)} de {filtered.length}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </Button>
+            <span className="text-sm font-body">
+              {currentPage} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </Button>
+          </div>
         </div>
       )}
 
@@ -265,10 +576,7 @@ const AdminProducts = () => {
                 <Label>Orden</Label>
                 <Input type="number" value={form.sort_order ?? 0} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
               </div>
-              <div className="flex items-end gap-2">
-                <Switch checked={!!form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
-                <Label className="mb-2">Visible</Label>
-              </div>
+              <div />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -329,6 +637,110 @@ const AdminProducts = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!disableTarget} onOpenChange={(o) => !o && setDisableTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Desactivar producto</DialogTitle>
+            <DialogDescription>
+              {disableTarget && (
+                <>¿Cómo quieres desactivar <strong>{disableTarget.product.name}</strong> en <strong>{disableTarget.store.name}</strong>?</>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <Button
+              variant="outline"
+              className="w-full justify-start font-body"
+              onClick={() => disableTarget && disableAtStore(disableTarget.product, disableTarget.store, nextOpenAt(disableTarget.store))}
+            >
+              <Clock className="w-4 h-4 mr-2" /> Solo hasta mañana (19:00)
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start font-body"
+              onClick={() => disableTarget && disableAtStore(disableTarget.product, disableTarget.store, null)}
+            >
+              <X className="w-4 h-4 mr-2" /> Desactivar indefinidamente
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDisableTarget(null)}>Cancelar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!linkingProduct} onOpenChange={(o) => !o && setLinkingProduct(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Carrot className="w-5 h-5 text-amber-600" />
+              Ingredientes vinculados
+            </DialogTitle>
+            <DialogDescription>
+              {linkingProduct && <>Selecciona los ingredientes que componen <strong>{linkingProduct.name}</strong>. Se usarán para la cascada al marcar un ingrediente como agotado.</>}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2 max-h-[55vh] overflow-y-auto">
+            {inventoryItems.length === 0 ? (
+              <p className="text-sm text-muted-foreground font-body text-center py-6">
+                No hay ingredientes en el inventario.
+              </p>
+            ) : (
+              Object.entries(
+                inventoryItems.reduce<Record<string, InventoryItemRow[]>>((acc, it) => {
+                  (acc[it.category] ||= []).push(it);
+                  return acc;
+                }, {})
+              ).map(([cat, list]) => (
+                <div key={cat}>
+                  <p className="text-xs font-body uppercase tracking-wider text-muted-foreground mb-1.5">{cat}</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                    {list.map((it) => {
+                      const selected = linkSelection.has(it.id);
+                      return (
+                        <button
+                          key={it.id}
+                          type="button"
+                          onClick={() => {
+                            setLinkSelection((prev) => {
+                              const next = new Set(prev);
+                              next.has(it.id) ? next.delete(it.id) : next.add(it.id);
+                              return next;
+                            });
+                          }}
+                          className={`px-2.5 py-1.5 rounded-md text-xs font-body text-left transition-colors ${
+                            selected
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-foreground hover:bg-muted/70"
+                          }`}
+                        >
+                          {it.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setLinkingProduct(null)}>Cancelar</Button>
+            <Button onClick={saveIngredientLinks}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <IngredientCascadeDialog
+        open={!!cascadeCtx}
+        onOpenChange={(o) => { if (!o) setCascadeCtx(null); }}
+        inventoryItemId={cascadeCtx?.inventoryItemId ?? null}
+        inventoryItemName={cascadeCtx?.inventoryItemName}
+        defaultStoreSlug={cascadeCtx?.storeSlug ?? null}
+        onConfirmed={fetchAll}
+      />
     </div>
   );
 };

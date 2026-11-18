@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      delivery_min_order_tiers: {
+        Row: {
+          created_at: string
+          id: string
+          max_km: number
+          min_order_amount: number
+          sort_order: number
+          store: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          max_km: number
+          min_order_amount: number
+          sort_order?: number
+          store: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          max_km?: number
+          min_order_amount?: number
+          sort_order?: number
+          store?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discount_assignments: {
         Row: {
           assigned_at: string
@@ -154,6 +184,111 @@ export type Database = {
         }
         Relationships: []
       }
+      email_send_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          message_id: string | null
+          metadata: Json | null
+          recipient_email: string
+          status: string
+          template_name: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          metadata?: Json | null
+          recipient_email: string
+          status: string
+          template_name: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          metadata?: Json | null
+          recipient_email?: string
+          status?: string
+          template_name?: string
+        }
+        Relationships: []
+      }
+      email_send_state: {
+        Row: {
+          auth_email_ttl_minutes: number
+          batch_size: number
+          id: number
+          retry_after_until: string | null
+          send_delay_ms: number
+          transactional_email_ttl_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          auth_email_ttl_minutes?: number
+          batch_size?: number
+          id?: number
+          retry_after_until?: string | null
+          send_delay_ms?: number
+          transactional_email_ttl_minutes?: number
+          updated_at?: string
+        }
+        Update: {
+          auth_email_ttl_minutes?: number
+          batch_size?: number
+          id?: number
+          retry_after_until?: string | null
+          send_delay_ms?: number
+          transactional_email_ttl_minutes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_unsubscribe_tokens: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      internal_config: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       inventory_items: {
         Row: {
           category: string
@@ -275,6 +410,60 @@ export type Database = {
           },
         ]
       }
+      job_postings: {
+        Row: {
+          category: string
+          created_at: string
+          department: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          location: string
+          professional_level: string | null
+          ref: number
+          sector: string | null
+          subcategory: string | null
+          title: string
+          updated_at: string
+          work_mode: string | null
+          work_schedule: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          department?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location: string
+          professional_level?: string | null
+          ref?: number
+          sector?: string | null
+          subcategory?: string | null
+          title: string
+          updated_at?: string
+          work_mode?: string | null
+          work_schedule?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          department?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          location?: string
+          professional_level?: string | null
+          ref?: number
+          sector?: string | null
+          subcategory?: string | null
+          title?: string
+          updated_at?: string
+          work_mode?: string | null
+          work_schedule?: string | null
+        }
+        Relationships: []
+      }
       media: {
         Row: {
           alt_text: string | null
@@ -311,6 +500,87 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_item_ingredients: {
+        Row: {
+          created_at: string
+          id: string
+          inventory_item_id: string
+          menu_item_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inventory_item_id: string
+          menu_item_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inventory_item_id?: string
+          menu_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_item_ingredients_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_item_ingredients_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_item_store_availability: {
+        Row: {
+          created_at: string
+          id: string
+          is_available: boolean
+          menu_item_id: string
+          store_slug: string
+          unavailable_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_available?: boolean
+          menu_item_id: string
+          store_slug: string
+          unavailable_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_available?: boolean
+          menu_item_id?: string
+          store_slug?: string
+          unavailable_until?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_item_store_availability_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_item_store_availability_store_slug_fkey"
+            columns: ["store_slug"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       menu_items: {
         Row: {
           allergens: string[] | null
@@ -319,7 +589,9 @@ export type Database = {
           badge_style: string | null
           category: string
           description: string | null
+          free_extras: number | null
           id: string
+          image_key: string | null
           is_active: boolean | null
           name: string
           price: number
@@ -333,7 +605,9 @@ export type Database = {
           badge_style?: string | null
           category: string
           description?: string | null
+          free_extras?: number | null
           id?: string
+          image_key?: string | null
           is_active?: boolean | null
           name: string
           price: number
@@ -347,7 +621,9 @@ export type Database = {
           badge_style?: string | null
           category?: string
           description?: string | null
+          free_extras?: number | null
           id?: string
+          image_key?: string | null
           is_active?: boolean | null
           name?: string
           price?: number
@@ -504,6 +780,8 @@ export type Database = {
           full_name: string | null
           id: string
           internal_notes: string | null
+          notify_orders: boolean
+          notify_reservations: boolean
           phone: string | null
           postal_code: string | null
           special_dates: Json | null
@@ -522,6 +800,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           internal_notes?: string | null
+          notify_orders?: boolean
+          notify_reservations?: boolean
           phone?: string | null
           postal_code?: string | null
           special_dates?: Json | null
@@ -540,6 +820,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           internal_notes?: string | null
+          notify_orders?: boolean
+          notify_reservations?: boolean
           phone?: string | null
           postal_code?: string | null
           special_dates?: Json | null
@@ -586,6 +868,7 @@ export type Database = {
           location: string
           notes: string | null
           phone: string
+          reminder_sent_at: string | null
           reservation_date: string
           reservation_time: string
           status: string
@@ -602,6 +885,7 @@ export type Database = {
           location: string
           notes?: string | null
           phone: string
+          reminder_sent_at?: string | null
           reservation_date: string
           reservation_time: string
           status?: string
@@ -618,6 +902,7 @@ export type Database = {
           location?: string
           notes?: string | null
           phone?: string
+          reminder_sent_at?: string | null
           reservation_date?: string
           reservation_time?: string
           status?: string
@@ -674,6 +959,69 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: Json
+        }
+        Relationships: []
+      }
+      stores: {
+        Row: {
+          accepts_delivery: boolean
+          accepts_pickup: boolean
+          created_at: string
+          is_active: boolean
+          name: string
+          orders_paused: boolean
+          orders_paused_until: string | null
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          accepts_delivery?: boolean
+          accepts_pickup?: boolean
+          created_at?: string
+          is_active?: boolean
+          name: string
+          orders_paused?: boolean
+          orders_paused_until?: string | null
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          accepts_delivery?: boolean
+          accepts_pickup?: boolean
+          created_at?: string
+          is_active?: boolean
+          name?: string
+          orders_paused?: boolean
+          orders_paused_until?: string | null
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      suppressed_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          metadata: Json | null
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          metadata?: Json | null
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string
         }
         Relationships: []
       }
@@ -762,12 +1110,21 @@ export type Database = {
         Args: { _store: string; _user_id: string }
         Returns: boolean
       }
+      can_insert_order_item: { Args: { _order_id: string }; Returns: boolean }
       can_manage_inventory_catalog: {
         Args: { _user_id: string }
         Returns: boolean
       }
       compute_discount_amount: {
         Args: { _subtotal: number; _type: string; _value: number }
+        Returns: number
+      }
+      delete_email: {
+        Args: { message_id: number; queue_name: string }
+        Returns: boolean
+      }
+      enqueue_email: {
+        Args: { payload: Json; queue_name: string }
         Returns: number
       }
       find_available_table: {
@@ -788,6 +1145,7 @@ export type Database = {
         }
         Returns: string[]
       }
+      generate_job_ref: { Args: never; Returns: number }
       get_best_assigned_discount: {
         Args: { p_subtotal: number }
         Returns: Json
@@ -822,6 +1180,23 @@ export type Database = {
           user_id: string
         }[]
       }
+      move_to_dlq: {
+        Args: {
+          dlq_name: string
+          message_id: number
+          payload: Json
+          source_queue: string
+        }
+        Returns: number
+      }
+      read_email_batch: {
+        Args: { batch_size: number; queue_name: string; vt: number }
+        Returns: {
+          message: Json
+          msg_id: number
+          read_ct: number
+        }[]
+      }
       validate_discount_preview: {
         Args: { p_code: string; p_subtotal: number }
         Returns: Json
@@ -850,12 +1225,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -879,11 +1254,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -904,11 +1279,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -929,11 +1304,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -946,11 +1321,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 
 interface MediaItem {
   id: string;
@@ -15,6 +16,7 @@ export const useMedia = (category?: string) => {
 
   useEffect(() => {
     const fetch = async () => {
+      const { data, error } = await fetchAllResult((from, to) => {
       let query = supabase
         .from("media")
         .select("id, file_url, file_type, media_category, reference_key")
@@ -24,7 +26,9 @@ export const useMedia = (category?: string) => {
         query = query.eq("media_category", category);
       }
 
-      const { data } = await query;
+      return query.order("id").range(from, to);
+      });
+      if (error) console.error("Error loading media", error);
       setMedia((data as MediaItem[]) || []);
       setLoading(false);
     };

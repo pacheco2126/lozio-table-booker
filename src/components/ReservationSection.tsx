@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
-import { AlertTriangle, CalendarIcon, Clock, CheckCircle, Info } from "lucide-react";
+import { AlertTriangle, CalendarIcon, Clock, CheckCircle, Info, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getUnavailableSlots, MAX_ONLINE_GUESTS, CALL_PHONE } from "@/lib/availability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -307,6 +307,14 @@ const ReservationSection = () => {
                   <h3 className="font-display text-2xl font-bold text-primary-foreground mb-1">{l.name}</h3>
                   <p className="text-primary-foreground/80 font-body text-sm">{l.address}</p>
                   <p className="text-primary-foreground/70 font-body text-sm">{l.hours}</p>
+                  <a
+                    href={`tel:${l.phone.replace(/\s/g, "")}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1.5 mt-1 text-primary-foreground/90 font-body text-sm font-semibold underline-offset-2 hover:underline"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    {l.phone}
+                  </a>
                   {isComingSoon && (
                     <div className="mt-3 space-y-1">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-dashed border-muted-foreground/40 bg-muted/60 text-muted-foreground font-body text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">

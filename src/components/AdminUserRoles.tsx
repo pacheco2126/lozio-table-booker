@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/pagination";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,14 +31,15 @@ const AdminUserRoles = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase.rpc("list_users_with_roles");
-    if (error) {
-      toast.error("Error cargando usuarios: " + error.message);
+    try {
+      const data = await fetchAllRows((from, to) => supabase.rpc("list_users_with_roles")
+        .order("user_id").range(from, to));
+      setUsers(data);
+    } catch {
+      toast.error("Error cargando usuarios");
+    } finally {
       setLoading(false);
-      return;
     }
-    setUsers((data as UserWithRoles[]) || []);
-    setLoading(false);
   };
 
   useEffect(() => {

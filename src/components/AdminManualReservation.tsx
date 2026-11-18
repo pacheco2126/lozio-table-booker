@@ -5,6 +5,7 @@ import { es, enUS, ca } from "date-fns/locale";
 import { CalendarIcon, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { ONLINE_TABLE_NAMES } from "@/lib/availability";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
@@ -28,11 +29,11 @@ const AdminManualReservation = ({ onCreated }: Props) => {
 
   useEffect(() => {
     const fetchCapacity = async () => {
-      const { data } = await supabase
+      const { data } = await fetchAllResult((from, to) => supabase
         .from("tables")
         .select("name, capacity")
         .eq("location", form.location)
-        .eq("is_active", true);
+        .eq("is_active", true).order("id").range(from, to));
       if (data) {
         const online = data.filter((t) => ONLINE_TABLE_NAMES.includes(t.name));
         const total = online.reduce((sum, t) => sum + t.capacity, 0);

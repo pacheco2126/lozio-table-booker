@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useCart } from "@/contexts/CartContext";
+import { useOrderFlow } from "@/contexts/OrderFlowContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,28 +20,30 @@ import {
   Minus,
   Plus,
   Trash2,
-  Clock,
-  Phone,
   User,
   Tag,
   X,
+  Truck,
 } from "lucide-react";
 import { useDiscount, type DiscountReason } from "@/hooks/useDiscount";
-import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { locationsData } from "@/lib/locations";
 import { getNearestStore } from "@/lib/nearestStore";
 import {
-  isStoreOpen,
+  computeDeliveryMinimumForAddress,
+  type DeliveryMinimumResult,
+} from "@/lib/deliveryMinimum";
+import {
   getScheduleStatus,
   getAvailableDays,
   getTimeSlots,
   formatDayLabel,
   formatTime,
-  type ScheduleStatus,
 } from "@/lib/storeHours";
+
 import { AlertTriangle, CalendarClock, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CartLocationDialog from "@/components/CartLocationDialog";
 import { z } from "zod";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
@@ -54,8 +57,35 @@ const Checkout = () => {
   const { t } = useTranslation();
   const stripe = useStripe();
   const elements = useElements();
+  const orderFlow = useOrderFlow();
 
   const [loading, setLoading] = useState(false);
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
+
+  // Auto-open the location dialog when arriving with cart items but no order type/store selected
+  useEffect(() => {
+    if (items.length === 0) return;
+    if (!orderFlow.orderType || !orderFlow.storeSlug) {
+      setLocationDialogOpen(true);
+    }
+  }, [items.length, orderFlow.orderType, orderFlow.storeSlug]);
+
+  // Reactively sync form fields with orderFlow changes (e.g. after the dialog accepts)
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      orderType: (orderFlow.orderType ?? prev.orderType) as "pickup" | "delivery",
+      pickupStore:
+        orderFlow.orderType === "pickup"
+          ? (orderFlow.storeSlug ?? "")
+          : prev.pickupStore,
+      address: orderFlow.address?.address ?? (orderFlow.orderType === "delivery" ? prev.address : ""),
+      streetNumber: orderFlow.address?.streetNumber ?? (orderFlow.orderType === "delivery" ? prev.streetNumber : ""),
+      city: orderFlow.address?.city ?? (orderFlow.orderType === "delivery" ? prev.city : ""),
+      postalCode: orderFlow.address?.postalCode ?? (orderFlow.orderType === "delivery" ? prev.postalCode : ""),
+    }));
+    setErrors({});
+  }, [orderFlow.orderType, orderFlow.storeSlug, orderFlow.address]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [profileAddress, setProfileAddress] = useState<{
     address: string;
@@ -115,10 +145,8 @@ const Checkout = () => {
     loadProfile();
   }, [user, authLoading]);
 
-  const pickupStores = [
-    { id: "tarragona", ...locationsData.tarragona },
-    { id: "arrabassada", ...locationsData.arrabassada },
-  ];
+
+
 
   const checkoutSchema = z
     .object({
@@ -128,10 +156,14 @@ const Checkout = () => {
       orderType: z.enum(["pickup", "delivery"]),
       pickupStore: z.string().optional(),
       address: z.string().optional(),
+      streetNumber: z.string().optional(),
       city: z.string().optional(),
       postalCode: z.string().optional(),
       paymentMethod: z.enum(["cash", "stripe"]),
       notes: z.string().max(500).optional(),
+      staircase: z.string().optional(),
+      floor: z.string().optional(),
+      door: z.string().optional(),
     })
     .refine(
       (data) => {
@@ -140,7 +172,7 @@ const Checkout = () => {
         }
         return true;
       },
-      { message: "Debes seleccionar en qué local recoges el pedido", path: ["pickupStore"] },
+      { message: t("checkout.pickupStoreRequired"), path: ["pickupStore"] },
     )
     .refine(
       (data) => {
@@ -150,17 +182,40 @@ const Checkout = () => {
         return true;
       },
       { message: t("checkout.addressRequired"), path: ["address"] },
+    )
+    .refine(
+      (data) => {
+        if (data.orderType === "delivery") {
+          return data.streetNumber && data.streetNumber.trim().length > 0;
+        }
+        return true;
+      },
+      { message: t("checkout.streetNumberRequired"), path: ["streetNumber"] },
+    )
+    .refine(
+      (data) => !(data.orderType === "delivery" && data.paymentMethod === "cash"),
+      { message: t("checkout.cashUnavailableForDelivery"), path: ["paymentMethod"] },
+    )
+    .refine(
+      (data) => {
+        if (data.orderType === "delivery") {
+          return data.floor && data.floor.trim().length > 0;
+        }
+        return true;
+      },
+      { message: t("checkout.floorRequired"), path: ["floor"] },
     );
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
-    orderType: "pickup" as "pickup" | "delivery",
-    pickupStore: "",
-    address: "",
-    city: "",
-    postalCode: "",
+    orderType: (orderFlow.orderType ?? "pickup") as "pickup" | "delivery",
+    pickupStore: orderFlow.orderType === "pickup" ? (orderFlow.storeSlug ?? "") : "",
+    address: orderFlow.address?.address ?? "",
+    streetNumber: orderFlow.address?.streetNumber ?? "",
+    city: orderFlow.address?.city ?? "",
+    postalCode: orderFlow.address?.postalCode ?? "",
     staircase: "",
     floor: "",
     door: "",
@@ -168,10 +223,75 @@ const Checkout = () => {
     notes: "",
   });
 
+
+  // Delivery minimum (based on distance from nearest store)
+  const [deliveryMin, setDeliveryMin] = useState<DeliveryMinimumResult | null>(null);
+  const [deliveryMinLoading, setDeliveryMinLoading] = useState(false);
+
+  useEffect(() => {
+    if (form.orderType !== "delivery") {
+      setDeliveryMin(null);
+      return;
+    }
+    const addr = form.address.trim();
+    const num = form.streetNumber.trim();
+    if (!addr || !num || !form.postalCode.trim()) {
+      setDeliveryMin(null);
+      return;
+    }
+    let cancelled = false;
+    setDeliveryMinLoading(true);
+    const handle = setTimeout(async () => {
+      const fullAddress = `${addr} ${num}`;
+      const at = scheduledFor ?? new Date();
+      try {
+        const result = await computeDeliveryMinimumForAddress(
+          fullAddress,
+          form.city,
+          form.postalCode,
+          at,
+        );
+        if (!cancelled) setDeliveryMin(result);
+      } catch (err) {
+        console.warn("[Checkout] deliveryMinimum error", err);
+        if (!cancelled) setDeliveryMin(null);
+      } finally {
+        if (!cancelled) setDeliveryMinLoading(false);
+      }
+    }, 600);
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    form.orderType,
+    form.address,
+    form.streetNumber,
+    form.city,
+    form.postalCode,
+    scheduledFor?.getTime(),
+  ]);
+
+  const deliveryBelowMin =
+    form.orderType === "delivery" &&
+    deliveryMin !== null &&
+    deliveryMin.geocoded &&
+    deliveryMin.minOrderAmount !== null &&
+    totalPrice < deliveryMin.minOrderAmount;
+
+  const deliveryOutOfRange =
+    form.orderType === "delivery" &&
+    deliveryMin !== null &&
+    deliveryMin.geocoded &&
+    deliveryMin.minOrderAmount === null &&
+    deliveryMin.maxKmConfigured > 0;
+
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +303,7 @@ const Checkout = () => {
     }
 
     if (scheduleMode === "scheduled" && !scheduledFor) {
-      toast.error("Selecciona una hora para programar tu pedido");
+      toast.error(t("checkout.scheduleTimeRequired"));
       return;
     }
 
@@ -194,7 +314,40 @@ const Checkout = () => {
         fieldErrors[err.path[0] as string] = err.message;
       });
       setErrors(fieldErrors);
+
+      // Scroll to first error field
+      const firstField = result.error.errors[0]?.path[0] as string | undefined;
+      if (firstField) {
+        setTimeout(() => {
+          const el =
+            document.getElementById(firstField) ||
+            document.querySelector(`[data-field="${firstField}"]`);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (el instanceof HTMLElement && typeof (el as HTMLInputElement).focus === "function") {
+              (el as HTMLInputElement).focus({ preventScroll: true });
+            }
+          }
+        }, 50);
+      }
+      toast.error(t("checkout.formIncomplete"));
       return;
+    }
+
+    if (form.orderType === "delivery") {
+      if (deliveryOutOfRange) {
+        toast.error(
+          t("checkout.outOfDeliveryZoneMsg", { km: deliveryMin?.maxKmConfigured?.toFixed(1) }),
+        );
+        document.getElementById("address")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      if (deliveryBelowMin && deliveryMin?.minOrderAmount != null) {
+        toast.error(
+          t("checkout.minOrderForAddressMsg", { amount: deliveryMin.minOrderAmount.toFixed(2) }),
+        );
+        return;
+      }
     }
 
     setLoading(true);
@@ -224,7 +377,7 @@ const Checkout = () => {
           assigned_to: assignedTo,
           delivery_address: form.orderType === "delivery"
             ? [
-                form.address,
+                [form.address, form.streetNumber].filter(Boolean).join(", "),
                 form.staircase ? `Esc. ${form.staircase}` : null,
                 form.floor ? `Piso ${form.floor}` : null,
                 form.door ? `Puerta ${form.door}` : null,
@@ -358,6 +511,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
+      <CartLocationDialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen} />
       <div className="pt-24 md:pt-28 pb-24 px-3 md:px-4">
         <div className="max-w-5xl mx-auto">
           <Button
@@ -391,7 +545,7 @@ const Checkout = () => {
               <div className="mb-6 bg-card border border-border rounded-xl p-5">
                 <h2 className="font-display text-base font-bold text-foreground mb-4 flex items-center gap-2">
                   <CalendarClock className="w-4 h-4 text-menu-teal" />
-                  ¿Cuándo quieres tu pedido?
+                  {t("checkout.scheduleTitle")}
                 </h2>
 
                 <div className="grid grid-cols-2 gap-3 mb-4">
@@ -410,9 +564,9 @@ const Checkout = () => {
                   >
                     <Zap className="w-4 h-4 text-menu-teal shrink-0" />
                     <div>
-                      <p className="font-display font-bold text-sm">Lo antes posible</p>
+                      <p className="font-display font-bold text-sm">{t("checkout.asap")}</p>
                       <p className="text-xs text-muted-foreground">
-                        {isCurrentlyOpen ? "Estamos abiertos" : "Cerrado ahora"}
+                        {isCurrentlyOpen ? t("checkout.openNow") : t("checkout.closedNow")}
                       </p>
                     </div>
                   </button>
@@ -438,8 +592,8 @@ const Checkout = () => {
                   >
                     <CalendarClock className="w-4 h-4 text-menu-teal shrink-0" />
                     <div>
-                      <p className="font-display font-bold text-sm">Programar</p>
-                      <p className="text-xs text-muted-foreground">Elige día y hora</p>
+                      <p className="font-display font-bold text-sm">{t("checkout.schedule")}</p>
+                      <p className="text-xs text-muted-foreground">{t("checkout.scheduleHint")}</p>
                     </div>
                   </button>
                 </div>
@@ -449,7 +603,7 @@ const Checkout = () => {
                   <div className="space-y-3">
                     {/* Day selector */}
                     <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Día</p>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t("checkout.day")}</p>
                       <div className="flex gap-2 flex-wrap">
                         {availableDays.map((day, i) => {
                           const isSelected =
@@ -479,9 +633,9 @@ const Checkout = () => {
 
                     {/* Time selector */}
                     <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Hora</p>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t("checkout.time")}</p>
                       {timeSlots.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No hay horarios disponibles para este día.</p>
+                        <p className="text-sm text-muted-foreground">{t("checkout.noTimeSlots")}</p>
                       ) : (
                         <div className="flex gap-2 flex-wrap">
                           {timeSlots.map((slot) => (
@@ -504,7 +658,7 @@ const Checkout = () => {
 
                     {scheduledFor && (
                       <p className="text-xs text-menu-teal font-semibold mt-1">
-                        ✓ Pedido programado para el {formatDayLabel(scheduledDay)} a las {scheduledTime}
+                        {t("checkout.scheduledFor", { day: formatDayLabel(scheduledDay), time: scheduledTime })}
                       </p>
                     )}
                   </div>
@@ -515,7 +669,7 @@ const Checkout = () => {
 
           <div className="grid lg:grid-cols-5 gap-8">
             <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-8">
-              {/* Contact */}
+              {/* Contact + Address summary */}
               <div className="bg-card rounded-xl p-6 border border-border">
                 <h2 className="font-display text-xl font-bold text-foreground mb-4">
                   {t("checkout.contactInfo")}
@@ -561,171 +715,44 @@ const Checkout = () => {
                     )}
                   </div>
                 </div>
-              </div>
 
-              {/* Order type */}
-              <div className="bg-card rounded-xl p-6 border border-border">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                  {t("checkout.orderType")}
-                </h2>
-                <RadioGroup
-                  value={form.orderType}
-                  onValueChange={(v) => {
-                    updateField("orderType", v);
-                    updateField("pickupStore", "");
-                  }}
-                  className="grid sm:grid-cols-2 gap-3"
-                >
-                  <label
-                    className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      form.orderType === "pickup"
-                        ? "border-menu-teal bg-menu-teal/5"
-                        : "border-border hover:border-menu-teal/30"
-                    }`}
-                  >
-                    <RadioGroupItem value="pickup" />
-                    <Store className="w-5 h-5 text-menu-teal" />
-                    <div>
-                      <p className="font-display font-bold text-sm">{t("checkout.pickup")}</p>
-                      <p className="text-xs text-muted-foreground">{t("checkout.pickupDesc")}</p>
-                    </div>
-                  </label>
-                  <label
-                    className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      form.orderType === "delivery"
-                        ? "border-menu-teal bg-menu-teal/5"
-                        : "border-border hover:border-menu-teal/30"
-                    }`}
-                  >
-                    <RadioGroupItem value="delivery" />
-                    <MapPin className="w-5 h-5 text-menu-teal" />
-                    <div>
-                      <p className="font-display font-bold text-sm">{t("checkout.delivery")}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t("checkout.deliveryDesc")}
-                      </p>
-                    </div>
-                  </label>
-                </RadioGroup>
-
-                {/* Estimated time */}
-                <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
-                  <Clock className="w-3.5 h-3.5 shrink-0" />
-                  <span>
-                    {form.orderType === "delivery"
-                      ? t("checkout.estimatedDelivery")
-                      : t("checkout.estimatedPickup")}
-                  </span>
-                </div>
-
-                {form.orderType === "pickup" && (
-                  <div className="mt-4 space-y-3">
-                    <p className="text-sm font-display font-semibold text-foreground">
-                      ¿En qué local recoges? *
-                    </p>
-                    <div className="grid sm:grid-cols-2 gap-3">
-                      {pickupStores.map((store) => {
-                        const fulfillAt = scheduledFor ?? new Date();
-                        const closed = !isStoreOpen(store.id, fulfillAt);
-                        return (
-                        <button
-                          key={store.id}
-                          type="button"
-                          disabled={closed}
-                          onClick={() => !closed && updateField("pickupStore", store.id)}
-                          className={`text-left p-4 rounded-lg border-2 transition-all relative ${
-                            closed
-                              ? "border-border opacity-50 cursor-not-allowed bg-muted/30"
-                              : form.pickupStore === store.id
-                              ? "border-menu-teal bg-menu-teal/5"
-                              : "border-border hover:border-menu-teal/30"
-                          }`}
-                        >
-                          {closed && (
-                            <span className="absolute top-2 right-2 text-[10px] bg-red-100 text-red-700 border border-red-200 rounded-full px-2 py-0.5 font-semibold">
-                              Cerrado hoy
-                            </span>
-                          )}
-                          <p className="font-display font-bold text-sm text-foreground mb-1">
-                            {store.name}
+                {/* Address / pickup summary (from OrderTypeDialog) */}
+                <div className="mt-5 pt-5 border-t border-border">
+                  {form.orderType === "delivery" ? (
+                    <div className="rounded-lg border-2 border-menu-teal/30 bg-menu-teal/5 p-4">
+                      <div className="flex items-start gap-3">
+                        <MapPin className="w-5 h-5 text-menu-teal shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-display font-bold text-sm text-foreground">
+                            {t("checkout.deliveryToHome")}
                           </p>
-                          <div className="flex items-start gap-1.5 text-xs text-muted-foreground mb-1">
-                            <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
-                            <span>{store.address}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                            <Clock className="w-3 h-3 shrink-0" />
-                            <span>{store.hours}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <Phone className="w-3 h-3 shrink-0" />
-                            <span>{store.phone}</span>
-                          </div>
-                        </button>
-                        );
-                      })}
-                    </div>
-                    {errors.pickupStore && (
-                      <p className="text-destructive text-xs">{errors.pickupStore}</p>
-                    )}
-                  </div>
-                )}
-
-                {form.orderType === "delivery" && (
-                  <div className="mt-4 space-y-4">
-                    {/* Copy address from profile */}
-                    {user && profileAddress && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setForm((prev) => ({
-                            ...prev,
-                            address: profileAddress.address,
-                            city: profileAddress.city,
-                            postalCode: profileAddress.postalCode,
-                          }));
-                          setErrors((prev) => ({ ...prev, address: "" }));
-                        }}
-                        className="w-full flex items-center gap-2.5 px-4 py-3 rounded-lg border-2 border-dashed border-menu-teal/50 bg-menu-teal/5 hover:bg-menu-teal/10 hover:border-menu-teal transition-all text-left"
-                      >
-                        <User className="w-4 h-4 text-menu-teal shrink-0" />
-                        <div className="min-w-0">
-                          <p className="font-display font-bold text-sm text-menu-teal">
-                            Enviarme a mi dirección
-                          </p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {[profileAddress.address, profileAddress.postalCode, profileAddress.city]
+                          <p className="text-xs text-muted-foreground mt-0.5 break-words">
+                            {[
+                              [form.address, form.streetNumber].filter(Boolean).join(", "),
+                              [form.postalCode, form.city].filter(Boolean).join(" "),
+                            ]
                               .filter(Boolean)
-                              .join(", ")}
+                              .join(" · ") || t("checkout.noAddress")}
                           </p>
                         </div>
-                      </button>
-                    )}
-
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="sm:col-span-2">
-                        <Label htmlFor="address">{t("checkout.address")} *</Label>
-                        <AddressAutocomplete
-                          value={form.address}
-                          onChange={(v) => updateField("address", v)}
-                          onSelect={({ address, city, postalCode }) => {
-                            setForm((prev) => ({
-                              ...prev,
-                              address,
-                              city: city || prev.city,
-                              postalCode: postalCode || prev.postalCode,
-                            }));
-                            setErrors((prev) => ({ ...prev, address: "" }));
-                          }}
-                          placeholder={t("checkout.addressPlaceholder")}
-                          error={errors.address}
-                        />
+                        <button
+                          type="button"
+                          onClick={() => setLocationDialogOpen(true)}
+                          className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
+                        >
+                          {t("checkout.change")}
+                        </button>
                       </div>
+                      {(errors.address || errors.streetNumber) && (
+                        <p className="text-destructive text-xs mt-2">
+                          {errors.address || errors.streetNumber}
+                        </p>
+                      )}
 
                       {/* Escalera / Piso / Puerta */}
-                      <div className="sm:col-span-2 grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 gap-3 mt-4">
                         <div>
-                          <Label htmlFor="staircase">Escalera</Label>
+                          <Label htmlFor="staircase" className="text-xs">{t("checkout.staircase")}</Label>
                           <Input
                             id="staircase"
                             value={form.staircase}
@@ -734,16 +761,19 @@ const Checkout = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="floor">Piso</Label>
+                          <Label htmlFor="floor" className="text-xs">{t("checkout.floor")} *</Label>
                           <Input
                             id="floor"
                             value={form.floor}
                             onChange={(e) => updateField("floor", e.target.value)}
                             placeholder="1º, 2º…"
                           />
+                          {errors.floor && (
+                            <p className="text-destructive text-xs mt-1">{errors.floor}</p>
+                          )}
                         </div>
                         <div>
-                          <Label htmlFor="door">Puerta</Label>
+                          <Label htmlFor="door" className="text-xs">{t("checkout.door")}</Label>
                           <Input
                             id="door"
                             value={form.door}
@@ -753,28 +783,85 @@ const Checkout = () => {
                         </div>
                       </div>
 
-                      <div>
-                        <Label htmlFor="city">{t("checkout.city")}</Label>
-                        <Input
-                          id="city"
-                          value={form.city}
-                          onChange={(e) => updateField("city", e.target.value)}
-                          placeholder={t("checkout.cityPlaceholder")}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="postalCode">{t("checkout.postalCode")}</Label>
-                        <Input
-                          id="postalCode"
-                          value={form.postalCode}
-                          onChange={(e) => updateField("postalCode", e.target.value)}
-                          placeholder={t("checkout.postalCodePlaceholder")}
-                        />
-                      </div>
+                      {/* Delivery min / out of range warnings */}
+                      {deliveryOutOfRange && (
+                        <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm mt-4">
+                          <p className="font-display font-bold text-destructive flex items-center gap-1.5">
+                            <AlertTriangle className="w-4 h-4" />
+                            {t("checkout.outOfDeliveryZone")}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {t("checkout.outOfDeliveryZoneDesc", {
+                              distance: deliveryMin?.distanceKm.toFixed(1),
+                              max: deliveryMin?.maxKmConfigured.toFixed(1),
+                            })}
+                          </p>
+                        </div>
+                      )}
+                      {!deliveryOutOfRange && deliveryBelowMin && deliveryMin?.minOrderAmount != null && (
+                        <div className="rounded-lg border border-amber-400/50 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm mt-4">
+                          <p className="font-display font-bold text-foreground flex items-center gap-1.5">
+                            <Truck className="w-4 h-4 text-menu-teal" />
+                            {t("checkout.minOrder", { amount: deliveryMin.minOrderAmount.toFixed(2) })}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {t("checkout.minOrderRemaining", {
+                              remaining: (deliveryMin.minOrderAmount - totalPrice).toFixed(2),
+                            })}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="rounded-lg border-2 border-menu-teal/30 bg-menu-teal/5 p-4">
+                      <div className="flex items-start gap-3">
+                        <Store className="w-5 h-5 text-menu-teal shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-display font-bold text-sm text-foreground">
+                            {t("checkout.pickupAtStore")}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {form.pickupStore
+                              ? locationsData[form.pickupStore as keyof typeof locationsData]?.name ?? form.pickupStore
+                              : t("checkout.noStoreSelected")}
+                          </p>
+                          {form.pickupStore && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {locationsData[form.pickupStore as keyof typeof locationsData]?.address}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setLocationDialogOpen(true)}
+                          className="text-xs font-display font-bold text-menu-teal hover:underline shrink-0"
+                        >
+                          {t("checkout.change")}
+                        </button>
+                      </div>
+                      {errors.pickupStore && (
+                        <p className="text-destructive text-xs mt-2">{errors.pickupStore}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {/* Notes */}
+              <div className="bg-card rounded-xl p-6 border border-border">
+                <h2 className="font-display text-xl font-bold text-foreground mb-4">
+                  {t("checkout.notesTitle")}
+                </h2>
+                <Textarea
+                  value={form.notes}
+                  onChange={(e) => updateField("notes", e.target.value)}
+                  placeholder={t("checkout.notesPlaceholder")}
+                  maxLength={500}
+                  rows={3}
+                />
+              </div>
+
+
 
               {/* Payment */}
               <div className="bg-card rounded-xl p-6 border border-border">
@@ -787,23 +874,28 @@ const Checkout = () => {
                   className="grid sm:grid-cols-2 gap-3"
                 >
                   <label
-                    className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      form.paymentMethod === "cash"
-                        ? "border-menu-teal bg-menu-teal/5"
-                        : "border-border hover:border-menu-teal/30"
+                    className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                      form.orderType === "delivery"
+                        ? "border-border opacity-50 cursor-not-allowed bg-muted/30"
+                        : form.paymentMethod === "cash"
+                          ? "border-menu-teal bg-menu-teal/5 cursor-pointer"
+                          : "border-border hover:border-menu-teal/30 cursor-pointer"
                     }`}
                   >
-                    <RadioGroupItem value="cash" />
+                    <RadioGroupItem value="cash" disabled={form.orderType === "delivery"} />
                     <Banknote className="w-5 h-5 text-menu-teal" />
                     <div>
                       <p className="font-display font-bold text-sm">
                         {t("checkout.cashPayment")}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {t("checkout.cashPaymentDesc")}
+                        {form.orderType === "delivery"
+                          ? t("checkout.cashUnavailableShort")
+                          : t("checkout.cashPaymentDesc")}
                       </p>
                     </div>
                   </label>
+
                   <label
                     className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                       form.paymentMethod === "stripe"
@@ -856,26 +948,27 @@ const Checkout = () => {
                 )}
               </div>
 
-              {/* Notes */}
-              <div className="bg-card rounded-xl p-6 border border-border">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                  {t("checkout.notesTitle")}
-                </h2>
-                <Textarea
-                  value={form.notes}
-                  onChange={(e) => updateField("notes", e.target.value)}
-                  placeholder={t("checkout.notesPlaceholder")}
-                  maxLength={500}
-                  rows={3}
-                />
-              </div>
 
               {/* Discount / coupon */}
               <div className="rounded-xl border border-border bg-card p-4 space-y-3">
                 <div className="flex items-center gap-2 font-display font-bold text-sm">
                   <Tag className="w-4 h-4" /> {t("checkout.discount.title")}
                 </div>
-                {discount.applied ? (
+                {!user ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground font-body">
+                      {t("checkout.discount.loginRequired")}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => navigate("/auth", { state: { from: "/pedido" } })}
+                      className="w-full font-body"
+                    >
+                      {t("checkout.discount.loginCta")}
+                    </Button>
+                  </div>
+                ) : discount.applied ? (
                   <div className="flex items-center justify-between gap-2 rounded-lg bg-primary/8 border border-primary/20 px-3 py-2">
                     <div className="text-sm">
                       <span className="font-bold text-primary">{discount.applied.code}</span>
@@ -926,12 +1019,21 @@ const Checkout = () => {
 
               <Button
                 type="submit"
-                disabled={loading || (form.paymentMethod === "stripe" && !stripe)}
+                disabled={
+                  loading ||
+                  (form.paymentMethod === "stripe" && !stripe) ||
+                  deliveryOutOfRange ||
+                  deliveryBelowMin
+                }
                 className="w-full bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display text-lg py-7 min-h-[56px]"
               >
                 {loading
                   ? t("checkout.processing")
-                  : `${t("checkout.confirmOrder")} · ${finalTotal.toFixed(2)} €`}
+                  : deliveryOutOfRange
+                    ? t("checkout.outOfZoneBtn")
+                    : deliveryBelowMin && deliveryMin?.minOrderAmount != null
+                      ? t("checkout.minOrderBtn", { amount: deliveryMin.minOrderAmount.toFixed(2) })
+                      : `${t("checkout.confirmOrder")} · ${finalTotal.toFixed(2)} €`}
               </Button>
             </form>
 

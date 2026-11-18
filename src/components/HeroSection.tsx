@@ -1,24 +1,28 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { UtensilsCrossed, Bike } from "lucide-react";
+import { UtensilsCrossed, Bike, Clock } from "lucide-react";
 import heroPizza from "@/assets/fondopizza.jpg";
 import logoZio from "@/assets/logozio.png";
 import { useMedia } from "@/hooks/useMedia";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useOrderFlow } from "@/contexts/OrderFlowContext";
 
 const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { getBackgroundVideos, loading } = useMedia("background_video");
+  const { getBackgroundVideos } = useMedia("background_video");
+  const { openDialog, setIntent } = useOrderFlow();
   const { isAdmin } = useIsAdmin();
 
   const backgroundVideos = getBackgroundVideos();
   const videoUrl = backgroundVideos.length > 0 ? backgroundVideos[0] : null;
 
   const scrollToReservation = () => {
+    setIntent("reservation");
     const el = document.getElementById("reservar");
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
 
   return (
     <section className="relative min-h-[100dvh] flex flex-col overflow-hidden hero-section">
@@ -81,38 +85,49 @@ const HeroSection = () => {
 
           {/* Pedir a Domicilio */}
           <button
-            onClick={() => {
-              if (!isAdmin) return;
-              const el = document.getElementById("menu");
-              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
+            onClick={isAdmin ? openDialog : undefined}
+            disabled={!isAdmin}
             className={`group relative flex-1 rounded-xl overflow-hidden border border-primary-foreground/20 backdrop-blur-sm transition-all duration-300 min-h-[140px] md:min-h-[200px] animate-fade-in-up ${
               isAdmin
                 ? "bg-foreground/40 hover:bg-foreground/50 cursor-pointer"
-                : "bg-foreground/20 cursor-default opacity-70"
+                : "bg-foreground/20 cursor-not-allowed"
             }`}
             style={{ animationDelay: "0.5s" }}
           >
-            {/* Badge JustEat (solo admin) / Próximamente (resto) */}
+            {/* Badge JustEat (siempre visible) */}
             <span
               className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[10px] md:text-xs font-bold shadow-lg animate-fade-in-up"
               style={{ animationDelay: "0.7s" }}
             >
-              {isAdmin ? "🏆 Mejor Restaurante JustEat Catalunya" : t("hero.comingSoon", "Próximamente")}
+              🏆 Mejor Restaurante JustEat Catalunya
             </span>
             <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
-              <Bike className={`w-10 h-10 md:w-12 md:h-12 mb-3 transition-transform ${isAdmin ? "text-accent group-hover:scale-110" : "text-primary-foreground/40"}`} />
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground mb-1">
-                {t("hero.orderCta", "Pedir a Domicilio")}
+              <Bike className={`w-10 h-10 md:w-12 md:h-12 mb-3 transition-transform text-accent ${isAdmin ? "group-hover:scale-110" : ""}`} />
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground mb-3">
+                {t("hero.orderCta", "Hacer un pedido")}
               </h2>
-              <p className="text-primary-foreground/60 text-sm font-body">
-                {t("hero.orderSubtitle", "Ver carta y hacer tu pedido")}
-              </p>
+              {isAdmin ? (
+                <p className="text-primary-foreground/60 text-sm font-body">
+                  {t("hero.orderSubtitle", "Ver carta y hacer tu pedido")}
+                </p>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="inline-flex items-center gap-2 px-5 py-2 rounded-lg border border-dashed border-primary-foreground/40 bg-foreground/20 text-primary-foreground/90">
+                    <Clock className="w-4 h-4" />
+                    <span className="text-sm font-bold tracking-widest uppercase">
+                      {t("hero.comingSoon")}
+                    </span>
+                  </div>
+                  <p className="text-primary-foreground/60 text-sm font-body italic">
+                    {t("hero.orderComingSoonHint")}
+                  </p>
+                </div>
+              )}
             </div>
-            {isAdmin && (
-              <div className="absolute inset-0 border-2 border-transparent group-hover:border-accent/40 rounded-xl transition-colors" />
-            )}
+            <div className={`absolute inset-0 border-2 border-transparent rounded-xl transition-colors ${isAdmin ? "group-hover:border-accent/40" : ""}`} />
           </button>
+
+
         </div>
       </div>
     </section>

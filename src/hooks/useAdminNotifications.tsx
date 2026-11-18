@@ -73,7 +73,7 @@ export const useAdminNotifications = () => {
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification('🍕 Nueva reserva en Lo Zio', {
         body,
-        icon: '/pwa-192x192.png',
+        icon: '/logo_app_inicio.png',
         // Unique tag per reservation so multiple notifications don't replace each other
         tag: `reservation-${Date.now()}`,
       });

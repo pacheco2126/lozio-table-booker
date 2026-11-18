@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/pagination";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,31 +76,24 @@ const AdminDiscounts = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("discounts")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-      return;
-    }
-    setDiscounts((data as Discount[]) || []);
-    // redemption counts
-    const ids = (data || []).map((d) => d.id);
-    if (ids.length) {
-      const { data: rd } = await supabase
-        .from("discount_redemptions")
-        .select("discount_id")
-        .in("discount_id", ids)
-        .is("cancelled_at", null);
+    try {
+      const data = await fetchAllRows((from, to) => supabase
+        .from("discounts").select("*")
+        .order("created_at", { ascending: false }).order("id").range(from, to));
+      const rd = await fetchAllRows((from, to) => supabase
+        .from("discount_redemptions").select("discount_id")
+        .is("cancelled_at", null).order("id").range(from, to));
       const c: Record<string, number> = {};
-      (rd || []).forEach((r: { discount_id: string }) => {
+      rd.forEach((r) => {
         c[r.discount_id] = (c[r.discount_id] || 0) + 1;
       });
+      setDiscounts(data as Discount[]);
       setCounts(c);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error al cargar los descuentos");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -452,18 +446,19 @@ const AssignmentsDialog = ({
   useEffect(() => {
     (async () => {
       const [u, a] = await Promise.all([
-        supabase.rpc("list_users_with_roles"),
-        supabase
-          .from("discount_assignments")
-          .select("user_id")
-          .eq("discount_id", discount.id),
+        fetchAllRows((from, to) => supabase.rpc("list_users_with_roles")
+          .order("user_id").range(from, to)),
+        fetchAllRows((from, to) => supabase.from("discount_assignments")
+          .select("user_id").eq("discount_id", discount.id)
+          .order("user_id").range(from, to)),
       ]);
-      if (u.data) setUsers(u.data as UserRow[]);
-      if (a.data) {
-        setAssigned(new Set((a.data as { user_id: string }[]).map((r) => r.user_id)));
-      }
+      setUsers(u as UserRow[]);
+      setAssigned(new Set(a.map(r => r.user_id)));
       setLoading(false);
-    })();
+    })().catch(() => {
+      toast.error("Error al cargar las asignaciones");
+      setLoading(false);
+    });
   }, [discount.id]);
 
   const filtered = useMemo(() => {
@@ -487,11 +482,16 @@ const AssignmentsDialog = ({
     setSaving(true);
     const current = new Set<string>();
     {
-      const { data } = await supabase
-        .from("discount_assignments")
-        .select("user_id")
-        .eq("discount_id", discount.id);
-      (data || []).forEach((r: { user_id: string }) => current.add(r.user_id));
+      try {
+        const data = await fetchAllRows((from, to) => supabase.from("discount_assignments")
+          .select("user_id").eq("discount_id", discount.id)
+          .order("user_id").range(from, to));
+        data.forEach(r => current.add(r.user_id));
+      } catch {
+        toast.error("Error al cargar las asignaciones");
+        setSaving(false);
+        return;
+      }
     }
     const toAdd = [...assigned].filter((u) => !current.has(u));
     const toRemove = [...current].filter((u) => !assigned.has(u));

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 import { useAuth } from "@/hooks/useAuth";
 import { useInventoryAccess, StoreSlug } from "@/hooks/useInventoryAccess";
 import { useNavigate } from "react-router-dom";
@@ -20,8 +21,9 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Pencil, Trash2, Plus, Loader2, ShoppingCart, ClipboardList, Package,
-  ChevronDown,
+  ChevronDown, AlertOctagon, Search, X, AlertTriangle,
 } from "lucide-react";
+import IngredientCascadeDialog from "@/components/admin/IngredientCascadeDialog";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -74,6 +76,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
   tomate_salsas:      "Tomate y salsas",
   embutidos_carnes:   "Embutidos y carnes",
   verduras:           "Verduras",
+  pescado:            "Pescado",
   bebidas:            "Bebidas",
   aceites_condimentos:"Aceites y condimentos",
   packaging:          "Packaging",
@@ -126,6 +129,13 @@ const AdminInventory = () => {
   // Collapsed categories
   const [collapsedCats, setCollapsedCats] = useState<Set<string>>(new Set());
 
+  // Name filter
+  const [nameFilter, setNameFilter] = useState("");
+  const [showOutPanel, setShowOutPanel] = useState(false);
+
+  // Ingredient cascade dialog
+  const [cascadeItem, setCascadeItem] = useState<InventoryItem | null>(null);
+
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   // ─── Guard: redirect if no inventory access ──────────────────────────────
@@ -147,17 +157,17 @@ const AdminInventory = () => {
     setLoadingData(true);
     const [{ data: itemData }, { data: stockData }, { data: moveData }] =
       await Promise.all([
-        supabase
+        fetchAllResult((from, to) => supabase
           .from("inventory_items")
           .select("*")
           .contains("stores", [store])
           .eq("is_active", true)
           .order("category")
-          .order("sort_order"),
-        supabase
+          .order("sort_order").order("id").range(from, to)),
+        fetchAllResult((from, to) => supabase
           .from("inventory_stock")
           .select("item_id, store, quantity, updated_at")
-          .eq("store", store),
+          .eq("store", store).order("id").range(from, to)),
         supabase
           .from("inventory_movements")
           .select("item_id, store, type, resulting_quantity, created_at, created_by")
@@ -328,13 +338,19 @@ const AdminInventory = () => {
   };
 
   // ─── Grouped items ────────────────────────────────────────────────────────
+  const normalize = (v: string) =>
+    v.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const nf = normalize(nameFilter.trim());
+  const visibleItems = nf ? items.filter((i) => normalize(i.name).includes(nf)) : items;
+
   const grouped = CATEGORIES.reduce<Record<string, InventoryItem[]>>((acc, cat) => {
-    const catItems = items.filter((i) => i.category === cat);
+    const catItems = visibleItems.filter((i) => i.category === cat);
     if (catItems.length > 0) acc[cat] = catItems;
     return acc;
   }, {});
 
   const lowItems = items.filter(isLow);
+  const outItems = items.filter((i) => qty(i.id) <= 0);
 
   // ─── Loading ──────────────────────────────────────────────────────────────
   if (accessLoading) {
@@ -406,13 +422,68 @@ const AdminInventory = () => {
 
         {/* ── Inventario ── */}
         <TabsContent value="inventario" className="space-y-4 mt-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
+              placeholder="Buscar ingrediente por nombre…"
+              className="pl-9 font-body"
+            />
+            {nameFilter && (
+              <button
+                onClick={() => setNameFilter("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                title="Limpiar"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {outItems.length > 0 && (
+            <Collapsible open={showOutPanel} onOpenChange={setShowOutPanel}>
+              <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800">
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                      <span className="font-body text-sm text-amber-900 dark:text-amber-100">
+                        Tienes <strong>{outItems.length}</strong> ingrediente{outItems.length === 1 ? "" : "s"} agotado{outItems.length === 1 ? "" : "s"} (stock 0)
+                      </span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-amber-700 dark:text-amber-400 transition-transform ${showOutPanel ? "rotate-180" : ""}`} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 pb-3 space-y-1.5 max-h-64 overflow-y-auto">
+                    {outItems.map((it) => (
+                      <div key={it.id} className="flex items-center justify-between gap-3 text-sm font-body py-1.5 border-t border-amber-200/60 dark:border-amber-800/60">
+                        <div className="min-w-0">
+                          <span className="font-medium text-foreground">{it.name}</span>
+                          <span className="text-xs text-muted-foreground ml-2">{CATEGORY_LABELS[it.category] ?? it.category}</span>
+                        </div>
+                        <button
+                          onClick={() => { setNameFilter(it.name); setShowOutPanel(false); }}
+                          className="text-xs text-primary hover:underline shrink-0"
+                        >
+                          Ver
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+          )}
+
           {loadingData ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             </div>
-          ) : items.length === 0 ? (
+          ) : visibleItems.length === 0 ? (
             <p className="text-center text-muted-foreground font-body py-10">
-              No hay artículos para este local.
+              {items.length === 0 ? "No hay artículos para este local." : "Ningún ingrediente coincide con la búsqueda."}
             </p>
           ) : (
             Object.entries(grouped).map(([cat, catItems]) => (
@@ -482,6 +553,15 @@ const AdminInventory = () => {
                               onClick={() => { setPurchaseItem(item); setActionValue(""); setActionNote(""); }}
                             >
                               <Plus className="w-3 h-3 mr-1" /> Entrada
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="font-body gap-1 text-amber-700 border-amber-300 hover:bg-amber-50 dark:text-amber-400 dark:border-amber-700 dark:hover:bg-amber-950"
+                              onClick={() => setCascadeItem(item)}
+                              title="Marcar agotado y desactivar productos que lo usan"
+                            >
+                              <AlertOctagon className="w-3.5 h-3.5" /> Agotado
                             </Button>
                             {canManageCatalog && (
                               <>
@@ -805,6 +885,14 @@ const AdminInventory = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <IngredientCascadeDialog
+        open={!!cascadeItem}
+        onOpenChange={(o) => { if (!o) setCascadeItem(null); }}
+        inventoryItemId={cascadeItem?.id ?? null}
+        inventoryItemName={cascadeItem?.name}
+        defaultStoreSlug={selectedStore}
+      />
     </div>
   );
 };

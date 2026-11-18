@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllResult } from "@/lib/pagination";
 
 interface MyDiscount {
   id: string;
@@ -22,7 +23,7 @@ export const MyDiscountsSection = () => {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data, error } = await supabase.rpc("list_my_discounts");
+      const { data, error } = await fetchAllResult((from, to) => supabase.rpc("list_my_discounts").order("id").range(from, to));
       if (cancelled) return;
       if (error) {
         setItems([]);

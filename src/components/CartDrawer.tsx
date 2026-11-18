@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { useOrderFlow } from "@/contexts/OrderFlowContext";
 import {
   Minus,
   Plus,
@@ -12,11 +13,21 @@ import {
   ChevronUp,
   ArrowRight,
   MessageSquare,
+  Truck,
+  AlertTriangle,
+  MapPin,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { extraCategories } from "@/lib/extras";
 import { ALL_UPSELL, UPSELL_IDS, type UpsellItem } from "@/lib/upsell";
+import {
+  computeDeliveryMinimumForAddress,
+  type DeliveryMinimumResult,
+} from "@/lib/deliveryMinimum";
+import CartLocationDialog from "@/components/CartLocationDialog";
+
+
 
 // Extras picker with category tabs
 const ExtrasPicker = ({
@@ -146,11 +157,74 @@ const CartDrawer = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const orderFlow = useOrderFlow();
 
   const [openNotes, setOpenNotes] = useState<Record<string, boolean>>({});
   const [showExtras, setShowExtras] = useState<Record<string, boolean>>({});
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
+
+  const needsLocation = items.length > 0 && (!orderFlow.orderType || !orderFlow.storeSlug);
+
+  // Auto-open location dialog when the cart opens with items but no chosen flow
+  useEffect(() => {
+    if (isOpen && needsLocation) setLocationDialogOpen(true);
+  }, [isOpen, needsLocation]);
+
+  const selectedStoreLabel = orderFlow.storeSlug
+    ? orderFlow.orderType === "delivery"
+      ? `Domicilio · ${orderFlow.storeSlug}`
+      : `Recoger · ${orderFlow.storeSlug}`
+    : null;
+
+
+  // Delivery minimum check (only when user already picked a delivery address)
+  const [deliveryMin, setDeliveryMin] = useState<DeliveryMinimumResult | null>(null);
+  useEffect(() => {
+    if (orderFlow.orderType !== "delivery" || !orderFlow.address) {
+      setDeliveryMin(null);
+      return;
+    }
+    const { address, streetNumber, city, postalCode } = orderFlow.address;
+    if (!address || !streetNumber || !postalCode) return;
+    let cancelled = false;
+    const handle = setTimeout(async () => {
+      try {
+        const res = await computeDeliveryMinimumForAddress(
+          `${address} ${streetNumber}`,
+          city,
+          postalCode,
+          new Date(),
+        );
+        if (!cancelled) setDeliveryMin(res);
+      } catch {
+        if (!cancelled) setDeliveryMin(null);
+      }
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+  }, [orderFlow.orderType, orderFlow.address]);
+
+  const deliveryBelowMin =
+    orderFlow.orderType === "delivery" &&
+    deliveryMin !== null &&
+    deliveryMin.geocoded &&
+    deliveryMin.minOrderAmount !== null &&
+    totalPrice < deliveryMin.minOrderAmount;
+
+  const deliveryOutOfRange =
+    orderFlow.orderType === "delivery" &&
+    deliveryMin !== null &&
+    deliveryMin.geocoded &&
+    deliveryMin.minOrderAmount === null &&
+    deliveryMin.maxKmConfigured > 0;
 
   const handleCheckout = () => {
+    if (needsLocation) {
+      setLocationDialogOpen(true);
+      return;
+    }
     setIsOpen(false);
     if (!user) {
       navigate("/auth", { state: { fromCart: true } });
@@ -158,6 +232,7 @@ const CartDrawer = () => {
       navigate("/pedido");
     }
   };
+
 
   const foodItems = items.filter((i) => !UPSELL_IDS.includes(i.id));
 
@@ -177,7 +252,26 @@ const CartDrawer = () => {
               </span>
             )}
           </SheetTitle>
+          {items.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setLocationDialogOpen(true)}
+              className={`mt-2 inline-flex items-center gap-2 self-start text-xs font-body px-2.5 py-1 rounded-full border transition-colors ${
+                needsLocation
+                  ? "border-amber-400/60 bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100"
+                  : "border-border bg-muted/40 text-foreground hover:bg-muted"
+              }`}
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              {needsLocation
+                ? "Selecciona local y tipo de pedido"
+                : selectedStoreLabel}
+              <span className="text-menu-teal underline ml-1">Cambiar</span>
+            </button>
+          )}
         </SheetHeader>
+
+        <CartLocationDialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen} />
 
         {items.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-muted-foreground font-body px-5">
@@ -379,6 +473,32 @@ const CartDrawer = () => {
         {items.length > 0 && (
           <SheetFooter className="border-t border-border px-5 py-4 mt-auto">
             <div className="w-full space-y-3">
+              {/* Delivery minimum / out of range warning */}
+              {deliveryOutOfRange && (
+                <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-2.5 text-xs flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+                  <p className="text-foreground">
+                    {deliveryMin?.maxKmConfigured
+                      ? t("cart.outOfZoneFullKm", { km: deliveryMin.maxKmConfigured.toFixed(1) })
+                      : `${t("cart.outOfZoneFull")}.`}
+                  </p>
+                </div>
+              )}
+              {!deliveryOutOfRange && deliveryBelowMin && deliveryMin?.minOrderAmount != null && (
+                <div className="rounded-lg border border-amber-400/50 bg-amber-50 dark:bg-amber-950/20 p-2.5 text-xs flex items-start gap-2">
+                  <Truck className="w-4 h-4 text-menu-teal shrink-0 mt-0.5" />
+                  <p className="text-foreground">
+                    {t("cart.minOrderDelivery")}{" "}
+                    <span className="font-bold">{deliveryMin.minOrderAmount.toFixed(2)} €</span>.
+                    {" "}{t("cart.minOrderRemaining")}{" "}
+                    <span className="font-bold text-amber-700 dark:text-amber-400">
+                      {(deliveryMin.minOrderAmount - totalPrice).toFixed(2)} €
+                    </span>
+                    .
+                  </p>
+                </div>
+              )}
+
               <div className="flex justify-between items-center">
                 <span className="font-display text-base font-bold text-foreground">
                   {t("cart.total")}
@@ -389,14 +509,20 @@ const CartDrawer = () => {
               </div>
               <Button
                 onClick={handleCheckout}
+                disabled={deliveryOutOfRange || deliveryBelowMin}
                 className="w-full bg-menu-teal hover:bg-menu-teal/90 text-menu-teal-foreground font-display text-base py-6 rounded-xl"
               >
-                {t("cart.checkout")}
-                <ArrowRight className="w-4 h-4 ml-2" />
+                {deliveryOutOfRange
+                  ? t("cart.outOfZoneShort")
+                  : deliveryBelowMin && deliveryMin?.minOrderAmount != null
+                    ? t("cart.minShort", { amount: deliveryMin.minOrderAmount.toFixed(2) })
+                    : t("cart.checkout")}
+                {!deliveryOutOfRange && !deliveryBelowMin && <ArrowRight className="w-4 h-4 ml-2" />}
               </Button>
             </div>
           </SheetFooter>
         )}
+
       </SheetContent>
     </Sheet>
   );

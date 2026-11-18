@@ -7,14 +7,19 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/contexts/CartContext";
+import { OrderFlowProvider } from "@/contexts/OrderFlowContext";
+import OrderTypeDialog from "@/components/OrderTypeDialog";
 import CartDrawer from "@/components/CartDrawer";
 import CartFloatingButton from "@/components/CartFloatingButton";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import InstallBanner from "@/components/InstallBanner";
+import SamsungBrowserBanner from "@/components/SamsungBrowserBanner";
 import UpdateBanner from "@/components/UpdateBanner";
 import AdminFAB from "@/components/AdminFAB";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 import IncomingOrderManager from "@/components/IncomingOrderManager";
+import { initStorePauses } from "@/lib/storePause";
+
 import AdminInventoryPage from "./pages/AdminInventoryPage.tsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -33,6 +38,9 @@ import ReviewPage from "./pages/ReviewPage.tsx";
 import AdminOrders from "./pages/AdminOrders.tsx";
 import MyOrders from "./pages/MyOrders.tsx";
 import Unsubscribe from "./pages/Unsubscribe.tsx";
+import Empleo from "./pages/Empleo.tsx";
+import EmpleoDetail from "./pages/EmpleoDetail.tsx";
+import FAQs from "./pages/FAQs.tsx";
 
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
@@ -44,6 +52,11 @@ const AdminNotificationListener = () => {
   return null;
 };
 
+const StorePauseSync = () => {
+  useEffect(() => initStorePauses(), []);
+  return null;
+};
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -52,18 +65,23 @@ const ScrollToTop = () => {
   return null;
 };
 
+
 const App = () => (
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
+        <OrderFlowProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner position="top-center" />
           <AdminNotificationListener />
+          <StorePauseSync />
+
           <BrowserRouter>
             <ScrollToTop />
             <InstallBanner />
+            <SamsungBrowserBanner />
             <UpdateBanner />
             <CartDrawer />
             <CartFloatingButton />
@@ -85,12 +103,17 @@ const App = () => (
               <Route path="/admin/pedidos/:store" element={<AdminOrders />} />
               <Route path="/mis-pedidos" element={<MyOrders />} />
               <Route path="/admin/inventario" element={<AdminInventoryPage />} />
+              <Route path="/empleo" element={<Empleo />} />
+              <Route path="/empleo/:id" element={<EmpleoDetail />} />
+              <Route path="/faqs" element={<FAQs />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <OrderTypeDialog />
           </BrowserRouter>
         </TooltipProvider>
+        </OrderFlowProvider>
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>

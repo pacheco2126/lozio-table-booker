@@ -1,8 +1,31 @@
 // Coordinates for each store (verified via Nominatim with postal code)
-const STORE_COORDS: Record<string, { lat: number; lng: number }> = {
+export const STORE_COORDS: Record<string, { lat: number; lng: number }> = {
   tarragona:   { lat: 41.1155485, lng: 1.2485137 }, // Carrer Reding 32 Bajos, 43001 Tarragona
   arrabassada: { lat: 41.1218510, lng: 1.2687617 }, // Carrer Joan Fuster 28, 43007 Tarragona (Vall de l'Arrabassada)
+  rincon:      { lat: 41.1155485, lng: 1.2485137 }, // Same area as tarragona — adjust if you get exact coords
 };
+
+export function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  return haversine(lat1, lng1, lat2, lng2);
+}
+
+export async function geocodeAddress(
+  address: string,
+  city: string,
+  postalCode: string,
+): Promise<{ lat: number; lng: number } | null> {
+  const street = stripApartment(address);
+  const attempts = [
+    [street, postalCode, city || "Tarragona", "España"].filter(Boolean).join(", "),
+    [street, "Tarragona", "España"].filter(Boolean).join(", "),
+    [postalCode, "Tarragona", "España"].filter(Boolean).join(", "),
+  ];
+  for (const attempt of attempts) {
+    const coords = await geocode(attempt);
+    if (coords) return coords;
+  }
+  return null;
+}
 
 // Haversine distance in km between two lat/lng points
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {

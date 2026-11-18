@@ -66,8 +66,8 @@ self.addEventListener('push', (event: PushEvent) => {
   event.waitUntil(
     self.registration.showNotification(data.title ?? '🍕 Nueva reserva en Lo Zio', {
       body: data.body,
-      icon: data.icon ?? '/pwa-192x192.png',
-      badge: data.badge ?? '/pwa-192x192.png',
+      icon: data.icon ?? '/logo_app_inicio.png',
+      badge: data.badge ?? '/logo_app_inicio.png',
       // Unique tag so back-to-back reservations don't replace each other
       tag: `res-${Date.now()}`,
       requireInteraction: true,
@@ -87,9 +87,18 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clients) => {
+      .then(async (clients) => {
         for (const client of clients) {
-          if ('focus' in client) return (client as WindowClient).focus();
+          const win = client as WindowClient;
+          try {
+            await win.focus();
+            if ('navigate' in win && typeof win.navigate === 'function') {
+              await win.navigate(url);
+            } else {
+              win.postMessage({ type: 'NAVIGATE', url });
+            }
+            return;
+          } catch { /* try next */ }
         }
         return self.clients.openWindow(url);
       }),

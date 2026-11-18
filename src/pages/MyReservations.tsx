@@ -6,6 +6,7 @@ import { es, enUS, ca } from "date-fns/locale";
 import { toast } from "sonner";
 import { CalendarIcon, Clock, Users, X, Edit2, ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows, fetchAllResult } from "@/lib/pagination";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -139,13 +140,16 @@ const MyReservations = () => {
   const fetchReservations = async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("reservations")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("reservation_date", { ascending: false });
-    if (!error && data) setReservations(data as Reservation[]);
-    setLoading(false);
+    try {
+      const data = await fetchAllRows((from, to) => supabase.from("reservations")
+        .select("*").eq("user_id", user.id)
+        .order("reservation_date", { ascending: false }).order("id").range(from, to));
+      setReservations(data);
+    } catch {
+      toast.error(t("reservation.error"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -190,6 +194,7 @@ const MyReservations = () => {
   };
 
   const loadAvailability = async (location: string, date: Date, guests: number, excludeIds: string[]) => {
+    const reservationPages = fetchAllResult((from, to) => {
     const query = supabase
       .from("reservations")
       .select("reservation_time, guests, table_id, table_ids")
@@ -201,10 +206,12 @@ const MyReservations = () => {
     for (const id of excludeIds) {
       query.neq("id", id);
     }
+    return query.order("id").range(from, to);
+    });
 
     const [resResult, tablesResult] = await Promise.all([
-      query,
-      supabase.from("tables").select("id, name, capacity").eq("location", location).eq("is_active", true),
+      reservationPages,
+      fetchAllResult((from, to) => supabase.from("tables").select("id, name, capacity").eq("location", location).eq("is_active", true).order("id").range(from, to)),
     ]);
     if (!resResult.error) {
       const unavailable = getUnavailableSlots(resResult.data || [], timeSlots, guests, tablesResult.data || undefined);

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
+import { fetchAllRows } from "../_shared/pagination.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,39 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    // Auth: require admin JWT OR service-role bearer (DB triggers).
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const token = authHeader.replace("Bearer ", "");
+    const isServiceRole = token === serviceRoleKey;
+    if (!isServiceRole) {
+      const authClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: claims } = await authClient.auth.getClaims(token);
+      if (!claims?.claims?.sub) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const adminCheck = createClient(supabaseUrl, serviceRoleKey);
+      const { data: isAdmin } = await adminCheck.rpc("has_role", {
+        _user_id: claims.claims.sub, _role: "admin",
+      });
+      if (!isAdmin) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const body = await req.json();
     // Supabase DB webhook sends { type, table, schema, record, old_record }
     // Manual test: { test: true, user_id?: string }
@@ -29,10 +63,10 @@ serve(async (req) => {
     );
 
     // Get all admin user IDs
-    const { data: adminRoles } = await supabase
+    const adminRoles = await fetchAllRows<{ user_id: string }>((from, to) => supabase
       .from("user_roles")
       .select("user_id")
-      .eq("role", "admin");
+      .eq("role", "admin").order("id").range(from, to));
 
     if (!adminRoles?.length) {
       return new Response(JSON.stringify({ sent: 0, reason: "no_admins" }), {
@@ -44,10 +78,13 @@ serve(async (req) => {
     const targetIds = isTest && body.user_id ? [body.user_id] : adminIds;
 
     // Get all push subscriptions for those admins
-    const { data: subscriptions } = await supabase
-      .from("push_subscriptions")
-      .select("*")
-      .in("user_id", targetIds);
+    const subscriptions: { endpoint: string; p256dh: string; auth: string }[] = [];
+    for (let offset = 0; offset < targetIds.length; offset += 100) {
+      const rows = await fetchAllRows<{ endpoint: string; p256dh: string; auth: string }>((from, to) => supabase
+        .from("push_subscriptions").select("*")
+        .in("user_id", targetIds.slice(offset, offset + 100)).order("id").range(from, to));
+      subscriptions.push(...rows);
+    }
 
     console.log(`[push] admins=${adminIds.length} subs=${subscriptions?.length ?? 0} test=${isTest}`);
 
