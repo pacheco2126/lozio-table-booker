@@ -11,16 +11,17 @@
 
 ALTER TABLE public.reviews DISABLE TRIGGER trg_reject_html_reviews;
 
+-- Categorías reales del formulario (ReviewPage / ReviewSection): restaurant, food, web.
 UPDATE public.reviews
-  SET category = 'overall'
-  WHERE category NOT IN ('food', 'service', 'ambiance', 'value', 'overall');
+  SET category = 'restaurant'
+  WHERE category NOT IN ('restaurant', 'food', 'web');
 
 ALTER TABLE public.reviews ENABLE TRIGGER trg_reject_html_reviews;
 
 ALTER TABLE public.reviews DROP CONSTRAINT IF EXISTS reviews_category_valid;
 ALTER TABLE public.reviews
   ADD CONSTRAINT reviews_category_valid
-    CHECK (category IN ('food', 'service', 'ambiance', 'value', 'overall'));
+    CHECK (category IN ('restaurant', 'food', 'web'));
 
 -- ── orders ────────────────────────────────────────────────────────────────────
 
