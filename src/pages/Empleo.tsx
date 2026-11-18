@@ -122,7 +122,7 @@ const Empleo = () => {
       <Helmet>
         <title>{t("jobs.seoTitle")}</title>
         <meta name="description" content={t("jobs.seoDescription")} />
-        <link rel="canonical" href="https://www.pizzeriaslozio.com/empleo" />
+        <link rel="canonical" href="https://pizzeriaslozio.com/empleo" />
       </Helmet>
       <Navbar forceSolid />
       <div className="pt-24 pb-16 max-w-5xl mx-auto px-4">

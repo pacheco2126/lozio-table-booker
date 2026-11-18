@@ -12,7 +12,7 @@ const FAQs = () => {
       <Helmet>
         <title>{t("faq.seoTitle")}</title>
         <meta name="description" content={t("faq.seoDescription")} />
-        <link rel="canonical" href="https://www.pizzeriaslozio.com/faqs" />
+        <link rel="canonical" href="https://pizzeriaslozio.com/faqs" />
       </Helmet>
       <Navbar forceSolid />
       <div className="pt-24">
