@@ -44,6 +44,40 @@
     />
     <link rel="icon" type="image/png" href="/Lozio_favicon-2.png" />
 
+    <!--
+      Auto-recuperación tras un despliegue: si una versión antigua de la página pide un
+      JS/CSS de /assets/ que ya no existe (404 → pantalla en blanco), borra las cachés
+      y recarga una sola vez. No desregistra el service worker (se perderían los push).
+    -->
+    <script>
+      (function () {
+        var KEY = "lz-stale-asset-reload";
+        function recover() {
+          var last = 0;
+          try { last = +sessionStorage.getItem(KEY) || 0; } catch (_) {}
+          if (Date.now() - last < 30000) return; // evita bucles de recarga
+          try { sessionStorage.setItem(KEY, String(Date.now())); } catch (_) {}
+          var jobs = [];
+          if (window.caches) {
+            jobs.push(caches.keys().then(function (ks) {
+              return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+            }));
+          }
+          if (navigator.serviceWorker) {
+            jobs.push(navigator.serviceWorker.getRegistration().then(function (r) { return r && r.update(); }));
+          }
+          Promise.all(jobs).catch(function () {}).then(function () { location.reload(); });
+        }
+        window.addEventListener("error", function (e) {
+          var t = e.target;
+          if (!t || (t.tagName !== "SCRIPT" && t.tagName !== "LINK")) return;
+          if ((t.src || t.href || "").indexOf("/assets/") === -1) return;
+          recover();
+        }, true);
+        window.addEventListener("vite:preloadError", recover);
+      })();
+    </script>
+
     <!-- SEO-JSONLD:START (generado desde src/lib/locations.ts y src/i18n/locales/es.json) -->
     <script type="application/ld+json">
 {

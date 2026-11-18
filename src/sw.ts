@@ -1,8 +1,8 @@
 /// <reference lib="webworker" />
 import { clientsClaim } from 'workbox-core';
 import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
-import { registerRoute } from 'workbox-routing';
-import { CacheFirst, NetworkOnly } from 'workbox-strategies';
+import { registerRoute, NavigationRoute } from 'workbox-routing';
+import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 
@@ -18,6 +18,20 @@ self.addEventListener('message', (event: ExtendableMessageEvent) => {
     self.skipWaiting();
   }
 });
+
+// Page navigations: network first, so a new deploy is picked up immediately.
+// Serving index.html from the precache could point to JS bundles that no longer
+// exist on the server after a deploy (404 → blank page). Falls back to the last
+// cached page when offline. Registered BEFORE precacheAndRoute so it wins for "/".
+registerRoute(
+  new NavigationRoute(
+    new NetworkFirst({
+      cacheName: 'pages',
+      networkTimeoutSeconds: 4,
+      plugins: [new CacheableResponsePlugin({ statuses: [200] })],
+    }),
+  ),
+);
 
 // Injected by vite-plugin-pwa at build time
 precacheAndRoute(self.__WB_MANIFEST);
