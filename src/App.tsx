@@ -57,11 +57,48 @@ const StorePauseSync = () => {
   return null;
 };
 
+// On route change: scroll to top, or — if the URL has a #hash (e.g. "/#menu" from
+// another page) — wait until that section exists and scroll to it. The browser's
+// native anchor jump fails on first load because React and the menu data aren't
+// there yet. Keeps re-aligning for a few seconds while content above loads and
+// shifts the layout, and stops as soon as the user scrolls by hand.
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const { pathname, hash, key } = useLocation();
+  // `key` only matters with a hash (re-clicking the same anchor); without a hash we
+  // keep the old behaviour: scroll to top only when the path itself changes.
+  const hashNavKey = hash ? key : null;
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (!hash) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    const id = decodeURIComponent(hash.slice(1));
+    const start = Date.now();
+    let lastTop: number | null = null;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const stop = () => { stopped = true; };
+    const events = ["wheel", "touchstart", "keydown", "mousedown"] as const;
+    events.forEach((e) => window.addEventListener(e, stop, { passive: true }));
+    const tick = () => {
+      if (stopped) return;
+      const el = document.getElementById(id);
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        if (lastTop === null || Math.abs(top - lastTop) > 4) {
+          el.scrollIntoView({ block: "start" });
+          lastTop = top;
+        }
+      }
+      if (Date.now() - start < 6000) timer = setTimeout(tick, 150);
+    };
+    tick();
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, stop));
+    };
+  }, [pathname, hash, hashNavKey]);
   return null;
 };
 
